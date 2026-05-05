@@ -1,0 +1,125 @@
+import prisma from "@/lib/prisma";
+import { 
+  Plus, 
+  ShoppingBag, 
+  Edit, 
+  Trash2, 
+  ExternalLink,
+  Search,
+  Tag
+} from "lucide-react";
+import Link from "next/link";
+import { cn } from "@/lib/utils";
+
+export default async function BeneficiosAdminPage() {
+  const beneficios = await prisma.beneficioKineClub.findMany({
+    orderBy: { createdAt: "desc" },
+  });
+
+  return (
+    <div className="space-y-8 animate-in fade-in duration-500">
+      <div className="flex flex-col md:flex-row md:items-center justify-between gap-6">
+        <div>
+          <h1 className="text-3xl font-black text-slate-900 mb-2">Gestión de KineClub</h1>
+          <p className="text-slate-500 font-medium">Administrá los beneficios y convenios para socios.</p>
+        </div>
+        <Link 
+          href="/admin/beneficios/nuevo" 
+          className="flex items-center px-6 py-4 rounded-2xl bg-blue-600 text-white font-bold hover:bg-blue-700 transition-all shadow-xl shadow-blue-100 shrink-0"
+        >
+          <Plus className="mr-2 h-5 w-5" /> Nuevo Beneficio
+        </Link>
+      </div>
+
+      <div className="bg-white rounded-[3rem] shadow-sm border border-slate-100 overflow-hidden">
+        <div className="p-8 border-b border-slate-50 flex flex-col md:flex-row md:items-center justify-between gap-4">
+          <h3 className="font-black text-slate-900">Beneficios Activos</h3>
+          <div className="flex items-center space-x-2 bg-slate-50 p-2 rounded-xl border border-slate-100">
+            <Search className="ml-2 h-4 w-4 text-slate-400" />
+            <input 
+              type="text" 
+              placeholder="Buscar beneficio..." 
+              className="bg-transparent border-none focus:ring-0 text-sm font-medium pr-4"
+            />
+          </div>
+        </div>
+
+        {beneficios.length === 0 ? (
+          <div className="py-20 text-center">
+            <div className="h-20 w-20 bg-slate-50 rounded-full flex items-center justify-center mx-auto mb-6 text-slate-300">
+              <ShoppingBag className="h-10 w-10" />
+            </div>
+            <h4 className="text-lg font-bold text-slate-900">No hay beneficios cargados</h4>
+            <p className="text-slate-500 mt-2">Cargá el primer beneficio para el KineClub.</p>
+          </div>
+        ) : (
+          <div className="overflow-x-auto">
+            <table className="w-full text-left">
+              <thead>
+                <tr className="border-b border-slate-50">
+                  <th className="px-8 py-6 text-[10px] font-black text-slate-400 uppercase tracking-widest">Empresa</th>
+                  <th className="px-8 py-6 text-[10px] font-black text-slate-400 uppercase tracking-widest">Descuento</th>
+                  <th className="px-8 py-6 text-[10px] font-black text-slate-400 uppercase tracking-widest">Categoría</th>
+                  <th className="px-8 py-6 text-[10px] font-black text-slate-400 uppercase tracking-widest text-right">Acciones</th>
+                </tr>
+              </thead>
+              <tbody className="divide-y divide-slate-50">
+                {beneficios.map((b) => (
+                  <tr key={b.id} className="hover:bg-slate-50/50 transition-colors group">
+                    <td className="px-8 py-6">
+                      <div className="flex items-center space-x-4">
+                        <div className="h-12 w-12 rounded-xl bg-slate-100 overflow-hidden shrink-0 border border-slate-200 flex items-center justify-center text-slate-300">
+                          {b.logo_url ? (
+                            <img src={b.logo_url} alt="" className="h-full w-full object-cover" />
+                          ) : (
+                            <ShoppingBag className="h-6 w-6" />
+                          )}
+                        </div>
+                        <div>
+                          <p className="font-black text-slate-900">{b.empresa}</p>
+                          <p className="text-xs text-slate-400 font-medium line-clamp-1">{b.descripcion}</p>
+                        </div>
+                      </div>
+                    </td>
+                    <td className="px-8 py-6">
+                      <span className="px-3 py-1 rounded-full bg-blue-50 text-blue-600 text-[10px] font-black uppercase tracking-widest border border-blue-100">
+                        {b.descuento}
+                      </span>
+                    </td>
+                    <td className="px-8 py-6">
+                      <p className="text-xs font-bold text-slate-400 flex items-center uppercase tracking-wider">
+                        <Tag className="mr-1.5 h-3 w-3" /> {b.categoria}
+                      </p>
+                    </td>
+                    <td className="px-8 py-6 text-right">
+                      <div className="flex items-center justify-end space-x-2">
+                        <Link 
+                          href={`/kineclub?cat=${b.categoria}`} 
+                          target="_blank"
+                          className="p-2 rounded-lg bg-slate-50 text-slate-400 hover:text-blue-600 transition-all"
+                        >
+                          <ExternalLink className="h-4 w-4" />
+                        </Link>
+                        <Link 
+                          href={`/admin/beneficios/editar/${b.id}`}
+                          className="p-2 rounded-lg bg-slate-50 text-slate-400 hover:text-slate-900 transition-all"
+                        >
+                          <Edit className="h-4 w-4" />
+                        </Link>
+                        <button 
+                          className="p-2 rounded-lg bg-slate-50 text-slate-400 hover:text-red-600 transition-all"
+                        >
+                          <Trash2 className="h-4 w-4" />
+                        </button>
+                      </div>
+                    </td>
+                  </tr>
+                ))}
+              </tbody>
+            </table>
+          </div>
+        )}
+      </div>
+    </div>
+  );
+}

@@ -1,0 +1,133 @@
+// This is your Prisma schema file,
+// learn more about it in the docs: https://pris.ly/d/prisma-schema
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+  directUrl = env("DIRECT_URL")
+}
+
+enum UserRole {
+  ADMIN
+  PROFESIONAL
+}
+
+enum Status {
+  PENDIENTE
+  ACTIVO
+  INACTIVO
+}
+
+enum SolicitudStatus {
+  PENDIENTE
+  APROBADA
+  RECHAZADA
+}
+
+enum CategoriaKineClub {
+  TURISMO
+  SALUD
+  GASTRONOMIA
+  COMERCIOS
+  EDUCACION
+  OTROS
+}
+
+model Profesional {
+  id                String         @id @default(cuid())
+  wp_id             String?        @unique // ID de referencia de la migración
+  nombre            String
+  apellido          String
+  full_name         String?
+  email             String?        @unique
+  matricula         String         @unique
+  dni               String?
+  telefono          String?
+  whatsapp          String?
+  direccion         String?
+  horarios          String?
+  foto_url          String?
+  slug              String         @unique
+  
+  // Relaciones
+  localidadId       String
+  localidad         Localidad      @relation(fields: [localidadId], references: [id])
+  
+  especialidades    Especialidad[]
+  
+  // Auth y Sistema
+  userId            String?        @unique // ID de Supabase Auth
+  role              UserRole       @default(PROFESIONAL)
+  status            Status         @default(ACTIVO)
+  
+  createdAt         DateTime       @default(now())
+  updatedAt         DateTime       @updatedAt
+}
+
+model Localidad {
+  id                String         @id @default(cuid())
+  nombre            String         @unique
+  profesionales     Profesional[]
+  createdAt         DateTime       @default(now())
+}
+
+model Especialidad {
+  id                String         @id @default(cuid())
+  nombre            String         @unique
+  profesionales     Profesional[]
+  createdAt         DateTime       @default(now())
+}
+
+model Noticia {
+  id                String    @id @default(cuid())
+  slug              String    @unique
+  titulo            String
+  resumen           String?
+  contenido         String    // Contenido en Markdown
+  imagen_url        String?
+  publicada         Boolean   @default(false)
+  publicada_en      DateTime?
+  
+  createdAt         DateTime  @default(now())
+  updatedAt         DateTime  @updatedAt
+}
+
+model ObraSocial {
+  id                String   @id @default(cuid())
+  nombre            String
+  logo_url          String?
+  convenio_url      String?  // PDF link
+  activa            Boolean  @default(true)
+  orden             Int      @default(0)
+  
+  createdAt         DateTime @default(now())
+}
+
+model BeneficioKineClub {
+  id                String            @id @default(cuid())
+  empresa           String
+  descripcion       String
+  descuento         String?
+  logo_url          String?
+  url               String?
+  categoria         CategoriaKineClub @default(OTROS)
+  activa            Boolean           @default(true)
+  
+  createdAt         DateTime          @default(now())
+}
+
+model Solicitud {
+  id                String          @id @default(cuid())
+  status            SolicitudStatus @default(PENDIENTE)
+  nombre            String
+  apellido          String
+  email             String
+  matricula         String
+  datos             Json            // Snapshot completo de los datos enviados
+  creada_en         DateTime        @default(now())
+  revisada_en       DateTime?
+}
