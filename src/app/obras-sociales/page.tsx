@@ -7,15 +7,12 @@ import {
   ImageIcon,
 } from "lucide-react";
 import Link from "next/link";
-import prisma from "@/lib/prisma";
+import { ObraSocialRepository } from "@/lib/repositories/ObraSocialRepository";
 
 export const revalidate = 60; // Revalidate every 60 seconds
 
 export default async function ObrasSocialesPage() {
-  const obrasSociales = await prisma.obraSocial.findMany({
-    where: { activa: true },
-    orderBy: { orden: "asc" },
-  });
+  const obrasSociales = await ObraSocialRepository.getAllActive();
 
   return (
     <div className="bg-slate-50 min-h-screen pb-20">

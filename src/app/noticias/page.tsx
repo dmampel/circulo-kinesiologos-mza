@@ -1,34 +1,12 @@
 import { Calendar, Clock, ChevronRight, Share2, Tag } from "lucide-react";
 import Link from "next/link";
+import { NoticiaRepository } from "@/lib/repositories/NoticiaRepository";
+import { format } from "date-fns";
+import { es } from "date-fns/locale";
 
-const NOTICIAS = [
-  {
-    id: 1,
-    titulo: "Nuevo Convenio con Obra Social de Mendoza",
-    resumen: "Se ha firmado un acuerdo histórico que mejora los honorarios profesionales para todos nuestros asociados a partir del próximo mes.",
-    fecha: "2026-05-01",
-    cat: "Institucional",
-    img: null
-  },
-  {
-    id: 2,
-    titulo: "Curso de Especialización en Kinesiología Deportiva",
-    resumen: "Inscripciones abiertas para el nuevo ciclo de capacitaciones 2026 con certificación internacional. Cupos limitados.",
-    fecha: "2026-04-28",
-    cat: "Capacitación",
-    img: null
-  },
-  {
-    id: 3,
-    titulo: "Asamblea General Ordinaria: Convocatoria",
-    resumen: "Invitamos a todos los socios a participar de la próxima asamblea para tratar el balance anual y nuevos proyectos del Círculo.",
-    fecha: "2026-04-15",
-    cat: "Institucional",
-    img: null
-  }
-];
+export default async function NoticiasPage() {
+  const noticias = await NoticiaRepository.getLatest();
 
-export default function NoticiasPage() {
   return (
     <div className="bg-slate-50 min-h-screen pb-20">
       {/* Header Noticias */}
@@ -50,16 +28,23 @@ export default function NoticiasPage() {
           
           {/* Columna de Noticias (Grid) */}
           <div className="lg:col-span-2 space-y-10">
-            {NOTICIAS.map((n) => (
+            {noticias.map((n) => (
               <article key={n.id} className="bg-white rounded-[3rem] overflow-hidden shadow-sm border border-slate-100 hover:shadow-xl transition-all group">
                 <div className="grid grid-cols-1 md:grid-cols-5 h-full">
                   <div className="md:col-span-2 bg-slate-100 min-h-[200px] flex items-center justify-center text-slate-300">
-                    <Calendar className="h-12 w-12 opacity-20" />
+                    {n.imagen_url ? (
+                      <img src={n.imagen_url} alt={n.titulo} className="h-full w-full object-cover" />
+                    ) : (
+                      <Calendar className="h-12 w-12 opacity-20" />
+                    )}
                   </div>
                   <div className="md:col-span-3 p-8 lg:p-10 flex flex-col justify-center">
                     <div className="flex items-center space-x-4 mb-4 text-[10px] font-black uppercase tracking-widest text-blue-600">
-                      <span className="bg-blue-50 px-3 py-1 rounded-full">{n.cat}</span>
-                      <span className="text-slate-400 flex items-center"><Clock className="mr-1 h-3 w-3" /> {n.fecha}</span>
+                      <span className="bg-blue-50 px-3 py-1 rounded-full">{n.categoria || "General"}</span>
+                      <span className="text-slate-400 flex items-center">
+                        <Clock className="mr-1 h-3 w-3" /> 
+                        {n.publicada_en ? format(n.publicada_en, "dd 'de' MMMM", { locale: es }) : "Reciente"}
+                      </span>
                     </div>
                     <h2 className="text-2xl font-black text-slate-900 mb-4 group-hover:text-blue-600 transition-colors leading-tight">
                       {n.titulo}
@@ -68,7 +53,7 @@ export default function NoticiasPage() {
                       {n.resumen}
                     </p>
                     <div className="flex items-center justify-between mt-auto pt-6 border-t border-slate-50">
-                      <Link href={`/noticias/${n.id}`} className="text-sm font-black text-slate-900 uppercase tracking-widest hover:text-blue-600 transition-colors flex items-center">
+                      <Link href={`/noticias/${n.slug}`} className="text-sm font-black text-slate-900 uppercase tracking-widest hover:text-blue-600 transition-colors flex items-center">
                         Leer nota completa <ChevronRight className="ml-1 h-4 w-4" />
                       </Link>
                       <button className="text-slate-400 hover:text-blue-600 transition-colors">

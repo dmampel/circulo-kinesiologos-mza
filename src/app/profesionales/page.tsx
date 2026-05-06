@@ -1,4 +1,6 @@
-import prisma from "@/lib/prisma";
+import { LocalidadRepository } from "@/lib/repositories/LocalidadRepository";
+import { EspecialidadRepository } from "@/lib/repositories/EspecialidadRepository";
+import { ProfesionalRepository } from "@/lib/repositories/ProfesionalRepository";
 import {
   Search,
   MapPin,
@@ -10,70 +12,35 @@ import {
   User,
 } from "lucide-react";
 import Link from "next/link";
-import SearchInput from "./SearchInput";
-import FilterSelect from "./FilterSelect";
-import AlphabetSidebar from "./AlphabetSidebar";
-import Pagination from "./Pagination";
+import SearchInput from "@/components/atoms/SearchInput";
+import FilterSelect from "@/components/atoms/FilterSelect";
+import AlphabetSidebar from "@/components/molecules/AlphabetSidebar";
+import Pagination from "@/components/molecules/Pagination";
 import WaveTransition from "@/components/WaveTransition";
 import { Suspense } from "react";
+
+import { profesionalSearchSchema } from "@/lib/validations/searchParams";
 
 const PAGE_SIZE = 24;
 
 interface Props {
-  searchParams: Promise<{
-    q?: string;
-    loc?: string;
-    spec?: string;
-    char?: string;
-    page?: string;
-  }>;
+  searchParams: Promise<Record<string, string | string[] | undefined>>;
 }
 
 export default async function ProfesionalesPage({ searchParams }: Props) {
-  const params = await searchParams;
-  const query = params.q || "";
-  const locId = params.loc || "";
-  const specId = params.spec || "";
-  const char = params.char || "";
-  const currentPage = Number(params.page) || 1;
-
-  const whereClause = {
-    status: "ACTIVO",
-    AND: [
-      query
-        ? {
-            OR: [
-              { nombre: { contains: query, mode: "insensitive" } },
-              { apellido: { contains: query, mode: "insensitive" } },
-              { full_name: { contains: query, mode: "insensitive" } },
-              { matricula: { contains: query, mode: "insensitive" } },
-            ],
-          }
-        : {},
-      char ? { apellido: { startsWith: char, mode: "insensitive" } } : {},
-      locId ? { localidadId: locId } : {},
-      specId ? { especialidades: { some: { id: specId } } } : {},
-    ],
-  } as any;
+  const params = profesionalSearchSchema.parse(await searchParams);
+  const { q: query, loc: locId, spec: specId, char, page: currentPage } = params;
 
   // 1. Fetch de filtros, total y profesionales de forma paralela
-  const [localidades, especialidades, totalCount, profesionales] =
+  const [localidades, especialidades, { data: profesionales, total: totalCount }] =
     await Promise.all([
-      prisma.localidad.findMany({ orderBy: { nombre: "asc" } }),
-      prisma.especialidad.findMany({
-        where: { nombre: { not: "UBICACIÓN" } },
-        orderBy: { nombre: "asc" },
-      }),
-      prisma.profesional.count({ where: whereClause }),
-      prisma.profesional.findMany({
-        where: whereClause,
-        include: {
-          localidad: true,
-          especialidades: true,
-        },
-        orderBy: { apellido: "asc" },
-        skip: (currentPage - 1) * PAGE_SIZE,
-        take: PAGE_SIZE,
+      LocalidadRepository.getAll(),
+      EspecialidadRepository.getAll(),
+      ProfesionalRepository.findPaginated(currentPage, PAGE_SIZE, {
+        query,
+        localidadId: locId,
+        especialidadId: specId,
+        char,
       }),
     ]);
 

@@ -1,4 +1,3 @@
-import prisma from "@/lib/prisma";
 import { Ticket, ShoppingBag, Coffee, Plane, Heart, ChevronRight, Sparkles } from "lucide-react";
 import Link from "next/link";
 import { cn } from "@/lib/utils";
@@ -12,20 +11,18 @@ const CATEGORIAS = [
   { id: "Salud", name: "Salud", icon: Heart, color: "bg-pink-500" },
 ];
 
+import { BeneficioRepository } from "@/lib/repositories/BeneficioRepository";
+import { kineClubSearchSchema } from "@/lib/validations/searchParams";
+
 interface Props {
-  searchParams: Promise<{
-    cat?: string;
-  }>;
+  searchParams: Promise<Record<string, string | string[] | undefined>>;
 }
 
 export default async function KineClubPage({ searchParams }: Props) {
-  const params = await searchParams;
-  const currentCat = params.cat || "TODOS";
+  const params = kineClubSearchSchema.parse(await searchParams);
+  const { cat: currentCat } = params;
 
-  const beneficios = await prisma.beneficioKineClub.findMany({
-    where: currentCat !== "TODOS" ? { categoria: currentCat as any } : {},
-    orderBy: { createdAt: "desc" },
-  });
+  const beneficios = await BeneficioRepository.getAll(currentCat);
   return (
     <div className="bg-slate-50 min-h-screen pb-20">
       <KineClubClient beneficios={beneficios} currentCat={currentCat} />

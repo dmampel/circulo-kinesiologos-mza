@@ -31,7 +31,6 @@ async function main() {
   }
 
   console.log(`📊 Cargando ${profesionales.length} profesionales...`);
-  
   for (const p of profesionales) {
     const slug = p.full_name
       .toLowerCase()
@@ -73,6 +72,42 @@ async function main() {
     } catch (error: any) {
       console.error(`❌ Error con ${p.full_name}:`, error.message);
     }
+  }
+
+  const NOTICIAS = [
+    {
+      titulo: "Nuevo Convenio con Obra Social de Mendoza",
+      contenido: "Se ha firmado un acuerdo histórico que mejora los honorarios profesionales para todos nuestros asociados a partir del próximo mes.",
+      resumen: "Se ha firmado un acuerdo histórico que mejora los honorarios profesionales para todos nuestros asociados a partir del próximo mes.",
+      publicada_en: new Date("2026-05-01"),
+      slug: "nuevo-convenio-obra-social-mendoza",
+    },
+    {
+      titulo: "Curso de Especialización en Kinesiología Deportiva",
+      contenido: "Inscripciones abiertas para el nuevo ciclo de capacitaciones 2026 con certificación internacional. Cupos limitados.",
+      resumen: "Inscripciones abiertas para el nuevo ciclo de capacitaciones 2026 con certificación internacional. Cupos limitados.",
+      publicada_en: new Date("2026-04-28"),
+      slug: "curso-especializacion-kinesiologia-deportiva",
+    },
+    {
+      titulo: "Asamblea General Ordinaria: Convocatoria",
+      contenido: "Invitamos a todos los socios a participar de la próxima asamblea para tratar el balance anual y nuevos proyectos del Círculo.",
+      resumen: "Invitamos a todos los socios a participar de la próxima asamblea para tratar el balance anual y nuevos proyectos del Círculo.",
+      publicada_en: new Date("2026-04-15"),
+      slug: "asamblea-general-ordinaria-convocatoria",
+    }
+  ];
+
+  console.log(`📊 Cargando ${NOTICIAS.length} noticias...`);
+  for (const n of NOTICIAS) {
+    await prisma.noticia.upsert({
+      where: { slug: n.slug },
+      update: {},
+      create: {
+        ...n,
+        publicada: true,
+      },
+    });
   }
 
   console.log('✅ Seed completado con éxito.');
