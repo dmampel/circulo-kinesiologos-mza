@@ -12,4 +12,10 @@ export class NoticiaRepository {
       where: { id },
     });
   }
+
+  static async getBySlug(slug: string) {
+    return prisma.noticia.findUnique({
+      where: { slug },
+    });
+  }
 }

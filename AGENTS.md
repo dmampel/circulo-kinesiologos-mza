@@ -23,6 +23,9 @@ CKM-Web es la plataforma institucional y de gestión para el Círculo de Kinesi�
 1. **Repository Pattern**: No usar Prisma directamente en los componentes. Todo acceso a datos debe pasar por `src/lib/repositories/`.
 2. **Server-First**: Priorizar Server Components para fetch de datos. Usar "use client" solo cuando sea estrictamente necesario para interactividad.
 3. **OpenSpec (OPSX)**: Todo cambio significativo debe ser precedido por un `openspec new change` y seguir el flujo de Propuesta -> Diseño -> Tareas.
+   - **Modo de Ejecución:** SIEMPRE usar modo `Interactivo` (pausar y validar después de cada fase).
+   - **Artifact Store:** SIEMPRE usar `openspec` para documentar todo el proceso y las decisiones en el repositorio.
+   - **Checklist de Tareas:** SIEMPRE antes de ejecutar la fase `sdd-archive`, volver al archivo `tasks.md` y marcar todas las tareas finalizadas con `[x]`.
 4. **Validation**: Usar esquemas de validación (Zod) para todos los inputs de usuario.
 
 ---
