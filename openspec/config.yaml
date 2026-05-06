@@ -1,0 +1,36 @@
+schema: spec-driven
+
+context: |
+  Tech stack: Next.js 16, Prisma 6, Supabase, Tailwind 4.
+  Architecture: App Router (src/app), basic feature-sliced (components, lib, utils).
+  Database: Supabase (Auth/Storage) + Prisma (ORM).
+  Styling: Tailwind CSS 4.
+
+strict_tdd: false # No test runner detected. Recommended: install vitest.
+
+rules:
+  proposal:
+    - Include database schema changes in the proposal.
+    - Identify if Supabase migrations are needed.
+  specs:
+    - Use Given/When/Then format for scenarios.
+    - Document specific Supabase edge cases (auth, RLS).
+  design:
+    - Detail Prisma schema updates.
+    - Include UI component breakdown (Atomic Design or similar).
+  tasks:
+    - Group by: DB/Prisma -> Supabase -> Backend -> Frontend.
+  apply:
+    - Follow Next.js 16 specific patterns (Server Components by default).
+    - Maintain strict type safety.
+  verify:
+    - Manual verification via browser tool (until Vitest is added).
+  archive:
+    - Ensure all specs are updated with implementation details.
+
+testing:
+  runner: null
+  layers:
+    unit: false
+    integration: false
+    e2e: false

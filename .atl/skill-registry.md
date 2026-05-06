@@ -1,19 +1,27 @@
-# Skill Registry - CirculoKinesiologos
+# Skill Registry - ckm-web
 
-## Project Context
-- **Stack**: Next.js 16 (App Router), React 19, Prisma (PostgreSQL), Supabase Auth, Tailwind CSS 4.
-- **Testing**: Not configured.
-- **Persistence**: Engram.
+Este registro contiene las habilidades disponibles para los agentes en este proyecto.
 
-## Compact Rules
-- **UI/UX**: Premium aesthetic, rounded borders (`rounded-[2rem]`, `rounded-[3rem]`), Glassmorphism (`backdrop-blur-2xl`, `bg-white/60`), modern gradients and smooth transitions.
-- **Search Pattern**: URL-based search with client-side `SearchInput` and server-side filtering via Prisma.
-- **Components**: Functional components, Lucide icons, Framer Motion for animations.
+## Project Skills
+- **openspec-explore**: Explora e investiga ideas antes de comprometerse a un cambio.
+- **openspec-propose**: Propone un cambio (Crea propuesta, diseño y tareas).
+- **openspec-apply-change**: Implementa las tareas de un cambio.
+- **openspec-archive-change**: Sincroniza specs delta y archiva un cambio completado.
+- **prisma-repository-pattern**: Implementa el patrón Repository para desacoplar el acceso a datos.
+- **frontend-atomic-tailwind**: Sigue Atomic Design y Tailwind CSS 4 para el UI.
 
-## User Skills
-| Skill | Trigger | Path |
-|-------|---------|------|
-| branch-pr | Creating a PR, preparing changes for review | /Users/delfina/.gemini/antigravity/skills/branch-pr/SKILL.md |
-| judgment-day | "judgment day", "review adversarial", "doble review" | /Users/delfina/.gemini/antigravity/skills/judgment-day/SKILL.md |
-| issue-creation | Creating a GitHub issue, reporting a bug | /Users/delfina/.gemini/antigravity/skills/issue-creation/SKILL.md |
-| skill-creator | Creating new AI skills | /Users/delfina/.gemini/antigravity/skills/skill-creator/SKILL.md |
+## System Skills
+- **sdd-init**: Inicializa el contexto de SDD en el proyecto.
+- **sdd-propose**: Crea una propuesta de cambio.
+- **sdd-spec**: Escribe especificaciones para un cambio.
+- **sdd-design**: Crea el documento de diseño técnico.
+- **sdd-tasks**: Desglosa un cambio en tareas.
+- **sdd-apply**: Implementa las tareas.
+- **sdd-verify**: Valida la implementación contra las specs.
+- **sdd-archive**: Archiva el cambio.
+- **skill-creator**: Crea nuevas habilidades.
+- **judgment-day**: Review adversarial paralelo.
+
+## Project Conventions
+- **AGENTS.md**: Reglas específicas para agentes.
+- **CLAUDE.md**: Guía de estilo y comandos.
