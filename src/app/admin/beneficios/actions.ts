@@ -11,30 +11,9 @@ export async function crearBeneficio(formData: FormData) {
     const empresa = formData.get("empresa") as string;
     const descripcion = formData.get("descripcion") as string;
     const descuento = formData.get("descuento") as string;
-    const categoria = formData.get("categoria") as string;
+    const categoriaId = formData.get("categoriaId") as string;
     const enlace = formData.get("enlace") as string;
-    const logo = formData.get("logo") as File;
-
-    let logo_url = null;
-
-    // 1. Subir logo si existe
-    if (logo && logo.size > 0) {
-      const fileExt = logo.name.split(".").pop();
-      const fileName = `${Date.now()}.${fileExt}`;
-      const filePath = `beneficios/${fileName}`;
-
-      const { error: uploadError } = await supabase.storage
-        .from("solicitudes") 
-        .upload(filePath, logo);
-
-      if (uploadError) throw new Error("Error subiendo logo: " + uploadError.message);
-
-      const { data: { publicUrl } } = supabase.storage
-        .from("solicitudes")
-        .getPublicUrl(filePath);
-        
-      logo_url = publicUrl;
-    }
+    const logo_url = formData.get("logo_url") as string;
 
     // 2. Guardar en DB
     await prisma.beneficioKineClub.create({
@@ -42,7 +21,7 @@ export async function crearBeneficio(formData: FormData) {
         empresa,
         descripcion,
         descuento,
-        categoria: categoria as any,
+        categoriaId,
         logo_url,
         url: enlace,
       },
@@ -58,6 +37,39 @@ export async function crearBeneficio(formData: FormData) {
   }
 }
 
+
+
+export async function actualizarBeneficio(id: string, formData: FormData) {
+  try {
+    const empresa = formData.get("empresa") as string;
+    const descripcion = formData.get("descripcion") as string;
+    const descuento = formData.get("descuento") as string;
+    const categoriaId = formData.get("categoriaId") as string;
+    const enlace = formData.get("enlace") as string;
+    const logo_url = formData.get("logo_url") as string;
+
+    await prisma.beneficioKineClub.update({
+      where: { id },
+      data: {
+        empresa,
+        descripcion,
+        descuento,
+        categoriaId,
+        logo_url,
+        url: enlace,
+      },
+    });
+
+    revalidatePath("/admin/beneficios");
+    revalidatePath("/kineclub");
+
+    return { success: true };
+  } catch (error: any) {
+    console.error("Error al actualizar beneficio:", error);
+    return { success: false, error: error.message };
+  }
+}
+
 export async function eliminarBeneficio(id: string) {
   try {
     await prisma.beneficioKineClub.delete({ where: { id } });
@@ -68,3 +80,4 @@ export async function eliminarBeneficio(id: string) {
     return { success: false, error: error.message };
   }
 }
+

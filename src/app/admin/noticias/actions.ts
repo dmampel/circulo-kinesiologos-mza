@@ -12,28 +12,7 @@ export async function crearNoticia(formData: FormData) {
     const resumen = formData.get("resumen") as string;
     const contenido = formData.get("contenido") as string;
     const publicada = formData.get("publicada") === "on";
-    const imagen = formData.get("imagen") as File;
-
-    let imagen_url = null;
-
-    // 1. Subir imagen si existe
-    if (imagen && imagen.size > 0) {
-      const fileExt = imagen.name.split(".").pop();
-      const fileName = `${Date.now()}.${fileExt}`;
-      const filePath = `noticias/${fileName}`;
-
-      const { error: uploadError } = await supabase.storage
-        .from("solicitudes") 
-        .upload(filePath, imagen);
-
-      if (uploadError) throw new Error("Error subiendo imagen: " + uploadError.message);
-
-      const { data: { publicUrl } } = supabase.storage
-        .from("solicitudes")
-        .getPublicUrl(filePath);
-        
-      imagen_url = publicUrl;
-    }
+    const imagen_url = formData.get("imagen_url") as string;
 
     // 2. Generar Slug
     const slug = titulo

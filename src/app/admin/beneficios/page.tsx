@@ -10,25 +10,34 @@ import {
 } from "lucide-react";
 import Link from "next/link";
 import { cn } from "@/lib/utils";
+import CategoriaSidebar from "./CategoriaSidebar";
+import { CategoriaRepository } from "@/lib/repositories/CategoriaRepository";
 
 export default async function BeneficiosAdminPage() {
-  const beneficios = await prisma.beneficioKineClub.findMany({
-    orderBy: { createdAt: "desc" },
-  });
+  const [beneficios, categorias] = await Promise.all([
+    prisma.beneficioKineClub.findMany({
+      include: { categoria: true },
+      orderBy: { createdAt: "desc" },
+    }),
+    CategoriaRepository.getAll()
+  ]);
 
   return (
-    <div className="space-y-8 animate-in fade-in duration-500">
+    <div className="space-y-8 animate-in fade-in duration-500 pb-20">
       <div className="flex flex-col md:flex-row md:items-center justify-between gap-6">
         <div>
           <h1 className="text-3xl font-black text-slate-900 mb-2">Gestión de KineClub</h1>
           <p className="text-slate-500 font-medium">Administrá los beneficios y convenios para socios.</p>
         </div>
-        <Link 
-          href="/admin/beneficios/nuevo" 
-          className="flex items-center px-6 py-4 rounded-2xl bg-blue-600 text-white font-bold hover:bg-blue-700 transition-all shadow-xl shadow-blue-100 shrink-0"
-        >
-          <Plus className="mr-2 h-5 w-5" /> Nuevo Beneficio
-        </Link>
+        <div className="flex items-center space-x-4">
+          <CategoriaSidebar categorias={categorias} />
+          <Link 
+            href="/admin/beneficios/nuevo" 
+            className="flex items-center px-6 py-4 rounded-2xl bg-blue-600 text-white font-bold hover:bg-blue-700 transition-all shadow-xl shadow-blue-100 shrink-0"
+          >
+            <Plus className="mr-2 h-5 w-5" /> Nuevo Beneficio
+          </Link>
+        </div>
       </div>
 
       <div className="bg-white rounded-[3rem] shadow-sm border border-slate-100 overflow-hidden">
@@ -88,13 +97,13 @@ export default async function BeneficiosAdminPage() {
                     </td>
                     <td className="px-8 py-6">
                       <p className="text-xs font-bold text-slate-400 flex items-center uppercase tracking-wider">
-                        <Tag className="mr-1.5 h-3 w-3" /> {b.categoria}
+                        <Tag className="mr-1.5 h-3 w-3" /> {b.categoria.nombre}
                       </p>
                     </td>
                     <td className="px-8 py-6 text-right">
                       <div className="flex items-center justify-end space-x-2">
                         <Link 
-                          href={`/kineclub?cat=${b.categoria}`} 
+                          href={`/kineclub?cat=${b.categoria.slug}`} 
                           target="_blank"
                           className="p-2 rounded-lg bg-slate-50 text-slate-400 hover:text-blue-600 transition-all"
                         >

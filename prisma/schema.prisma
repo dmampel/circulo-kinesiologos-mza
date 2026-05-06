@@ -28,14 +28,6 @@ enum SolicitudStatus {
   RECHAZADA
 }
 
-enum CategoriaKineClub {
-  TURISMO
-  SALUD
-  GASTRONOMIA
-  COMERCIOS
-  EDUCACION
-  OTROS
-}
 
 model Profesional {
   id                String         @id @default(cuid())
@@ -114,10 +106,21 @@ model BeneficioKineClub {
   descuento         String?
   logo_url          String?
   url               String?
-  categoria         CategoriaKineClub @default(OTROS)
+  categoriaId       String?
+  categoria         CategoriaBeneficio? @relation(fields: [categoriaId], references: [id])
   activa            Boolean           @default(true)
   
   createdAt         DateTime          @default(now())
+}
+
+model CategoriaBeneficio {
+  id          String              @id @default(cuid())
+  nombre      String              @unique
+  slug        String              @unique
+  icono       String?
+  color       String?
+  beneficios  BeneficioKineClub[]
+  createdAt   DateTime            @default(now())
 }
 
 model Solicitud {

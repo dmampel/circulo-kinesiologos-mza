@@ -1,25 +1,40 @@
 "use client";
 
-import { Ticket, ShoppingBag, ChevronRight, Sparkles, Plane, Coffee, Heart } from "lucide-react";
+import { 
+  Ticket, 
+  ShoppingBag, 
+  ChevronRight, 
+  Sparkles, 
+  Plane, 
+  Coffee as Utensils, 
+  Heart, 
+  Tag, 
+  GraduationCap 
+} from "lucide-react";
 import { cn } from "@/lib/utils";
 import { motion } from "framer-motion";
+import { useRouter } from "next/navigation";
 import Link from "next/link";
-import { useRouter, useSearchParams } from "next/navigation";
 
-const CATEGORIAS = [
-  { id: "TODOS", name: "Todos", icon: Sparkles },
-  { id: "Turismo", name: "Turismo", icon: Plane },
-  { id: "Gastronomía", name: "Gastronomía", icon: Coffee },
-  { id: "Comercios", name: "Comercios", icon: ShoppingBag },
-  { id: "Salud", name: "Salud", icon: Heart },
-];
+const ICON_MAP: Record<string, any> = {
+  Sparkles,
+  Plane,
+  Utensils,
+  ShoppingBag,
+  Heart,
+  Tag,
+  GraduationCap
+};
 
 interface Beneficio {
   id: string;
   empresa: string;
   descripcion: string;
   descuento: string | null;
-  categoria: string;
+  categoria: {
+    nombre: string;
+    slug: string;
+  };
   logo_url?: string | null;
   url?: string | null;
 }
@@ -27,9 +42,15 @@ interface Beneficio {
 interface Props {
   beneficios: Beneficio[];
   currentCat: string;
+  categorias: Array<{
+    id: string;
+    name: string;
+    iconName: string;
+    color: string;
+  }>;
 }
 
-export default function KineClubClient({ beneficios, currentCat }: Props) {
+export default function KineClubClient({ beneficios, currentCat, categorias }: Props) {
   const router = useRouter();
   
   const handleCatChange = (catId: string) => {
@@ -77,18 +98,21 @@ export default function KineClubClient({ beneficios, currentCat }: Props) {
 
       <div className="mx-auto max-w-7xl px-4 -mt-16 relative z-20">
         <div className="bg-white p-4 rounded-[2.5rem] shadow-xl border border-slate-100 flex flex-wrap justify-center gap-2 mb-12">
-          {CATEGORIAS.map((cat) => (
-            <button 
-              key={cat.id}
-              onClick={() => handleCatChange(cat.id)}
-              className={cn(
-                "flex items-center px-6 py-3 rounded-2xl text-sm font-bold transition-all",
-                currentCat === cat.id ? "bg-slate-900 text-white shadow-lg" : "text-slate-500 hover:bg-slate-50"
-              )}
-            >
-              <cat.icon className="mr-2 h-4 w-4" /> {cat.name}
-            </button>
-          ))}
+          {categorias.map((cat) => {
+            const Icon = ICON_MAP[cat.iconName] || Tag;
+            return (
+              <button 
+                key={cat.id}
+                onClick={() => handleCatChange(cat.id)}
+                className={cn(
+                  "flex items-center px-6 py-3 rounded-2xl text-sm font-bold transition-all",
+                  currentCat === cat.id ? "bg-slate-900 text-white shadow-lg" : "text-slate-500 hover:bg-slate-50"
+                )}
+              >
+                <Icon className="mr-2 h-4 w-4" /> {cat.name}
+              </button>
+            );
+          })}
         </div>
 
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
@@ -121,7 +145,7 @@ export default function KineClubClient({ beneficios, currentCat }: Props) {
                   </div>
 
                   <div className="mb-8">
-                    <p className="text-[10px] font-black text-slate-400 uppercase tracking-widest mb-2">{b.categoria}</p>
+                    <p className="text-[10px] font-black text-slate-400 uppercase tracking-widest mb-2">{b.categoria.nombre}</p>
                     <h3 className="text-2xl font-black text-slate-900 mb-3">{b.empresa}</h3>
                     <p className="text-slate-500 text-sm leading-relaxed line-clamp-3">
                       {b.descripcion}

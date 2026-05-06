@@ -22,12 +22,11 @@ import { crearNoticia } from "../actions";
 export default function NuevaNoticiaPage() {
   const router = useRouter();
   const [isPending, setIsPending] = useState(false);
-  const [previewImage, setPreviewImage] = useState<string | null>(null);
-  
   const [formData, setFormData] = useState({
     titulo: "",
     resumen: "",
     contenido: "",
+    imagen_url: "",
     publicada: false,
   });
 
@@ -37,15 +36,6 @@ export default function NuevaNoticiaPage() {
       ...prev, 
       [name]: type === "checkbox" ? (e.target as HTMLInputElement).checked : value 
     }));
-  };
-
-  const handleImageChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-    const file = e.target.files?.[0];
-    if (file) {
-      const reader = new FileReader();
-      reader.onloadend = () => setPreviewImage(reader.result as string);
-      reader.readAsDataURL(file);
-    }
   };
 
   const handleSubmit = async (e: React.FormEvent) => {
@@ -132,24 +122,27 @@ export default function NuevaNoticiaPage() {
           {/* Sidebar: Imagen y Publicación */}
           <div className="space-y-8">
             <div className="bg-white rounded-[2.5rem] p-8 border border-slate-100 shadow-sm space-y-6">
-              <div className="space-y-4 text-center">
-                <label className="text-xs font-black text-slate-400 uppercase tracking-widest">Imagen de Portada</label>
-                <div className="relative group aspect-video rounded-3xl bg-slate-50 border-2 border-dashed border-slate-200 overflow-hidden flex items-center justify-center transition-all hover:border-blue-400 hover:bg-blue-50">
-                  {previewImage ? (
-                    <img src={previewImage} alt="Preview" className="h-full w-full object-cover" />
-                  ) : (
-                    <div className="flex flex-col items-center text-slate-300">
-                      <ImageIcon className="h-10 w-10 mb-2" />
-                      <span className="text-[10px] font-black uppercase">Click para subir</span>
-                    </div>
-                  )}
+              <div className="space-y-4">
+                <label className="text-xs font-black text-slate-400 uppercase tracking-widest">Imagen de Portada (URL)</label>
+                <div className="space-y-4">
                   <input 
-                    type="file" 
-                    name="imagen"
-                    onChange={handleImageChange}
-                    className="absolute inset-0 opacity-0 cursor-pointer z-10" 
-                    accept="image/*"
+                    type="url" 
+                    name="imagen_url"
+                    value={formData.imagen_url}
+                    onChange={handleChange}
+                    className="w-full px-4 py-3 rounded-xl bg-slate-50 border-transparent focus:bg-white focus:border-blue-600 focus:ring-4 focus:ring-blue-100 transition-all text-xs font-bold" 
+                    placeholder="https://images.unsplash.com/..."
                   />
+                  <div className="relative group aspect-video rounded-3xl bg-slate-50 border-2 border-dashed border-slate-200 overflow-hidden flex items-center justify-center transition-all hover:border-blue-400">
+                    {formData.imagen_url ? (
+                      <img src={formData.imagen_url} alt="Preview" className="h-full w-full object-cover" />
+                    ) : (
+                      <div className="flex flex-col items-center text-slate-300">
+                        <ImageIcon className="h-10 w-10 mb-2" />
+                        <span className="text-[10px] font-black uppercase tracking-widest">Vista Previa</span>
+                      </div>
+                    )}
+                  </div>
                 </div>
               </div>
 
