@@ -67,6 +67,7 @@ export async function crearSolicitud(formData: FormData) {
           dni: formData.get("dni") as string,
           telefono: formData.get("telefono") as string,
           direccion: formData.get("direccion") as string,
+          localidadId: formData.get("localidadId") as string,
           especialidad: formData.get("especialidad") as string,
           archivos: archivosUrls,
           fecha_solicitud: new Date().toISOString(),
