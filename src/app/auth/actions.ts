@@ -12,13 +12,23 @@ export async function login(formData: FormData) {
     password: formData.get("password") as string,
   };
 
-  const { error } = await supabase.auth.signInWithPassword(data);
+  const { data: { user }, error } = await supabase.auth.signInWithPassword(data);
 
-  if (error) {
+  if (error || !user) {
     redirect("/login?error=Could not authenticate user");
   }
 
+  // Verificar si es un profesional vinculado
+  const { ProfesionalRepository } = await import("@/lib/repositories/ProfesionalRepository");
+  const profesional = await ProfesionalRepository.findByUserId(user.id);
+
   revalidatePath("/", "layout");
+
+  if (profesional) {
+    redirect("/mi-panel");
+  }
+
+  // Por defecto, si no es profesional pero tiene acceso, asumo que es admin o un profesional sin perfil
   redirect("/admin");
 }
 
@@ -45,4 +55,20 @@ export async function logout() {
   await supabase.auth.signOut();
   revalidatePath("/", "layout");
   redirect("/login");
+}
+
+export async function updatePassword(formData: FormData) {
+  const supabase = await createClient();
+  const password = formData.get("password") as string;
+
+  const { error } = await supabase.auth.updateUser({
+    password: password,
+  });
+
+  if (error) {
+    redirect("/auth/set-password?error=Could not update password");
+  }
+
+  revalidatePath("/", "layout");
+  redirect("/mi-panel");
 }

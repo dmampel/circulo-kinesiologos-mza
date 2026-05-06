@@ -59,4 +59,24 @@ export class ProfesionalRepository {
       total,
     };
   }
+
+  static async findBySlug(slug: string) {
+    return prisma.profesional.findUnique({
+      where: { slug, status: "ACTIVO" },
+      include: {
+        localidad: true,
+        especialidades: true,
+      },
+    });
+  }
+
+  static async findByUserId(userId: string) {
+    return prisma.profesional.findUnique({
+      where: { userId },
+      include: {
+        localidad: true,
+        especialidades: true,
+      },
+    });
+  }
 }

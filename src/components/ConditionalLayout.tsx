@@ -7,14 +7,15 @@ import Footer from "./Footer";
 export default function ConditionalLayout({ children }: { children: React.ReactNode }) {
   const pathname = usePathname();
   const isAdmin = pathname?.startsWith("/admin");
+  const isPortal = pathname?.startsWith("/mi-panel");
 
   return (
     <>
-      {!isAdmin && <Navbar />}
+      {!isAdmin && !isPortal && <Navbar />}
       <main className="flex-grow">
         {children}
       </main>
-      {!isAdmin && <Footer />}
+      {!isAdmin && !isPortal && <Footer />}
     </>
   );
 }

@@ -26,6 +26,7 @@ CKM-Web es la plataforma institucional y de gestión para el Círculo de Kinesi�
    - **Modo de Ejecución:** SIEMPRE usar modo `Interactivo` (pausar y validar después de cada fase).
    - **Artifact Store:** SIEMPRE usar `openspec` para documentar todo el proceso y las decisiones en el repositorio.
    - **Checklist de Tareas:** SIEMPRE antes de ejecutar la fase `sdd-archive`, volver al archivo `tasks.md` y marcar todas las tareas finalizadas con `[x]`.
+   - **Persistence:** TRAS CADA CHANGE archivado, realizar un `git commit` (siguiendo Work Units) y un `git push` al repositorio remoto.
 4. **Validation**: Usar esquemas de validación (Zod) para todos los inputs de usuario.
 
 ---

@@ -33,6 +33,7 @@ export async function gestionarSolicitud(id: string, accion: "APROBAR" | "RECHAZ
           data: {
             full_name: `${solicitud.nombre} ${solicitud.apellido}`,
           },
+          redirectTo: `${process.env.NEXT_PUBLIC_SITE_URL || 'http://localhost:3000'}/auth/callback?next=/auth/set-password`,
         }
       );
 

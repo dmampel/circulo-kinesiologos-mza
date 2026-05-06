@@ -3,7 +3,7 @@
 import prisma from "@/lib/prisma";
 import { revalidatePath } from "next/cache";
 import { redirect } from "next/navigation";
-import { createClient } from "@/utils/supabase/server";
+import { supabaseAdmin } from "@/lib/supabase/admin";
 import { Resend } from "resend";
 
 const resend = new Resend(process.env.RESEND_API_KEY);
@@ -15,7 +15,8 @@ export async function getLocalidades() {
 }
 
 export async function crearSolicitud(formData: FormData) {
-  const supabase = await createClient();
+  // Usamos supabaseAdmin para tener permisos de escritura en Storage sin RLS (Service Role)
+  const supabase = supabaseAdmin;
 
   // 1. Extraer datos del formulario
   const nombre = formData.get("nombre") as string;
