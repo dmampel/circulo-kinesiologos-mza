@@ -4,11 +4,50 @@
 This version has breaking changes — APIs, conventions, and file structure may all differ from your training data. Read the relevant guide in `node_modules/next/dist/docs/` before writing any code. Heed deprecation notices.
 <!-- END:nextjs-agent-rules -->
 
-# Responsive Design Rules
+# CKM-Web: Círculo de Kinesiólogos de Mendoza
 
-1. **NO FIXED PIXELS**: Never use fixed `px` for spacing (padding, margin), font sizes, or widths unless it's for 1px borders or specific icons. Always use Tailwind's relative scale (`p-4`, `m-2`, `text-lg`).
-2. **REM OVER PX**: Prefer `rem` units for custom values. Assume 1rem = 16px.
-3. **ADAPTIVE SPACING**: For large components (hero sections, main containers), use responsive prefixes. Example: `p-6 md:p-10 lg:p-16` instead of a single `p-16`.
-4. **MAX-WIDTH LIMITS**: Always wrap main layouts in containers with max-width (e.g., `max-w-7xl`) to prevent content from stretching too far on ultra-wide screens.
-5. **FLUID TYPOGRAPHY**: For hero headers, use a combination of `text-4xl md:text-6xl lg:text-7xl` to ensure the text scales gracefully.
+## Project Overview
+CKM-Web es la plataforma institucional y de gestión para el Círculo de Kinesiólogos de Mendoza. Su objetivo es centralizar la información para socios (Noticias, KineClub, Eventos) y facilitar la administración de beneficios y convenios.
 
+### Tech Stack
+- **Framework**: Next.js 15+ (App Router)
+- **Database**: PostgreSQL (Supabase) via Prisma ORM
+- **Styling**: Tailwind CSS 4
+- **State/Logic**: Server Actions & Repository Pattern
+- **Persistence**: OPSX (Spec-Driven Development)
+
+---
+
+## 🏛️ Architecture Pillars
+
+1. **Repository Pattern**: No usar Prisma directamente en los componentes. Todo acceso a datos debe pasar por `src/lib/repositories/`.
+2. **Server-First**: Priorizar Server Components para fetch de datos. Usar "use client" solo cuando sea estrictamente necesario para interactividad.
+3. **OpenSpec (OPSX)**: Todo cambio significativo debe ser precedido por un `openspec new change` y seguir el flujo de Propuesta -> Diseño -> Tareas.
+4. **Validation**: Usar esquemas de validación (Zod) para todos los inputs de usuario.
+
+---
+
+## 🎨 UI/UX Principles (Premium Design)
+
+1. **Rich Aesthetics**: El sitio debe sentirse premium. Usar gradientes suaves, glassmorphism (`backdrop-blur`), y sombras sutiles. Evitar colores planos genéricos.
+2. **Atomic Design**: Organizar componentes de forma jerárquica y reutilizable.
+3. **Micro-animations**: Implementar transiciones suaves con `framer-motion` o CSS transitions para mejorar la experiencia percibida.
+4. **Vibrant & Clean**: Fondo mayormente claro/blanco con acentos vibrantes (Azul CKM, Rojo KineClub).
+
+---
+
+## 📱 Responsive Design Rules
+
+1. **NO FIXED PIXELS**: Nunca usar `px` fijos para espaciados, fuentes o anchos (excepto bordes de 1px). Usar escalas relativas de Tailwind.
+2. **REM OVER PX**: Preferir unidades `rem`. (1rem = 16px base, adaptable según pantalla).
+3. **ADAPTIVE SPACING**: Usar prefijos responsivos (`p-6 md:p-10`) para componentes grandes.
+4. **FLUID TYPOGRAPHY**: Usar escalado fluido para headers (ej: `text-4xl md:text-6xl`).
+
+---
+
+## 🛠️ Workflow Standards
+
+1. **Conventional Commits**: Seguir el estándar `type: description` (feat, fix, style, refactor, docs).
+2. **No Console Logs**: Limpiar todos los logs antes de cada commit, a menos que sean críticos para depuración en desarrollo.
+3. **Error Handling**: Siempre capturar errores en Server Actions y devolver un objeto `{ success: boolean, error?: string }`.
+4. **Clean Code**: Mantener las funciones pequeñas y enfocadas en una sola responsabilidad.
