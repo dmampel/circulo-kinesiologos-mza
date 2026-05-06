@@ -76,7 +76,7 @@ export default function KineClubClient({ beneficios, currentCat, categorias }: P
             initial={{ opacity: 0, y: 20 }}
             animate={{ opacity: 1, y: 0 }}
             transition={{ delay: 0.1 }}
-            className="text-5xl lg:text-7xl font-black text-white mb-8 tracking-tighter"
+            className="text-4xl md:text-6xl lg:text-7xl font-black text-white mb-8 tracking-tighter"
           >
             Beneficios que <br /> <span className="text-blue-500 underline decoration-blue-500/30 underline-offset-8">hacen la diferencia</span>
           </motion.h1>
@@ -128,9 +128,9 @@ export default function KineClubClient({ beneficios, currentCat, categorias }: P
                 initial={{ opacity: 0, y: 20 }}
                 animate={{ opacity: 1, y: 0 }}
                 transition={{ delay: idx * 0.05 }}
-                className="bg-white rounded-[3rem] overflow-hidden border border-slate-100 shadow-sm hover:shadow-2xl hover:-translate-y-2 transition-all group"
+                className="bg-white rounded-[2rem] md:rounded-[3rem] overflow-hidden border border-slate-100 shadow-sm hover:shadow-2xl hover:-translate-y-2 transition-all group"
               >
-                <div className="p-10">
+                <div className="p-6 md:p-10">
                   <div className="flex items-start justify-between mb-8">
                     <div className="h-16 w-16 bg-slate-50 rounded-2xl flex items-center justify-center text-slate-300 group-hover:bg-blue-600 group-hover:text-white transition-colors overflow-hidden">
                       {b.logo_url ? (
@@ -174,7 +174,7 @@ export default function KineClubClient({ beneficios, currentCat, categorias }: P
           )}
         </div>
 
-        <div className="mt-24 text-center bg-blue-50 p-16 rounded-[4rem] border border-blue-100">
+        <div className="mt-16 md:mt-24 text-center bg-blue-50 p-8 md:p-16 rounded-[2.5rem] md:rounded-[4rem] border border-blue-100">
           <h2 className="text-3xl font-black text-slate-900 mb-4">¿Cómo utilizo los beneficios?</h2>
           <p className="text-slate-600 max-w-xl mx-auto mb-10 leading-relaxed">
             Es muy simple: presentá tu carnet digital o físico en cualquiera de los comercios adheridos y empezá a disfrutar.

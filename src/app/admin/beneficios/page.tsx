@@ -26,7 +26,7 @@ export default async function BeneficiosAdminPage() {
     <div className="space-y-8 animate-in fade-in duration-500 pb-20">
       <div className="flex flex-col md:flex-row md:items-center justify-between gap-6">
         <div>
-          <h1 className="text-3xl font-black text-slate-900 mb-2">Gestión de KineClub</h1>
+          <h1 className="text-2xl md:text-3xl font-black text-slate-900 mb-2">Gestión de KineClub</h1>
           <p className="text-slate-500 font-medium">Administrá los beneficios y convenios para socios.</p>
         </div>
         <div className="flex items-center space-x-4">
@@ -40,8 +40,8 @@ export default async function BeneficiosAdminPage() {
         </div>
       </div>
 
-      <div className="bg-white rounded-[3rem] shadow-sm border border-slate-100 overflow-hidden">
-        <div className="p-8 border-b border-slate-50 flex flex-col md:flex-row md:items-center justify-between gap-4">
+      <div className="bg-white rounded-2xl md:rounded-[3rem] shadow-sm border border-slate-100 overflow-hidden">
+        <div className="p-4 md:p-8 border-b border-slate-50 flex flex-col md:flex-row md:items-center justify-between gap-4">
           <h3 className="font-black text-slate-900">Beneficios Activos</h3>
           <div className="flex items-center space-x-2 bg-slate-50 p-2 rounded-xl border border-slate-100">
             <Search className="ml-2 h-4 w-4 text-slate-400" />
@@ -66,16 +66,16 @@ export default async function BeneficiosAdminPage() {
             <table className="w-full text-left">
               <thead>
                 <tr className="border-b border-slate-50">
-                  <th className="px-8 py-6 text-[10px] font-black text-slate-400 uppercase tracking-widest">Empresa</th>
-                  <th className="px-8 py-6 text-[10px] font-black text-slate-400 uppercase tracking-widest">Descuento</th>
-                  <th className="px-8 py-6 text-[10px] font-black text-slate-400 uppercase tracking-widest">Categoría</th>
-                  <th className="px-8 py-6 text-[10px] font-black text-slate-400 uppercase tracking-widest text-right">Acciones</th>
+                  <th className="px-4 md:px-8 py-6 text-[10px] font-black text-slate-400 uppercase tracking-widest">Empresa</th>
+                  <th className="px-4 md:px-8 py-6 text-[10px] font-black text-slate-400 uppercase tracking-widest">Descuento</th>
+                  <th className="px-4 md:px-8 py-6 text-[10px] font-black text-slate-400 uppercase tracking-widest">Categoría</th>
+                  <th className="px-4 md:px-8 py-6 text-[10px] font-black text-slate-400 uppercase tracking-widest text-right">Acciones</th>
                 </tr>
               </thead>
               <tbody className="divide-y divide-slate-50">
                 {beneficios.map((b) => (
                   <tr key={b.id} className="hover:bg-slate-50/50 transition-colors group">
-                    <td className="px-8 py-6">
+                    <td className="px-4 md:px-8 py-6">
                       <div className="flex items-center space-x-4">
                         <div className="h-12 w-12 rounded-xl bg-slate-100 overflow-hidden shrink-0 border border-slate-200 flex items-center justify-center text-slate-300">
                           {b.logo_url ? (
@@ -90,17 +90,17 @@ export default async function BeneficiosAdminPage() {
                         </div>
                       </div>
                     </td>
-                    <td className="px-8 py-6">
+                    <td className="px-4 md:px-8 py-6">
                       <span className="px-3 py-1 rounded-full bg-blue-50 text-blue-600 text-[10px] font-black uppercase tracking-widest border border-blue-100">
                         {b.descuento}
                       </span>
                     </td>
-                    <td className="px-8 py-6">
+                    <td className="px-4 md:px-8 py-6">
                       <p className="text-xs font-bold text-slate-400 flex items-center uppercase tracking-wider">
                         <Tag className="mr-1.5 h-3 w-3" /> {b.categoria.nombre}
                       </p>
                     </td>
-                    <td className="px-8 py-6 text-right">
+                    <td className="px-4 md:px-8 py-6 text-right">
                       <div className="flex items-center justify-end space-x-2">
                         <Link 
                           href={`/kineclub?cat=${b.categoria.slug}`} 

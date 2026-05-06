@@ -8,6 +8,14 @@
 :root {
   --background: oklch(1 0 0);
   --foreground: oklch(0.145 0 0);
+  font-size: 16px;
+}
+
+/* Ajuste para laptops de 13-14 pulgadas (resoluciones intermedias) */
+@media (min-width: 1024px) and (max-width: 1440px) {
+  :root {
+    font-size: 14px; /* Bajamos el base para que los rem escalen hacia abajo */
+  }
 }
 
 @media (prefers-color-scheme: dark) {
