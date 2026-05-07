@@ -24,3 +24,16 @@ The system MUST support pagination to optimize performance.
 - **WHEN** the system requests page 2 with a specific page size
 - **THEN** the repository SHOULD return the correct slice of data and the total count for pagination calculations.
 
+### Requirement: Unique Field Lookup
+The `ProfesionalRepository` MUST support looking up professionals by unique fields (email, matricula) to prevent duplicates.
+
+#### Scenario: Lookup by email
+- **GIVEN** the system needs to verify an email
+- **WHEN** the `ProfesionalRepository` is queried by email (case-insensitive)
+- **THEN** it MUST return the matching professional or null if not found.
+
+#### Scenario: Lookup by matricula
+- **GIVEN** the system needs to verify a matricula
+- **WHEN** the `ProfesionalRepository` is queried by matricula
+- **THEN** it MUST return the matching professional or null if not found.
+

@@ -12,9 +12,12 @@ export default function BotonesSolicitud({ id }: { id: string }) {
     
     setIsPending(true);
     try {
-      await gestionarSolicitud(id, accion);
+      const result = await gestionarSolicitud(id, accion);
+      if (!result.success) {
+        alert(result.error || "Hubo un error al procesar la acción.");
+      }
     } catch (error) {
-      alert("Hubo un error al procesar la acción.");
+      alert("Error de conexión al procesar la acción.");
     } finally {
       setIsPending(false);
     }

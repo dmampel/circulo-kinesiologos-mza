@@ -79,4 +79,24 @@ export class ProfesionalRepository {
       },
     });
   }
+
+  static async findByEmail(email: string) {
+    return prisma.profesional.findUnique({
+      where: { email: email.toLowerCase() },
+      include: {
+        localidad: true,
+        especialidades: true,
+      },
+    });
+  }
+
+  static async findByMatricula(matricula: string) {
+    return prisma.profesional.findUnique({
+      where: { matricula },
+      include: {
+        localidad: true,
+        especialidades: true,
+      },
+    });
+  }
 }
