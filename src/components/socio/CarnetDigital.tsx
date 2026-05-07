@@ -1,8 +1,7 @@
 "use client";
 
 import { motion } from "framer-motion";
-import { ShieldCheck, CheckCircle2, Award, QrCode } from "lucide-react";
-import { Profesional } from "@prisma/client";
+import { ShieldCheck, QrCode } from "lucide-react";
 
 interface Props {
   profesional: any; // Usamos any por las relaciones o definimos el tipo extendido
@@ -14,7 +13,7 @@ export default function CarnetDigital({ profesional }: Props) {
       initial={{ opacity: 0, y: 20 }}
       animate={{ opacity: 1, y: 0 }}
       transition={{ duration: 0.5 }}
-      className="relative w-full max-w-md mx-auto aspect-[1.6/1] rounded-[2.5rem] overflow-hidden shadow-2xl shadow-blue-500/20 group"
+      className="relative w-full aspect-[1.6/1] rounded-[2.5rem] overflow-hidden shadow-2xl shadow-blue-500/20 group"
     >
       {/* Fondo Base con Gradiente Profundo */}
       <div className="absolute inset-0 bg-gradient-to-br from-blue-700 via-blue-800 to-slate-900" />
