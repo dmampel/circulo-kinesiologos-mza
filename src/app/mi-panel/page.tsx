@@ -7,7 +7,8 @@ import {
   UserCircle, 
   Bell, 
   Settings,
-  AlertCircle
+  AlertCircle,
+  CheckCircle2
 } from "lucide-react";
 import Link from "next/link";
 
