@@ -13,6 +13,14 @@ export interface PaginatedResult<T> {
   total: number;
 }
 
+export interface UpdateProfesionalData {
+  telefono?: string;
+  whatsapp?: string;
+  direccion?: string;
+  horarios?: string;
+  foto_url?: string;
+}
+
 export class ProfesionalRepository {
   static async findPaginated(
     page: number,
@@ -97,6 +105,13 @@ export class ProfesionalRepository {
         localidad: true,
         especialidades: true,
       },
+    });
+  }
+
+  static async update(userId: string, data: UpdateProfesionalData) {
+    return prisma.profesional.update({
+      where: { userId },
+      data,
     });
   }
 }
