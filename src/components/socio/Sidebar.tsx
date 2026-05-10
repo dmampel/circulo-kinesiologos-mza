@@ -32,7 +32,7 @@ const navItems = [
 const toolItems = [
   { title: "Obras Sociales", href: "/obras-sociales", icon: Building2 },
   { title: "KineClub", href: "/kineclub", icon: Star },
-  { title: "Capacitaciones", href: "/noticias", icon: BookOpen },
+  { title: "Capacitaciones", href: "/mi-panel/capacitaciones", icon: BookOpen },
 ];
 
 export default function Sidebar() {

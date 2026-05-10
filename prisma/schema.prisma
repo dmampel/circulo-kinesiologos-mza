@@ -48,7 +48,8 @@ model Profesional {
   localidadId String
   localidad   Localidad @relation(fields: [localidadId], references: [id])
 
-  especialidades Especialidad[]
+  especialidades            Especialidad[]
+  inscripcionesCapacitacion InscripcionCapacitacion[]
 
   // Auth y Sistema
   userId String?  @unique // ID de Supabase Auth
@@ -132,4 +133,58 @@ model Solicitud {
   datos       Json // Snapshot completo de los datos enviados
   creada_en   DateTime        @default(now())
   revisada_en DateTime?
+}
+
+enum TipoCapacitacion {
+  CURSO
+  TALLER
+  CONGRESO
+  ASAMBLEA
+}
+
+enum ModalidadCapacitacion {
+  PRESENCIAL
+  VIRTUAL
+  HIBRIDO
+}
+
+enum EstadoInscripcion {
+  PENDIENTE
+  CONFIRMADA
+  CANCELADA
+  ASISTIO
+}
+
+model Capacitacion {
+  id              String                @id @default(cuid())
+  tipo            TipoCapacitacion
+  titulo          String
+  descripcion     String                @db.Text
+  modalidad       ModalidadCapacitacion
+  fechaInicio     DateTime
+  fechaFin        DateTime?
+  ubicacion       String?
+  cupoMaximo      Int?
+  costo           Decimal?              @db.Decimal(10,2)
+  publicada       Boolean               @default(false)
+  
+  inscripciones   InscripcionCapacitacion[]
+  
+  createdAt       DateTime              @default(now())
+  updatedAt       DateTime              @updatedAt
+}
+
+model InscripcionCapacitacion {
+  id              String            @id @default(cuid())
+  capacitacionId  String
+  profesionalId   String
+  estado          EstadoInscripcion @default(PENDIENTE)
+  
+  capacitacion    Capacitacion      @relation(fields: [capacitacionId], references: [id])
+  profesional     Profesional       @relation(fields: [profesionalId], references: [id])
+  
+  createdAt       DateTime          @default(now())
+  updatedAt       DateTime          @updatedAt
+
+  @@unique([capacitacionId, profesionalId])
 }
