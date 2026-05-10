@@ -2,6 +2,7 @@ import { createClient } from "@/utils/supabase/server";
 import { ProfesionalRepository } from "@/lib/repositories/ProfesionalRepository";
 import { CapacitacionRepository } from "@/lib/repositories/CapacitacionRepository";
 import { redirect } from "next/navigation";
+import Link from "next/link";
 import { BookOpen, Calendar, MapPin, CheckCircle2, Clock, XCircle } from "lucide-react";
 import BotonInscripcion from "@/components/socio/BotonInscripcion";
 import BotonCancelarInscripcion from "@/components/socio/BotonCancelarInscripcion";
@@ -108,7 +109,12 @@ export default async function CapacitacionesSocioPage() {
                             {c.modalidad}
                           </span>
                         </div>
-                        <h3 className="text-lg font-black text-slate-900">{c.titulo}</h3>
+                        <Link
+                          href={`/mi-panel/capacitaciones/${c.id}`}
+                          className="hover:text-blue-600 transition-colors"
+                        >
+                          <h3 className="text-lg font-black text-slate-900">{c.titulo}</h3>
+                        </Link>
                       </div>
 
                       <p className="text-sm text-slate-500 font-medium line-clamp-2">

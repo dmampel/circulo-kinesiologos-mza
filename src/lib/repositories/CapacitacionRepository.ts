@@ -122,4 +122,21 @@ export class CapacitacionRepository {
       data: { estado },
     });
   }
+
+  static async findPublicadaById(id: string) {
+    return prisma.capacitacion.findFirst({
+      where: { id, publicada: true },
+      include: {
+        _count: {
+          select: { inscripciones: { where: { estado: { not: "CANCELADA" } } } },
+        },
+      },
+    });
+  }
+
+  static async getInscripcionSocio(profesionalId: string, capacitacionId: string) {
+    return prisma.inscripcionCapacitacion.findFirst({
+      where: { profesionalId, capacitacionId, estado: { not: "CANCELADA" } },
+    });
+  }
 }
