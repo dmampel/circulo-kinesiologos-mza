@@ -1,10 +1,12 @@
 import { CapacitacionRepository } from "@/lib/repositories/CapacitacionRepository";
-import { Plus, BookOpen, Clock, Search, ExternalLink, Users, Edit } from "lucide-react";
+import { Plus, BookOpen, Clock, Search, Users, Pencil } from "lucide-react";
 import Link from "next/link";
 import { cn } from "@/lib/utils";
 
+type CapacitacionListItem = Awaited<ReturnType<typeof CapacitacionRepository.findAll>>[number];
+
 export default async function CapacitacionesAdminPage() {
-  const capacitaciones = await CapacitacionRepository.findAll();
+  const capacitaciones: CapacitacionListItem[] = await CapacitacionRepository.findAll();
 
   return (
     <div className="space-y-8 animate-in fade-in duration-500">
@@ -70,7 +72,7 @@ export default async function CapacitacionesAdminPage() {
                     <td className="px-8 py-6">
                       <p className="text-xs font-bold text-slate-400 flex items-center uppercase tracking-wider">
                         <Clock className="mr-1.5 h-3 w-3" />
-                        {new Date(c.fechaInicio).toLocaleDateString()}
+                        {new Date(c.fechaInicio).toLocaleDateString("es-AR")}
                       </p>
                     </td>
                     <td className="px-8 py-6">
@@ -91,6 +93,13 @@ export default async function CapacitacionesAdminPage() {
                     </td>
                     <td className="px-8 py-6 text-right">
                       <div className="flex items-center justify-end space-x-2">
+                        <Link
+                          href={`/admin/capacitaciones/${c.id}/editar`}
+                          className="p-2 rounded-lg bg-slate-50 text-slate-500 hover:bg-slate-600 hover:text-white transition-all shadow-sm"
+                          title="Editar capacitación"
+                        >
+                          <Pencil className="h-4 w-4" />
+                        </Link>
                         <Link
                           href={`/admin/capacitaciones/${c.id}`}
                           className="p-2 rounded-lg bg-blue-50 text-blue-600 hover:bg-blue-600 hover:text-white transition-all shadow-sm"

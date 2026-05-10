@@ -1,8 +1,13 @@
+"use client";
+
+import { useActionState } from "react";
 import { createCapacitacion } from "../actions";
 import { ArrowLeft, Save } from "lucide-react";
 import Link from "next/link";
 
 export default function NuevaCapacitacionPage() {
+  const [state, action, pending] = useActionState(createCapacitacion, null);
+
   return (
     <div className="max-w-3xl mx-auto space-y-8 animate-in fade-in duration-500">
       <div className="flex items-center gap-4">
@@ -18,7 +23,7 @@ export default function NuevaCapacitacionPage() {
         </div>
       </div>
 
-      <form action={createCapacitacion} className="bg-white rounded-[2.5rem] shadow-sm border border-slate-100 p-8 space-y-6">
+      <form action={action} className="bg-white rounded-[2.5rem] shadow-sm border border-slate-100 p-8 space-y-6">
         <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
           <div className="space-y-2">
             <label className="text-xs font-bold text-slate-900 uppercase tracking-widest">Título</label>
@@ -28,6 +33,9 @@ export default function NuevaCapacitacionPage() {
               className="w-full px-4 py-3 bg-slate-50 border border-slate-200 rounded-xl focus:ring-2 focus:ring-blue-500 focus:border-transparent outline-none transition-all"
               placeholder="Ej: Curso de Kinesiología Deportiva"
             />
+            {state?.errors?.titulo?.[0] && (
+              <p className="text-xs font-medium text-red-500 mt-1">{state.errors.titulo[0]}</p>
+            )}
           </div>
 
           <div className="space-y-2">
@@ -42,6 +50,9 @@ export default function NuevaCapacitacionPage() {
               <option value="CONGRESO">Congreso</option>
               <option value="ASAMBLEA">Asamblea</option>
             </select>
+            {state?.errors?.tipo?.[0] && (
+              <p className="text-xs font-medium text-red-500 mt-1">{state.errors.tipo[0]}</p>
+            )}
           </div>
 
           <div className="space-y-2">
@@ -55,6 +66,9 @@ export default function NuevaCapacitacionPage() {
               <option value="VIRTUAL">Virtual</option>
               <option value="HIBRIDO">Híbrido</option>
             </select>
+            {state?.errors?.modalidad?.[0] && (
+              <p className="text-xs font-medium text-red-500 mt-1">{state.errors.modalidad[0]}</p>
+            )}
           </div>
 
           <div className="space-y-2">
@@ -74,6 +88,9 @@ export default function NuevaCapacitacionPage() {
               required
               className="w-full px-4 py-3 bg-slate-50 border border-slate-200 rounded-xl focus:ring-2 focus:ring-blue-500 focus:border-transparent outline-none transition-all"
             />
+            {state?.errors?.fechaInicio?.[0] && (
+              <p className="text-xs font-medium text-red-500 mt-1">{state.errors.fechaInicio[0]}</p>
+            )}
           </div>
 
           <div className="space-y-2">
@@ -83,6 +100,9 @@ export default function NuevaCapacitacionPage() {
               name="fechaFin"
               className="w-full px-4 py-3 bg-slate-50 border border-slate-200 rounded-xl focus:ring-2 focus:ring-blue-500 focus:border-transparent outline-none transition-all"
             />
+            {state?.errors?.fechaFin?.[0] && (
+              <p className="text-xs font-medium text-red-500 mt-1">{state.errors.fechaFin[0]}</p>
+            )}
           </div>
 
           <div className="space-y-2">
@@ -94,6 +114,9 @@ export default function NuevaCapacitacionPage() {
               className="w-full px-4 py-3 bg-slate-50 border border-slate-200 rounded-xl focus:ring-2 focus:ring-blue-500 focus:border-transparent outline-none transition-all"
               placeholder="Sin límite si está vacío"
             />
+            {state?.errors?.cupoMaximo?.[0] && (
+              <p className="text-xs font-medium text-red-500 mt-1">{state.errors.cupoMaximo[0]}</p>
+            )}
           </div>
 
           <div className="space-y-2">
@@ -106,6 +129,9 @@ export default function NuevaCapacitacionPage() {
               className="w-full px-4 py-3 bg-slate-50 border border-slate-200 rounded-xl focus:ring-2 focus:ring-blue-500 focus:border-transparent outline-none transition-all"
               placeholder="Gratis si está vacío"
             />
+            {state?.errors?.costo?.[0] && (
+              <p className="text-xs font-medium text-red-500 mt-1">{state.errors.costo[0]}</p>
+            )}
           </div>
         </div>
 
@@ -118,6 +144,9 @@ export default function NuevaCapacitacionPage() {
             className="w-full px-4 py-3 bg-slate-50 border border-slate-200 rounded-xl focus:ring-2 focus:ring-blue-500 focus:border-transparent outline-none transition-all resize-none"
             placeholder="Detalles del curso, disertantes, etc."
           />
+          {state?.errors?.descripcion?.[0] && (
+            <p className="text-xs font-medium text-red-500 mt-1">{state.errors.descripcion[0]}</p>
+          )}
         </div>
 
         <div className="flex items-center gap-3 py-4 border-t border-slate-100">
@@ -142,9 +171,10 @@ export default function NuevaCapacitacionPage() {
           </Link>
           <button
             type="submit"
-            className="flex items-center px-8 py-3 rounded-xl bg-blue-600 text-white font-bold hover:bg-blue-700 transition-all shadow-lg shadow-blue-200"
+            disabled={pending}
+            className="flex items-center px-8 py-3 rounded-xl bg-blue-600 text-white font-bold hover:bg-blue-700 transition-all shadow-lg shadow-blue-200 disabled:opacity-60"
           >
-            <Save className="mr-2 h-4 w-4" /> Guardar Capacitación
+            <Save className="mr-2 h-4 w-4" /> {pending ? "Guardando..." : "Guardar Capacitación"}
           </button>
         </div>
       </form>

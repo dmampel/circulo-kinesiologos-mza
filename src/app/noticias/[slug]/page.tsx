@@ -53,11 +53,11 @@ export default async function NoticiaDetailPage({ params }: Props) {
         {/* Article Header */}
         <header className="mb-12">
           <div className="flex items-center justify-between mb-6">
-            <time 
-              dateTime={noticia.publicada_en.toISOString()}
+            <time
+              dateTime={noticia.publicada_en?.toISOString()}
               className="text-sm font-semibold text-blue-600 tracking-wider uppercase"
             >
-              {format(noticia.publicada_en, "d 'de' MMMM, yyyy", { locale: es })}
+              {noticia.publicada_en ? format(noticia.publicada_en, "d 'de' MMMM, yyyy", { locale: es }) : ""}
             </time>
             
             <button className="p-2 text-slate-400 hover:text-slate-600 bg-white rounded-full shadow-sm hover:shadow transition-all">

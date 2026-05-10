@@ -3,8 +3,45 @@ import { ProfesionalRepository } from "@/lib/repositories/ProfesionalRepository"
 import { CapacitacionRepository } from "@/lib/repositories/CapacitacionRepository";
 import { redirect } from "next/navigation";
 import { BookOpen, Calendar, MapPin, CheckCircle2, Clock, XCircle } from "lucide-react";
-import { cancelarInscripcionSocio } from "./actions";
 import BotonInscripcion from "@/components/socio/BotonInscripcion";
+import BotonCancelarInscripcion from "@/components/socio/BotonCancelarInscripcion";
+
+function InscripcionCard({ insc, profesionalId }: { insc: Inscripcion; profesionalId: string }) {
+  return (
+    <div className="bg-white rounded-2xl p-4 border border-slate-100 shadow-sm relative overflow-hidden group">
+      <div className="absolute top-0 left-0 w-1 h-full bg-slate-200 group-hover:bg-blue-400 transition-colors" />
+      <div className="pl-2">
+        <p className="text-sm font-black text-slate-900 line-clamp-1">{insc.capacitacion.titulo}</p>
+        <p className="text-xs text-slate-400 font-medium mb-3">
+          {new Date(insc.capacitacion.fechaInicio).toLocaleDateString("es-AR")}
+        </p>
+        <div className="flex items-center justify-between">
+          {insc.estado === "PENDIENTE" && (
+            <span className="text-[10px] font-black uppercase tracking-widest text-orange-600 bg-orange-50 px-2 py-1 rounded-full flex items-center">
+              <Clock className="mr-1 h-3 w-3" /> Pendiente
+            </span>
+          )}
+          {insc.estado === "CONFIRMADA" && (
+            <span className="text-[10px] font-black uppercase tracking-widest text-green-600 bg-green-50 px-2 py-1 rounded-full flex items-center">
+              <CheckCircle2 className="mr-1 h-3 w-3" /> Confirmada
+            </span>
+          )}
+          {insc.estado === "CANCELADA" && (
+            <span className="text-[10px] font-black uppercase tracking-widest text-red-600 bg-red-50 px-2 py-1 rounded-full flex items-center">
+              <XCircle className="mr-1 h-3 w-3" /> Cancelada
+            </span>
+          )}
+          {insc.estado !== "CANCELADA" && (
+            <BotonCancelarInscripcion inscripcionId={insc.id} profesionalId={profesionalId} />
+          )}
+        </div>
+      </div>
+    </div>
+  );
+}
+
+type Publicada = Awaited<ReturnType<typeof CapacitacionRepository.findPublicadas>>[number];
+type Inscripcion = Awaited<ReturnType<typeof CapacitacionRepository.getInscripcionesSocio>>[number];
 
 export default async function CapacitacionesSocioPage() {
   const supabase = await createClient();
@@ -18,11 +55,18 @@ export default async function CapacitacionesSocioPage() {
   const publicadas = await CapacitacionRepository.findPublicadas();
   const misInscripciones = await CapacitacionRepository.getInscripcionesSocio(profesional.id);
 
-  // Armamos un Map de los IDs donde ya estoy inscripto y NO está cancelado para la UI
-  const estadoInscripcionesMap = new Map(
+  const estadoInscripcionesMap = new Map<string, string>(
     misInscripciones
-      .filter((i) => i.estado !== "CANCELADA")
-      .map((i) => [i.capacitacionId, i.estado])
+      .filter((i: Inscripcion) => i.estado !== "CANCELADA")
+      .map((i: Inscripcion) => [i.capacitacionId, i.estado])
+  );
+
+  const ahora = new Date();
+  const inscripcionesProximas = misInscripciones.filter(
+    (i: Inscripcion) => i.estado !== "CANCELADA" && new Date(i.capacitacion.fechaInicio) > ahora
+  );
+  const inscripcionesHistorial = misInscripciones.filter(
+    (i: Inscripcion) => i.estado === "CANCELADA" || new Date(i.capacitacion.fechaInicio) <= ahora
   );
 
   return (
@@ -47,8 +91,8 @@ export default async function CapacitacionesSocioPage() {
             </div>
           ) : (
             <div className="grid grid-cols-1 gap-6">
-              {publicadas.map((c) => {
-                const estadoInscripcion = estadoInscripcionesMap.get(c.id) || null;
+              {publicadas.map((c: Publicada) => {
+                const estadoInscripcion: string | null = estadoInscripcionesMap.get(c.id) ?? null;
                 const yaInscripto = estadoInscripcion !== null;
                 const sinCupo = c.cupoMaximo ? c._count.inscripciones >= c.cupoMaximo : false;
 
@@ -74,7 +118,7 @@ export default async function CapacitacionesSocioPage() {
                       <div className="flex flex-wrap items-center gap-4 text-xs font-bold text-slate-400">
                         <div className="flex items-center">
                           <Calendar className="mr-1.5 h-4 w-4" />
-                          {new Date(c.fechaInicio).toLocaleDateString()}
+                          {new Date(c.fechaInicio).toLocaleDateString("es-AR")}
                         </div>
                         {c.ubicacion && (
                           <div className="flex items-center">
@@ -105,11 +149,11 @@ export default async function CapacitacionesSocioPage() {
                           Cupo Agotado
                         </div>
                       ) : (
-                        <BotonInscripcion 
-                          profesionalId={profesional.id} 
-                          capacitacionId={c.id} 
-                          costo={c.costo ? Number(c.costo) : null} 
-                          titulo={c.titulo} 
+                        <BotonInscripcion
+                          profesionalId={profesional.id}
+                          capacitacionId={c.id}
+                          costo={c.costo ? Number(c.costo) : null}
+                          titulo={c.titulo}
                           estadoInscripcion={estadoInscripcion}
                         />
                       )}
@@ -122,51 +166,36 @@ export default async function CapacitacionesSocioPage() {
         </div>
 
         {/* Mis Inscripciones (Columna Derecha 1/3) */}
-        <div className="space-y-6">
-          <h2 className="text-xl font-black text-slate-900">Historial</h2>
-          <div className="bg-slate-50 rounded-3xl border border-slate-100 p-6 space-y-4">
-            {misInscripciones.length === 0 ? (
-              <p className="text-sm text-slate-400 font-medium text-center py-4">No tenés inscripciones previas.</p>
-            ) : (
-              misInscripciones.map((insc) => (
-                <div key={insc.id} className="bg-white rounded-2xl p-4 border border-slate-100 shadow-sm relative overflow-hidden group">
-                  <div className="absolute top-0 left-0 w-1 h-full bg-slate-200 group-hover:bg-blue-400 transition-colors" />
-                  <div className="pl-2">
-                    <p className="text-sm font-black text-slate-900 line-clamp-1">{insc.capacitacion.titulo}</p>
-                    <p className="text-xs text-slate-400 font-medium mb-3">
-                      {new Date(insc.capacitacion.fechaInicio).toLocaleDateString()}
-                    </p>
-                    
-                    <div className="flex items-center justify-between">
-                      {insc.estado === "PENDIENTE" && (
-                        <span className="text-[10px] font-black uppercase tracking-widest text-orange-600 bg-orange-50 px-2 py-1 rounded-full flex items-center">
-                          <Clock className="mr-1 h-3 w-3" /> Pendiente
-                        </span>
-                      )}
-                      {insc.estado === "CONFIRMADA" && (
-                        <span className="text-[10px] font-black uppercase tracking-widest text-green-600 bg-green-50 px-2 py-1 rounded-full flex items-center">
-                          <CheckCircle2 className="mr-1 h-3 w-3" /> Confirmada
-                        </span>
-                      )}
-                      {insc.estado === "CANCELADA" && (
-                        <span className="text-[10px] font-black uppercase tracking-widest text-red-600 bg-red-50 px-2 py-1 rounded-full flex items-center">
-                          <XCircle className="mr-1 h-3 w-3" /> Cancelada
-                        </span>
-                      )}
+        <div className="space-y-8">
 
-                      {insc.estado !== "CANCELADA" && (
-                        <form action={cancelarInscripcionSocio.bind(null, insc.id, profesional.id)}>
-                          <button type="submit" className="text-[10px] font-bold text-slate-400 hover:text-red-500 hover:underline transition-colors">
-                            Bajarme
-                          </button>
-                        </form>
-                      )}
-                    </div>
-                  </div>
-                </div>
-              ))
-            )}
+          {/* Próximamente */}
+          <div className="space-y-4">
+            <h2 className="text-xl font-black text-slate-900">Próximas</h2>
+            <div className="bg-slate-50 rounded-3xl border border-slate-100 p-6 space-y-4">
+              {inscripcionesProximas.length === 0 ? (
+                <p className="text-sm text-slate-400 font-medium text-center py-4">No tenés eventos próximos.</p>
+              ) : (
+                inscripcionesProximas.map((insc: Inscripcion) => (
+                  <InscripcionCard key={insc.id} insc={insc} profesionalId={profesional.id} />
+                ))
+              )}
+            </div>
           </div>
+
+          {/* Historial */}
+          <div className="space-y-4">
+            <h2 className="text-xl font-black text-slate-900">Historial</h2>
+            <div className="bg-slate-50 rounded-3xl border border-slate-100 p-6 space-y-4">
+              {inscripcionesHistorial.length === 0 ? (
+                <p className="text-sm text-slate-400 font-medium text-center py-4">No tenés inscripciones anteriores.</p>
+              ) : (
+                inscripcionesHistorial.map((insc: Inscripcion) => (
+                  <InscripcionCard key={insc.id} insc={insc} profesionalId={profesional.id} />
+                ))
+              )}
+            </div>
+          </div>
+
         </div>
       </div>
     </div>

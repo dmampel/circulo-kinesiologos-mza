@@ -96,13 +96,13 @@ export default async function BeneficiosAdminPage() {
                     </td>
                     <td className="px-4 md:px-8 py-6">
                       <p className="text-xs font-bold text-slate-400 flex items-center uppercase tracking-wider">
-                        <Tag className="mr-1.5 h-3 w-3" /> {b.categoria.nombre}
+                        <Tag className="mr-1.5 h-3 w-3" /> {b.categoria?.nombre}
                       </p>
                     </td>
                     <td className="px-4 md:px-8 py-6 text-right">
                       <div className="flex items-center justify-end space-x-2">
                         <Link 
-                          href={`/kineclub?cat=${b.categoria.slug}`} 
+                          href={`/kineclub?cat=${b.categoria?.slug}`}
                           target="_blank"
                           className="p-2 rounded-lg bg-slate-50 text-slate-400 hover:text-blue-600 transition-all"
                         >

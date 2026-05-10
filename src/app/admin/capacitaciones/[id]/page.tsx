@@ -66,7 +66,7 @@ export default async function CapacitacionDetallePage({ params }: { params: Prom
                     </td>
                     <td className="px-8 py-4">
                       <p className="text-xs font-bold text-slate-400">
-                        {new Date(insc.createdAt).toLocaleDateString()}
+                        {new Date(insc.createdAt).toLocaleDateString("es-AR")}
                       </p>
                     </td>
                     <td className="px-8 py-4">

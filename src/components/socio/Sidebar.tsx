@@ -27,12 +27,12 @@ const navItems = [
   { title: "Dashboard", href: "/mi-panel", icon: LayoutDashboard },
   { title: "Mi Carnet", href: "/mi-panel/carnet", icon: CreditCard },
   { title: "Mi Perfil", href: "/mi-panel/perfil", icon: UserCircle },
+  { title: "Capacitaciones", href: "/mi-panel/capacitaciones", icon: BookOpen },
 ];
 
 const toolItems = [
   { title: "Obras Sociales", href: "/obras-sociales", icon: Building2 },
   { title: "KineClub", href: "/kineclub", icon: Star },
-  { title: "Capacitaciones", href: "/mi-panel/capacitaciones", icon: BookOpen },
 ];
 
 export default function Sidebar() {
@@ -99,7 +99,7 @@ export default function Sidebar() {
       {/* Tools Section */}
       <div className="mt-auto pt-6 border-t border-slate-100">
         <p className="text-[9px] font-black text-slate-400 uppercase tracking-[0.2em] px-2 mb-3">
-          Herramientas
+          Páginas del Sitio
         </p>
         <div className="space-y-1">
           {toolItems.map((item) => (

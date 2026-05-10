@@ -116,7 +116,7 @@ export class CapacitacionRepository {
     });
   }
 
-  static async actualizarEstadoInscripcion(id: string, estado: "PENDIENTE" | "CONFIRMADA" | "CANCELADA" | "ASISTIO") {
+  static async actualizarEstadoInscripcion(id: string, estado: "PENDIENTE" | "CONFIRMADA" | "CANCELADA") {
     return prisma.inscripcionCapacitacion.update({
       where: { id },
       data: { estado },

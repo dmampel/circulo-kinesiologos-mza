@@ -152,7 +152,6 @@ enum EstadoInscripcion {
   PENDIENTE
   CONFIRMADA
   CANCELADA
-  ASISTIO
 }
 
 model Capacitacion {

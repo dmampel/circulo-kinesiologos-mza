@@ -40,7 +40,7 @@ export default async function NoticiasPage() {
                   </div>
                   <div className="md:col-span-3 p-8 lg:p-10 flex flex-col justify-center">
                     <div className="flex items-center space-x-4 mb-4 text-[10px] font-black uppercase tracking-widest text-blue-600">
-                      <span className="bg-blue-50 px-3 py-1 rounded-full">{n.categoria || "General"}</span>
+                      <span className="bg-blue-50 px-3 py-1 rounded-full">General</span>
                       <span className="text-slate-400 flex items-center">
                         <Clock className="mr-1 h-3 w-3" /> 
                         {n.publicada_en ? format(n.publicada_en, "dd 'de' MMMM", { locale: es }) : "Reciente"}

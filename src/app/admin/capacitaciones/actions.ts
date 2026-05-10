@@ -1,31 +1,72 @@
 "use server";
 
+import { z } from "zod";
+import { CapacitacionSchema, CapacitacionFormState } from "./schema";
 import { CapacitacionRepository } from "@/lib/repositories/CapacitacionRepository";
 import { revalidatePath } from "next/cache";
 import { redirect } from "next/navigation";
-import { TipoCapacitacion, ModalidadCapacitacion } from "@prisma/client";
 
-export async function createCapacitacion(formData: FormData) {
-  const data = {
-    titulo: formData.get("titulo") as string,
-    descripcion: formData.get("descripcion") as string,
-    tipo: formData.get("tipo") as TipoCapacitacion,
-    modalidad: formData.get("modalidad") as ModalidadCapacitacion,
-    fechaInicio: new Date(formData.get("fechaInicio") as string),
-    fechaFin: formData.get("fechaFin") ? new Date(formData.get("fechaFin") as string) : undefined,
-    ubicacion: (formData.get("ubicacion") as string) || undefined,
-    cupoMaximo: formData.get("cupoMaximo") ? parseInt(formData.get("cupoMaximo") as string) : undefined,
-    costo: formData.get("costo") ? parseFloat(formData.get("costo") as string) : undefined,
+export async function createCapacitacion(
+  _prevState: CapacitacionFormState,
+  formData: FormData
+): Promise<CapacitacionFormState> {
+  const fechaFinRaw = formData.get("fechaFin") as string;
+
+  const parsed = CapacitacionSchema.safeParse({
+    titulo: formData.get("titulo"),
+    descripcion: formData.get("descripcion"),
+    tipo: formData.get("tipo"),
+    modalidad: formData.get("modalidad"),
+    fechaInicio: formData.get("fechaInicio"),
+    fechaFin: fechaFinRaw || undefined,
+    ubicacion: formData.get("ubicacion") || undefined,
+    cupoMaximo: formData.get("cupoMaximo") || undefined,
+    costo: formData.get("costo") || undefined,
     publicada: formData.get("publicada") === "on",
-  };
+  });
 
-  await CapacitacionRepository.create(data);
+  if (!parsed.success) {
+    return { success: false, errors: z.flattenError(parsed.error).fieldErrors };
+  }
 
+  await CapacitacionRepository.create(parsed.data);
   revalidatePath("/admin/capacitaciones");
   redirect("/admin/capacitaciones");
 }
 
-export async function cambiarEstadoInscripcion(id: string, nuevoEstado: "PENDIENTE" | "CONFIRMADA" | "CANCELADA" | "ASISTIO") {
+export async function updateCapacitacion(
+  id: string,
+  _prevState: CapacitacionFormState,
+  formData: FormData
+): Promise<CapacitacionFormState> {
+  const fechaFinRaw = formData.get("fechaFin") as string;
+
+  const parsed = CapacitacionSchema.partial().safeParse({
+    titulo: formData.get("titulo"),
+    descripcion: formData.get("descripcion"),
+    tipo: formData.get("tipo"),
+    modalidad: formData.get("modalidad"),
+    fechaInicio: formData.get("fechaInicio"),
+    fechaFin: fechaFinRaw || undefined,
+    ubicacion: formData.get("ubicacion") || undefined,
+    cupoMaximo: formData.get("cupoMaximo") || undefined,
+    costo: formData.get("costo") || undefined,
+    publicada: formData.get("publicada") === "on",
+  });
+
+  if (!parsed.success) {
+    return { success: false, errors: z.flattenError(parsed.error).fieldErrors };
+  }
+
+  await CapacitacionRepository.update(id, parsed.data);
+  revalidatePath("/admin/capacitaciones");
+  redirect("/admin/capacitaciones");
+}
+
+export async function cambiarEstadoInscripcion(
+  id: string,
+  nuevoEstado: "PENDIENTE" | "CONFIRMADA" | "CANCELADA"
+) {
   await CapacitacionRepository.actualizarEstadoInscripcion(id, nuevoEstado);
   revalidatePath("/admin/capacitaciones/[id]", "page");
 }

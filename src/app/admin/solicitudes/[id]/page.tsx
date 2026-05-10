@@ -71,7 +71,7 @@ export default async function DetalleSolicitudPage({ params }: Props) {
                 {solicitud.status}
               </span>
               <span className="text-xs text-slate-400 font-bold uppercase tracking-tight flex items-center">
-                <Clock className="h-3 w-3 mr-1" /> Recibida el {new Date(solicitud.creada_en).toLocaleDateString()}
+                <Clock className="h-3 w-3 mr-1" /> Recibida el {new Date(solicitud.creada_en).toLocaleDateString("es-AR")}
               </span>
             </div>
           </div>

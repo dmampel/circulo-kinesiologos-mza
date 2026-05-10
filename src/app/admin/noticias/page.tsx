@@ -96,7 +96,7 @@ export default async function NoticiasAdminPage() {
                     <td className="px-8 py-6">
                       <p className="text-xs font-bold text-slate-400 flex items-center uppercase tracking-wider">
                         <Clock className="mr-1.5 h-3 w-3" /> 
-                        {n.publicada_en ? new Date(n.publicada_en).toLocaleDateString() : new Date(n.createdAt).toLocaleDateString()}
+                        {n.publicada_en ? new Date(n.publicada_en).toLocaleDateString("es-AR") : new Date(n.createdAt).toLocaleDateString("es-AR")}
                       </p>
                     </td>
                     <td className="px-8 py-6 text-right">
