@@ -1,14 +1,15 @@
 import { createClient } from "@/utils/supabase/server";
 import { ProfesionalRepository } from "@/lib/repositories/ProfesionalRepository";
+import { BeneficioRepository } from "@/lib/repositories/BeneficioRepository";
 import { redirect } from "next/navigation";
 import CarnetDigital from "@/components/socio/CarnetDigital";
+import QRModal from "@/components/socio/QRModal";
 import {
   ArrowUpRight,
   UserCircle,
-  Bell,
-  Settings,
   AlertCircle,
-  LogOut,
+  Star,
+  BookOpen,
 } from "lucide-react";
 import Link from "next/link";
 import { cn } from "@/lib/utils";
@@ -24,6 +25,7 @@ export default async function DashboardPage() {
   }
 
   const profesional = await ProfesionalRepository.findByUserId(user.id);
+  const beneficios = await BeneficioRepository.findFeatured(3);
 
   if (!profesional) {
     return (
@@ -107,51 +109,53 @@ export default async function DashboardPage() {
                 className="transform group-hover:rotate-y-6 transition-transform duration-700 ease-out"
                 style={{ transformStyle: "preserve-3d" }}
               >
-                <CarnetDigital profesional={profesional} />
+                <CarnetDigital profesional={profesional} slug={profesional.slug} />
               </div>
             </div>
           </div>
 
           {/* Right Column: Quick Access Shortcuts */}
           <div className="lg:col-span-6 space-y-8">
-            <div className="space-y-4">
-              <h2 className="text-2xl font-bold text-slate-900 tracking-tight">
-                Acceso Rápido
-              </h2>
-              <div className="grid grid-cols-2 gap-4">
-                {[
-                  {
-                    label: "Mi Perfil",
-                    href: "/mi-panel/perfil",
-                    icon: UserCircle,
-                  },
-                  { label: "KineClub", href: "/kineclub", icon: ArrowUpRight },
-                  {
-                    label: "Capacitaciones",
-                    href: "/capacitaciones",
-                    icon: ArrowUpRight,
-                  },
-                  {
-                    label: "Convenios",
-                    href: "/convenios",
-                    icon: ArrowUpRight,
-                  },
-                ].map((item, i) => (
-                  <Link
-                    key={i}
-                    href={item.href}
-                    className="flex items-center gap-3 p-4 bg-white border border-slate-100 rounded-2xl hover:border-blue-200 hover:shadow-md transition-all group"
-                  >
-                    <div className="h-10 w-10 rounded-xl bg-slate-50 flex items-center justify-center text-slate-400 group-hover:bg-blue-600 group-hover:text-white transition-all">
-                      <item.icon className="h-5 w-5" />
-                    </div>
-                    <span className="text-xs font-bold text-slate-700 group-hover:text-slate-900">
-                      {item.label}
-                    </span>
-                  </Link>
-                ))}
+            {/* Acceso Rápido */}
+          <div className="space-y-4">
+            <h2 className="text-2xl font-bold text-slate-900 tracking-tight">
+              Acceso Rápido
+            </h2>
+            <div className="space-y-3">
+              <Link
+                href="/mi-panel/perfil"
+                className="flex items-center gap-4 p-5 bg-white border border-slate-100 rounded-2xl hover:border-blue-200 hover:shadow-md transition-all group w-full"
+              >
+                <div className="h-12 w-12 rounded-xl bg-slate-50 flex items-center justify-center text-slate-400 group-hover:bg-blue-600 group-hover:text-white transition-all shrink-0">
+                  <UserCircle className="h-6 w-6" />
+                </div>
+                <div>
+                  <p className="text-sm font-bold text-slate-800 group-hover:text-slate-900">Editar Perfil</p>
+                  <p className="text-[11px] text-slate-400 font-medium">Actualizá tus datos de contacto y foto</p>
+                </div>
+                <ArrowUpRight className="h-4 w-4 ml-auto text-slate-300 group-hover:text-blue-600 transition-colors" />
+              </Link>
+
+              <QRModal
+                slug={profesional.slug}
+                nombre={`${profesional.nombre} ${profesional.apellido}`}
+                matricula={profesional.matricula}
+              />
+
+<div className="relative flex items-center gap-4 p-5 bg-white border border-slate-100 rounded-2xl opacity-50 cursor-not-allowed w-full">
+                <div className="h-12 w-12 rounded-xl bg-slate-50 flex items-center justify-center text-slate-400 shrink-0">
+                  <BookOpen className="h-6 w-6" />
+                </div>
+                <div>
+                  <p className="text-sm font-bold text-slate-800">Cursos y Capacitaciones</p>
+                  <p className="text-[11px] text-slate-400 font-medium">Formación continua para profesionales</p>
+                </div>
+                <span className="ml-auto text-[9px] font-black uppercase tracking-widest px-2 py-1 bg-amber-50 text-amber-600 border border-amber-100 rounded-lg shrink-0">
+                  Próximamente
+                </span>
               </div>
             </div>
+          </div>
           </div>
         </div>
       </section>
@@ -218,8 +222,40 @@ export default async function DashboardPage() {
           </div>
         </div>
 
-        {/* Right Column: Support */}
-        <aside className="lg:col-span-4 space-y-6 self-end">
+        {/* Right Column: Beneficios + Soporte */}
+        <aside className="lg:col-span-4 space-y-6">
+          {beneficios.length > 0 && (
+            <div className="p-6 rounded-[1.5rem] bg-white border border-slate-100 shadow-sm">
+              <div className="flex items-center justify-between mb-5">
+                <h3 className="text-[10px] font-black uppercase tracking-widest text-slate-400">Tus Beneficios</h3>
+                <Link
+                  href="/kineclub"
+                  className="text-[10px] font-black text-blue-600 uppercase tracking-widest hover:underline"
+                >
+                  Ver todos
+                </Link>
+              </div>
+              <div className="space-y-4">
+                {beneficios.map((b) => (
+                  <div key={b.id} className="flex items-start gap-3">
+                    <div className="h-8 w-8 rounded-xl bg-blue-50 flex items-center justify-center text-blue-500 shrink-0">
+                      <Star className="h-4 w-4" />
+                    </div>
+                    <div className="min-w-0">
+                      <p className="text-xs font-black text-slate-800 truncate">{b.empresa}</p>
+                      <p className="text-[11px] text-slate-400 leading-snug line-clamp-2">{b.descripcion}</p>
+                      {b.descuento && (
+                        <span className="inline-block mt-1 px-2 py-0.5 bg-green-50 text-green-600 text-[9px] font-black rounded-full border border-green-100">
+                          {b.descuento}
+                        </span>
+                      )}
+                    </div>
+                  </div>
+                ))}
+              </div>
+            </div>
+          )}
+
           <div className="p-6 rounded-[1.5rem] bg-slate-50 border border-slate-100 shadow-sm relative overflow-hidden">
             <h5 className="text-[9px] font-black uppercase tracking-widest mb-3 text-slate-400">
               Soporte
