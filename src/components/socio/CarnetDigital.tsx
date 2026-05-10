@@ -1,13 +1,15 @@
 "use client";
 
 import { motion } from "framer-motion";
-import { ShieldCheck, QrCode } from "lucide-react";
+import { ShieldCheck } from "lucide-react";
+import CarnetQR from "@/components/socio/CarnetQR";
 
 interface Props {
   profesional: any; // Usamos any por las relaciones o definimos el tipo extendido
+  slug: string;
 }
 
-export default function CarnetDigital({ profesional }: Props) {
+export default function CarnetDigital({ profesional, slug }: Props) {
   return (
     <motion.div
       initial={{ opacity: 0, y: 20 }}
@@ -96,10 +98,10 @@ export default function CarnetDigital({ profesional }: Props) {
             </div>
           </div>
 
-          {/* QR Code (Mockup) */}
-          <div className="h-16 w-16 bg-white rounded-2xl p-2 shadow-xl group-hover:scale-105 transition-transform duration-500 cursor-help">
-            <div className="h-full w-full bg-slate-50 rounded-lg flex items-center justify-center text-slate-800">
-              <QrCode className="h-10 w-10 opacity-80" />
+          {/* QR Code (real — apunta al perfil público) */}
+          <div className="h-16 w-16 bg-white rounded-2xl p-2 shadow-xl group-hover:scale-105 transition-transform duration-500">
+            <div className="h-full w-full rounded-lg flex items-center justify-center bg-slate-800">
+              <CarnetQR slug={slug} />
             </div>
           </div>
         </div>

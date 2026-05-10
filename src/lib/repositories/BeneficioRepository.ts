@@ -14,4 +14,13 @@ export class BeneficioRepository {
       orderBy: { createdAt: "desc" },
     });
   }
+
+  static async findFeatured(limit = 3) {
+    return prisma.beneficioKineClub.findMany({
+      where: { activa: true },
+      orderBy: { createdAt: "desc" },
+      take: limit,
+      include: { categoria: true },
+    });
+  }
 }
