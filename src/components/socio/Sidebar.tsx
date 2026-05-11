@@ -12,6 +12,7 @@ import {
   Building2,
   Star,
   BookOpen,
+  Megaphone,
 } from "lucide-react";
 import { clsx } from "clsx";
 import { twMerge } from "tailwind-merge";
@@ -28,6 +29,7 @@ const navItems = [
   { title: "Mi Carnet", href: "/mi-panel/carnet", icon: CreditCard },
   { title: "Mi Perfil", href: "/mi-panel/perfil", icon: UserCircle },
   { title: "Capacitaciones", href: "/mi-panel/capacitaciones", icon: BookOpen },
+  { title: "Circulares", href: "/mi-panel/circulares", icon: Megaphone },
 ];
 
 const toolItems = [

@@ -2,6 +2,7 @@ import { createClient } from "@/utils/supabase/server";
 import { ProfesionalRepository } from "@/lib/repositories/ProfesionalRepository";
 import { BeneficioRepository } from "@/lib/repositories/BeneficioRepository";
 import { CapacitacionRepository } from "@/lib/repositories/CapacitacionRepository";
+import { CircularRepository } from "@/lib/repositories/CircularRepository";
 import { redirect } from "next/navigation";
 import CarnetDigital from "@/components/socio/CarnetDigital";
 import QRModal from "@/components/socio/QRModal";
@@ -44,19 +45,6 @@ function formatHora(fecha: Date) {
   return `${String(h).padStart(2, "0")}:${String(m).padStart(2, "0")}`;
 }
 
-function EstadoBadge({ estado }: { estado: string }) {
-  if (estado === "CONFIRMADA")
-    return (
-      <span className="px-2 py-0.5 rounded-md text-[9px] font-black uppercase tracking-widest bg-green-50 text-green-600 border border-green-100">
-        Confirmada
-      </span>
-    );
-  return (
-    <span className="px-2 py-0.5 rounded-md text-[9px] font-black uppercase tracking-widest bg-amber-50 text-amber-600 border border-amber-100">
-      Pendiente
-    </span>
-  );
-}
 
 const MODALIDAD_COLORS: Record<string, { bar: string; bg: string; icon: string }> = {
   PRESENCIAL: { bar: "border-l-blue-500", bg: "bg-blue-50/40", icon: "text-blue-500" },
@@ -77,7 +65,8 @@ export default async function DashboardPage() {
   }
 
   const profesional = await ProfesionalRepository.findByUserId(user.id);
-  const beneficios = await BeneficioRepository.findFeatured(3);
+  const beneficios = await BeneficioRepository.findRandom(3);
+  const circulares = await CircularRepository.getPublishedLatest(3);
 
   if (!profesional) {
     return (
@@ -372,7 +361,7 @@ export default async function DashboardPage() {
               Circulares Institucionales
             </h2>
             <Link
-              href="/novedades"
+              href="/mi-panel/circulares"
               className="text-[11px] text-slate-400 hover:text-slate-700 transition-colors"
             >
               Ver historial
@@ -380,42 +369,28 @@ export default async function DashboardPage() {
           </div>
 
           <div className="space-y-0 relative before:absolute before:left-[11px] before:top-4 before:bottom-4 before:w-[1px] before:bg-slate-100">
-            {[
-              {
-                title: "Actualización del Vademécum y Convenios de Prestación",
-                date: "12 de Mayo, 2026",
-                tag: "Circular Nº 124",
-              },
-              {
-                title: "Convocatoria a Asamblea Anual de Socios",
-                date: "08 de Mayo, 2026",
-                tag: "Institucional",
-              },
-              {
-                title: "Nuevas medidas de bioseguridad en consultorios",
-                date: "05 de Mayo, 2026",
-                tag: "Salud",
-              },
-            ].map((news, i) => (
-              <div key={i} className="group relative pl-10 py-6 first:pt-0">
+            {circulares.length === 0 ? (
+              <div className="pl-10 text-slate-400 text-sm italic py-4">No hay circulares publicadas por el momento.</div>
+            ) : circulares.map((circular, i) => (
+              <div key={circular.id} className="group relative pl-10 py-6 first:pt-0">
                 <div className="absolute left-0 top-[38px] first:top-[38px] h-[22px] w-[22px] rounded-full border-4 border-white bg-slate-100 group-hover:bg-blue-600 transition-colors z-10" />
                 <div className="space-y-1.5">
                   <div className="flex items-center gap-3">
                     <span className="text-[10px] font-bold text-slate-400 uppercase tracking-widest">
-                      {news.date}
+                      {new Intl.DateTimeFormat("es-AR", { day: "2-digit", month: "long", year: "numeric" }).format(circular.publicada_en || circular.createdAt)}
                     </span>
                     <span className="h-1 w-1 rounded-full bg-slate-200" />
                     <span className="text-[10px] font-black text-blue-600 uppercase tracking-widest">
-                      {news.tag}
+                      {circular.etiqueta}
                     </span>
                   </div>
-                  <Link href={`/novedades/${i}`} className="block">
+                  <Link href={`/mi-panel/circulares/${circular.id}`} className="block">
                     <h3 className="text-lg font-bold text-slate-900 group-hover:text-blue-700 transition-colors leading-tight">
-                      {news.title}
+                      {circular.titulo}
                     </h3>
                   </Link>
                   <Link
-                    href="#"
+                    href={`/mi-panel/circulares/${circular.id}`}
                     className="inline-flex items-center text-[10px] font-bold text-slate-400 uppercase tracking-widest group-hover:text-slate-900 transition-colors pt-1"
                   >
                     Ver más <ArrowUpRight className="ml-1 h-3 w-3" />
