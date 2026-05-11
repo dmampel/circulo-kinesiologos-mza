@@ -43,6 +43,12 @@ export default async function ProfesionalesAdminPage({
         </div>
       ) : (
         <div className="bg-white rounded-[3rem] shadow-sm border border-slate-100 overflow-hidden">
+          <div className="px-8 py-5 border-b border-slate-50 flex items-center gap-3">
+            <h3 className="font-black text-slate-900">Resultados</h3>
+            <span className="px-2 py-0.5 rounded-lg bg-slate-100 text-slate-500 text-xs font-black">
+              {profesionales.length}
+            </span>
+          </div>
           <table className="w-full text-left">
             <thead>
               <tr className="border-b border-slate-50">

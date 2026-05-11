@@ -1,39 +1,50 @@
 import { CapacitacionRepository } from "@/lib/repositories/CapacitacionRepository";
-import { Plus, BookOpen, Clock, Search, Users, Pencil } from "lucide-react";
+import { Plus, BookOpen, Clock, Users, Pencil } from "lucide-react";
 import Link from "next/link";
 import { cn } from "@/lib/utils";
+import AdminSearch from "../_components/AdminSearch";
 
 type CapacitacionListItem = Awaited<ReturnType<typeof CapacitacionRepository.findAll>>[number];
 
-export default async function CapacitacionesAdminPage() {
-  const capacitaciones: CapacitacionListItem[] = await CapacitacionRepository.findAll();
+export default async function CapacitacionesAdminPage({
+  searchParams,
+}: {
+  searchParams: Promise<{ q?: string }>;
+}) {
+  const { q } = await searchParams;
+  const query = q?.trim().toLowerCase() ?? "";
+
+  const todas: CapacitacionListItem[] = await CapacitacionRepository.findAll();
+  const capacitaciones = query
+    ? todas.filter((c) => c.titulo.toLowerCase().includes(query))
+    : todas;
 
   return (
     <div className="space-y-8 animate-in fade-in duration-500">
       <div className="flex flex-col md:flex-row md:items-center justify-between gap-6">
         <div>
           <h1 className="text-3xl font-black text-slate-900 mb-2">Gestión de Capacitaciones</h1>
-          <p className="text-slate-500 font-medium">Administrá cursos, asambleas y eventos, y controlá las inscripciones.</p>
+          <p className="text-slate-500 font-medium">
+            Administrá cursos, asambleas y eventos, y controlá las inscripciones.
+          </p>
         </div>
-        <Link
-          href="/admin/capacitaciones/nuevo"
-          className="flex items-center px-6 py-4 rounded-2xl bg-blue-600 text-white font-bold hover:bg-blue-700 transition-all shadow-xl shadow-blue-100 shrink-0"
-        >
-          <Plus className="mr-2 h-5 w-5" /> Nueva Capacitación
-        </Link>
+        <div className="flex items-center gap-3">
+          <AdminSearch placeholder="Buscar capacitación..." />
+          <Link
+            href="/admin/capacitaciones/nuevo"
+            className="flex items-center px-6 py-4 rounded-2xl bg-blue-600 text-white font-bold hover:bg-blue-700 transition-all shadow-xl shadow-blue-100 shrink-0"
+          >
+            <Plus className="mr-2 h-5 w-5" /> Nueva Capacitación
+          </Link>
+        </div>
       </div>
 
       <div className="bg-white rounded-[3rem] shadow-sm border border-slate-100 overflow-hidden">
-        <div className="p-8 border-b border-slate-50 flex flex-col md:flex-row md:items-center justify-between gap-4">
+        <div className="p-8 border-b border-slate-50 flex items-center gap-3">
           <h3 className="font-black text-slate-900">Todas las Capacitaciones</h3>
-          <div className="flex items-center space-x-2 bg-slate-50 p-2 rounded-xl border border-slate-100">
-            <Search className="ml-2 h-4 w-4 text-slate-400" />
-            <input
-              type="text"
-              placeholder="Buscar..."
-              className="bg-transparent border-none focus:ring-0 text-sm font-medium pr-4"
-            />
-          </div>
+          <span className="px-2 py-0.5 rounded-lg bg-slate-100 text-slate-500 text-xs font-black">
+            {capacitaciones.length}
+          </span>
         </div>
 
         {capacitaciones.length === 0 ? (
@@ -41,20 +52,38 @@ export default async function CapacitacionesAdminPage() {
             <div className="h-20 w-20 bg-slate-50 rounded-full flex items-center justify-center mx-auto mb-6 text-slate-300">
               <BookOpen className="h-10 w-10" />
             </div>
-            <h4 className="text-lg font-bold text-slate-900">No hay capacitaciones creadas</h4>
-            <p className="text-slate-500 mt-2">Creá el primer evento o curso para los profesionales.</p>
+            <h4 className="text-lg font-bold text-slate-900">
+              {query ? "Sin resultados" : "No hay capacitaciones creadas"}
+            </h4>
+            <p className="text-slate-500 mt-2">
+              {query
+                ? `No se encontraron capacitaciones para "${query}".`
+                : "Creá el primer evento o curso para los profesionales."}
+            </p>
           </div>
         ) : (
           <div className="overflow-x-auto">
             <table className="w-full text-left">
               <thead>
                 <tr className="border-b border-slate-50">
-                  <th className="px-8 py-6 text-[10px] font-black text-slate-400 uppercase tracking-widest">Capacitación</th>
-                  <th className="px-8 py-6 text-[10px] font-black text-slate-400 uppercase tracking-widest">Modalidad</th>
-                  <th className="px-8 py-6 text-[10px] font-black text-slate-400 uppercase tracking-widest">Fecha Inicio</th>
-                  <th className="px-8 py-6 text-[10px] font-black text-slate-400 uppercase tracking-widest">Inscriptos</th>
-                  <th className="px-8 py-6 text-[10px] font-black text-slate-400 uppercase tracking-widest">Estado</th>
-                  <th className="px-8 py-6 text-[10px] font-black text-slate-400 uppercase tracking-widest text-right">Acciones</th>
+                  <th className="px-8 py-6 text-[10px] font-black text-slate-400 uppercase tracking-widest">
+                    Capacitación
+                  </th>
+                  <th className="px-8 py-6 text-[10px] font-black text-slate-400 uppercase tracking-widest">
+                    Modalidad
+                  </th>
+                  <th className="px-8 py-6 text-[10px] font-black text-slate-400 uppercase tracking-widest">
+                    Fecha Inicio
+                  </th>
+                  <th className="px-8 py-6 text-[10px] font-black text-slate-400 uppercase tracking-widest">
+                    Inscriptos
+                  </th>
+                  <th className="px-8 py-6 text-[10px] font-black text-slate-400 uppercase tracking-widest">
+                    Estado
+                  </th>
+                  <th className="px-8 py-6 text-[10px] font-black text-slate-400 uppercase tracking-widest text-right">
+                    Acciones
+                  </th>
                 </tr>
               </thead>
               <tbody className="divide-y divide-slate-50">
@@ -62,7 +91,9 @@ export default async function CapacitacionesAdminPage() {
                   <tr key={c.id} className="hover:bg-slate-50/50 transition-colors group">
                     <td className="px-8 py-6">
                       <div className="flex flex-col">
-                        <p className="font-black text-slate-900 group-hover:text-blue-600 transition-colors line-clamp-1">{c.titulo}</p>
+                        <p className="font-black text-slate-900 group-hover:text-blue-600 transition-colors line-clamp-1">
+                          {c.titulo}
+                        </p>
                         <p className="text-xs text-slate-400 font-medium">{c.tipo}</p>
                       </div>
                     </td>
@@ -79,15 +110,22 @@ export default async function CapacitacionesAdminPage() {
                       <div className="flex items-center gap-2">
                         <Users className="h-4 w-4 text-slate-300" />
                         <span className="text-xs font-black text-slate-700">
-                          {c._count.inscripciones} {c.cupoMaximo && <span className="text-slate-400 font-medium">/ {c.cupoMaximo}</span>}
+                          {c._count.inscripciones}
+                          {c.cupoMaximo && (
+                            <span className="text-slate-400 font-medium"> / {c.cupoMaximo}</span>
+                          )}
                         </span>
                       </div>
                     </td>
                     <td className="px-8 py-6">
-                      <span className={cn(
-                        "px-3 py-1 rounded-full text-[10px] font-black uppercase tracking-widest",
-                        c.publicada ? "bg-green-100 text-green-600" : "bg-orange-100 text-orange-600"
-                      )}>
+                      <span
+                        className={cn(
+                          "px-3 py-1 rounded-full text-[10px] font-black uppercase tracking-widest",
+                          c.publicada
+                            ? "bg-green-100 text-green-600"
+                            : "bg-orange-100 text-orange-600"
+                        )}
+                      >
                         {c.publicada ? "Publicada" : "Borrador"}
                       </span>
                     </td>
