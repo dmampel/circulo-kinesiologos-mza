@@ -23,4 +23,16 @@ export class BeneficioRepository {
       include: { categoria: true },
     });
   }
+
+  static async findRandom(limit = 3) {
+    const todos = await prisma.beneficioKineClub.findMany({
+      where: { activa: true },
+      include: { categoria: true },
+    });
+    for (let i = todos.length - 1; i > 0; i--) {
+      const j = Math.floor(Math.random() * (i + 1));
+      [todos[i], todos[j]] = [todos[j], todos[i]];
+    }
+    return todos.slice(0, limit);
+  }
 }

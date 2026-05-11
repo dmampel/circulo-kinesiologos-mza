@@ -2,28 +2,35 @@
 
 import Link from "next/link";
 import { usePathname } from "next/navigation";
-import { 
-  LayoutDashboard, 
-  Users, 
-  FileText, 
-  Settings, 
-  LogOut, 
+import {
+  LayoutDashboard,
+  Users,
+  FileText,
+  Settings,
+  LogOut,
   Bell,
   ShieldCheck,
   Briefcase,
   Ticket,
   Globe,
-  BookOpen
+  BookOpen,
+  Megaphone,
 } from "lucide-react";
 import { cn } from "@/lib/utils";
 
 const SIDEBAR_LINKS = [
   { name: "Resumen", href: "/admin", icon: LayoutDashboard },
-  { name: "Solicitudes", href: "/admin/solicitudes", icon: Bell, badge: "NUEVO" },
+  {
+    name: "Solicitudes",
+    href: "/admin/solicitudes",
+    icon: Bell,
+    badge: "NUEVO",
+  },
   { name: "Profesionales", href: "/admin/profesionales", icon: Users },
   { name: "Obras Sociales", href: "/admin/obras-sociales", icon: Briefcase },
   { name: "KineClub", href: "/admin/beneficios", icon: Ticket },
   { name: "Noticias", href: "/admin/noticias", icon: FileText },
+  { name: "Circulares", href: "/admin/circulares", icon: Megaphone },
   { name: "Capacitaciones", href: "/admin/capacitaciones", icon: BookOpen },
 ];
 
@@ -43,7 +50,9 @@ export default function AdminLayout({
             <div className="h-8 w-8 bg-blue-600 rounded flex items-center justify-center">
               <span className="font-bold">CK</span>
             </div>
-            <span className="font-black tracking-tight text-lg">Panel Admin</span>
+            <span className="font-black tracking-tight text-lg">
+              Panel Admin
+            </span>
           </div>
         </div>
 
@@ -57,9 +66,9 @@ export default function AdminLayout({
                 href={link.href}
                 className={cn(
                   "flex items-center justify-between px-4 py-3 rounded-xl text-sm font-bold transition-all",
-                  isActive 
-                    ? "bg-blue-600 text-white shadow-lg shadow-blue-900/50" 
-                    : "text-slate-400 hover:bg-slate-800 hover:text-white"
+                  isActive
+                    ? "bg-blue-600 text-white shadow-lg shadow-blue-900/50"
+                    : "text-slate-400 hover:bg-slate-800 hover:text-white",
                 )}
               >
                 <div className="flex items-center">
@@ -77,7 +86,10 @@ export default function AdminLayout({
         </nav>
 
         <div className="p-6 border-t border-slate-800 space-y-2">
-          <Link href="/" className="flex items-center w-full px-4 py-3 text-sm font-bold text-slate-400 hover:text-blue-400 transition-colors">
+          <Link
+            href="/"
+            className="flex items-center w-full px-4 py-3 text-sm font-bold text-slate-400 hover:text-blue-400 transition-colors"
+          >
             <Globe className="mr-3 h-5 w-5" /> Volver al Sitio
           </Link>
           <button className="flex items-center w-full px-4 py-3 text-sm font-bold text-slate-400 hover:text-red-400 transition-colors">
@@ -91,12 +103,15 @@ export default function AdminLayout({
         {/* Topbar */}
         <header className="h-20 bg-white border-b sticky top-0 z-10 flex items-center justify-between px-8">
           <h2 className="text-sm font-black text-slate-400 uppercase tracking-widest">
-            {SIDEBAR_LINKS.find(l => l.href === pathname)?.name || "Administración"}
+            {SIDEBAR_LINKS.find((l) => l.href === pathname)?.name ||
+              "Administración"}
           </h2>
           <div className="flex items-center space-x-4">
             <div className="text-right hidden sm:block">
               <p className="text-sm font-black text-slate-900">Admin General</p>
-              <p className="text-[10px] font-bold text-slate-400 uppercase tracking-wider">Círculo Mendoza</p>
+              <p className="text-[10px] font-bold text-slate-400 uppercase tracking-wider">
+                Círculo Mendoza
+              </p>
             </div>
             <div className="h-10 w-10 rounded-xl bg-slate-100 flex items-center justify-center text-slate-400">
               <ShieldCheck className="h-6 w-6" />
@@ -105,9 +120,7 @@ export default function AdminLayout({
         </header>
 
         {/* Viewport */}
-        <div className="p-8">
-          {children}
-        </div>
+        <div className="p-8">{children}</div>
       </main>
     </div>
   );

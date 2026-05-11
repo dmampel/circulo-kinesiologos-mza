@@ -25,13 +25,17 @@ export default function Navbar() {
 
   useEffect(() => {
     const getUser = async () => {
-      const { data: { user } } = await supabase.auth.getUser();
+      const {
+        data: { user },
+      } = await supabase.auth.getUser();
       setUser(user);
       setLoading(false);
     };
     getUser();
 
-    const { data: { subscription } } = supabase.auth.onAuthStateChange((_event, session) => {
+    const {
+      data: { subscription },
+    } = supabase.auth.onAuthStateChange((_event, session) => {
       setUser(session?.user ?? null);
     });
 
@@ -53,8 +57,12 @@ export default function Navbar() {
               <span className="text-white font-bold text-xl">CK</span>
             </div>
             <div className="flex flex-col">
-              <span className="text-sm font-bold leading-tight text-slate-900">Círculo de Kinesiólogos</span>
-              <span className="text-[10px] font-medium tracking-widest text-slate-500 uppercase">Mendoza</span>
+              <span className="text-sm font-bold leading-tight text-slate-900">
+                Círculo de Kinesiólogos
+              </span>
+              <span className="text-[10px] font-medium tracking-widest text-slate-500 uppercase">
+                Mendoza
+              </span>
             </div>
           </Link>
 
@@ -69,7 +77,7 @@ export default function Navbar() {
                 {link.name}
               </Link>
             ))}
-            
+
             <div className="h-4 w-[1px] bg-slate-200 mx-2" />
 
             {!loading && (
@@ -115,7 +123,11 @@ export default function Navbar() {
               onClick={() => setIsOpen(!isOpen)}
               className="text-slate-600 hover:text-blue-600 p-2"
             >
-              {isOpen ? <X className="h-6 w-6" /> : <Menu className="h-6 w-6" />}
+              {isOpen ? (
+                <X className="h-6 w-6" />
+              ) : (
+                <Menu className="h-6 w-6" />
+              )}
             </button>
           </div>
         </div>
@@ -135,7 +147,7 @@ export default function Navbar() {
                 {link.name}
               </Link>
             ))}
-            
+
             <div className="pt-4 space-y-3">
               {!loading && (
                 <>
