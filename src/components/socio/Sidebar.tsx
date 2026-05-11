@@ -8,11 +8,13 @@ import {
   UserCircle,
   LogOut,
   ChevronRight,
+  ArrowUpRight,
   ShieldCheck,
   Building2,
   Star,
   BookOpen,
   Megaphone,
+  Home,
 } from "lucide-react";
 import { clsx } from "clsx";
 import { twMerge } from "tailwind-merge";
@@ -33,6 +35,7 @@ const navItems = [
 ];
 
 const toolItems = [
+  { title: "Inicio", href: "/", icon: Home },
   { title: "Obras Sociales", href: "/obras-sociales", icon: Building2 },
   { title: "KineClub", href: "/kineclub", icon: Star },
 ];
@@ -114,7 +117,7 @@ export default function Sidebar() {
                 <item.icon className="h-4 w-4 group-hover:scale-110 transition-transform duration-300" />
                 <span className="font-bold text-sm tracking-tight">{item.title}</span>
               </div>
-              <ChevronRight className="h-3.5 w-3.5 opacity-0 group-hover:opacity-100 transition-opacity" />
+              <ArrowUpRight className="h-3.5 w-3.5 opacity-0 group-hover:opacity-100 transition-opacity" />
             </Link>
           ))}
         </div>

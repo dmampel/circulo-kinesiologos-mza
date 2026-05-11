@@ -71,12 +71,11 @@ export default async function CapacitacionesSocioPage() {
   );
 
   return (
-    <div className="space-y-12 animate-in fade-in duration-500 pb-12">
-      <div>
-        <h1 className="text-3xl font-black text-slate-900 mb-2">Mis Capacitaciones</h1>
-        <p className="text-slate-500 font-medium">
-          Anotate a cursos, congresos y jornadas de actualización.
-        </p>
+    <div className="space-y-10 pb-10 animate-in fade-in duration-500">
+      <div className="space-y-1">
+        <p className="text-[10px] font-black text-blue-600 uppercase tracking-[0.3em]">Panel Profesional · CKM</p>
+        <h1 className="text-3xl font-black text-slate-900 tracking-tight leading-none">Mis Capacitaciones</h1>
+        <p className="text-sm text-slate-500 font-medium pt-1">Anotate a cursos, congresos y jornadas de actualización.</p>
       </div>
 
       <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">

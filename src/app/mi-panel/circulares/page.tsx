@@ -2,7 +2,7 @@ import { createClient } from "@/utils/supabase/server";
 import { CircularRepository } from "@/lib/repositories/CircularRepository";
 import { redirect } from "next/navigation";
 import Link from "next/link";
-import { ArrowLeft, ArrowRight, FileText, Megaphone } from "lucide-react";
+import { ArrowRight, FileText, Megaphone } from "lucide-react";
 
 export default async function CircularesHistorialPage() {
   const supabase = await createClient();
@@ -17,31 +17,20 @@ export default async function CircularesHistorialPage() {
   const circulares = await CircularRepository.getAllPublished();
 
   return (
-    <div className="max-w-3xl mx-auto space-y-10 pb-16 animate-in fade-in duration-500">
+    <div className="max-w-3xl mx-auto space-y-10 pb-10 animate-in fade-in duration-500">
       {/* Header */}
-      <div className="flex items-start gap-4 pt-2">
-        <Link
-          href="/mi-panel"
-          className="flex items-center justify-center h-10 w-10 rounded-xl bg-white border border-slate-200 text-slate-400 hover:text-slate-900 hover:border-slate-300 hover:shadow-sm transition-all shrink-0 mt-1"
-        >
-          <ArrowLeft className="h-4 w-4" />
-        </Link>
-        <div className="space-y-1">
-          <p className="text-[10px] font-black text-blue-600 uppercase tracking-[0.3em]">
-            Panel Profesional · CKM
-          </p>
-          <h1 className="text-3xl font-black text-slate-900 tracking-tight leading-none">
-            Circulares Institucionales
-          </h1>
-          {circulares.length > 0 && (
-            <p className="text-sm text-slate-500 font-medium pt-1">
-              {circulares.length}{" "}
-              {circulares.length === 1
-                ? "circular publicada"
-                : "circulares publicadas"}
-            </p>
-          )}
-        </div>
+      <div className="space-y-1">
+        <p className="text-[10px] font-black text-blue-600 uppercase tracking-[0.3em]">
+          Panel Profesional · CKM
+        </p>
+        <h1 className="text-3xl font-black text-slate-900 tracking-tight leading-none">
+          Circulares Institucionales
+        </h1>
+        <p className="text-sm text-slate-500 font-medium pt-1">
+          {circulares.length > 0
+            ? `${circulares.length} ${circulares.length === 1 ? "circular publicada" : "circulares publicadas"}`
+            : "Comunicaciones internas del Círculo."}
+        </p>
       </div>
 
       {/* List */}
