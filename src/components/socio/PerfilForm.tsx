@@ -2,7 +2,7 @@
 
 import { useActionState, useRef, useState } from "react";
 import { updateDatosContacto, updateFotoPerfil } from "@/app/mi-panel/perfil/actions";
-import { Phone, MessageCircle, MapPin, Clock, Camera, CheckCircle, AlertCircle, User, CreditCard } from "lucide-react";
+import { Phone, MessageCircle, MapPin, Clock, Camera, CheckCircle, AlertCircle, User, CreditCard, Mail, Stethoscope } from "lucide-react";
 import Image from "next/image";
 
 type ActionResult = { success: true } | { success: false; error: string } | null;
@@ -12,6 +12,8 @@ interface PerfilFormProps {
     nombre: string;
     apellido: string;
     matricula: string;
+    email: string;
+    especialidades: string;
     telefono: string | null;
     whatsapp: string | null;
     direccion: string | null;
@@ -65,11 +67,13 @@ export default function PerfilForm({ profesional }: PerfilFormProps) {
         <p className="text-[10px] font-black text-slate-400 uppercase tracking-[0.25em] mb-4">
           Datos Institucionales
         </p>
-        <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
+        <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-4">
           {[
             { icon: User, label: "Nombre", value: profesional.nombre },
             { icon: User, label: "Apellido", value: profesional.apellido },
+            { icon: Mail, label: "Email", value: profesional.email },
             { icon: CreditCard, label: "Matrícula", value: `M.P. ${profesional.matricula}` },
+            { icon: Stethoscope, label: "Especialidad", value: profesional.especialidades },
           ].map(({ icon: Icon, label, value }) => (
             <div key={label} className="flex items-center gap-3">
               <div className="h-9 w-9 bg-white border border-slate-100 rounded-xl flex items-center justify-center text-slate-400 shrink-0">
@@ -141,7 +145,7 @@ export default function PerfilForm({ profesional }: PerfilFormProps) {
             <button
               type="submit"
               disabled={fotoPending}
-              className="px-5 py-2.5 bg-blue-600 text-white rounded-xl text-sm font-bold hover:bg-blue-700 disabled:opacity-50 disabled:cursor-not-allowed transition-all"
+              className="px-6 py-3 bg-blue-600 text-white rounded-xl text-sm font-bold hover:bg-blue-700 disabled:opacity-50 disabled:cursor-not-allowed transition-all"
             >
               {fotoPending ? "Subiendo…" : "Guardar foto"}
             </button>
@@ -212,7 +216,7 @@ export default function PerfilForm({ profesional }: PerfilFormProps) {
           <button
             type="submit"
             disabled={contactPending}
-            className="px-6 py-3 bg-slate-900 text-white rounded-xl text-sm font-bold hover:bg-slate-700 disabled:opacity-50 disabled:cursor-not-allowed transition-all"
+            className="px-6 py-3 bg-blue-600 text-white rounded-xl text-sm font-bold hover:bg-blue-700 disabled:opacity-50 disabled:cursor-not-allowed transition-all"
           >
             {contactPending ? "Guardando…" : "Guardar cambios"}
           </button>
