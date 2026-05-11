@@ -14,6 +14,14 @@ export async function getLocalidades() {
   });
 }
 
+export async function getEspecialidades() {
+  return await prisma.especialidad.findMany({
+    where: { nombre: { not: "UBICACIÓN" } },
+    orderBy: { nombre: "asc" },
+    select: { id: true, nombre: true },
+  });
+}
+
 export async function crearSolicitud(formData: FormData) {
   // Usamos supabaseAdmin para tener permisos de escritura en Storage sin RLS (Service Role)
   const supabase = supabaseAdmin;
@@ -23,6 +31,11 @@ export async function crearSolicitud(formData: FormData) {
   const apellido = formData.get("apellido") as string;
   const email = formData.get("email") as string;
   const matricula = formData.get("matricula") as string;
+  const especialidadId = formData.get("especialidad") as string;
+
+  const especialidadNombre = especialidadId
+    ? (await prisma.especialidad.findUnique({ where: { id: especialidadId }, select: { nombre: true } }))?.nombre ?? especialidadId
+    : "No especificada";
 
   // Validación de servidor básica
   if (!nombre || !apellido || !email || !matricula) {
@@ -94,7 +107,7 @@ export async function crearSolicitud(formData: FormData) {
                 <p><strong>Profesional:</strong> ${nombre} ${apellido}</p>
                 <p><strong>Matrícula:</strong> ${matricula}</p>
                 <p><strong>Email:</strong> ${email}</p>
-                <p><strong>Especialidad:</strong> ${formData.get("especialidad")}</p>
+                <p><strong>Especialidad:</strong> ${especialidadNombre}</p>
                 <hr style="border: 0; border-top: 1px solid #eee; margin: 20px 0;" />
                 <p>Podés revisar la documentación y aprobar la solicitud desde el panel administrativo:</p>
                 <a href="${process.env.NEXT_PUBLIC_SITE_URL || 'http://localhost:3000'}/admin/solicitudes" 

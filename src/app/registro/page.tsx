@@ -13,7 +13,7 @@ import {
   Loader2
 } from "lucide-react";
 import { cn } from "@/lib/utils";
-import { crearSolicitud, getLocalidades } from "./actions";
+import { crearSolicitud, getLocalidades, getEspecialidades } from "./actions";
 import { useEffect } from "react";
 
 const STEPS = [
@@ -26,6 +26,7 @@ export default function RegistroPage() {
   const [currentStep, setCurrentStep] = useState(1);
   const [isPending, setIsPending] = useState(false);
   const [localidades, setLocalidades] = useState<{id: string, nombre: string}[]>([]);
+  const [especialidades, setEspecialidades] = useState<{id: string, nombre: string}[]>([]);
   const [archivos, setArchivos] = useState<Record<string, File | null>>({
     dni: null,
     titulo: null,
@@ -51,6 +52,7 @@ export default function RegistroPage() {
 
   useEffect(() => {
     getLocalidades().then(setLocalidades);
+    getEspecialidades().then(setEspecialidades);
   }, []);
 
   const handleChange = (e: React.ChangeEvent<HTMLInputElement | HTMLSelectElement>) => {
@@ -188,9 +190,9 @@ export default function RegistroPage() {
                   <label className="text-xs font-bold text-slate-400 uppercase ml-1">Especialidad Principal <span className="text-red-500">*</span></label>
                   <select name="especialidad" value={formData.especialidad} onChange={handleChange} required className="w-full px-6 py-4 rounded-2xl bg-slate-50 border-transparent focus:bg-white focus:border-blue-600 focus:ring-4 focus:ring-blue-100 transition-all text-sm font-medium appearance-none">
                     <option value="">Seleccioná tu especialidad</option>
-                    <option value="traumato">Traumatología</option>
-                    <option value="neuro">Neurología</option>
-                    <option value="rpg">R.P.G.</option>
+                    {especialidades.map((esp) => (
+                      <option key={esp.id} value={esp.id}>{esp.nombre}</option>
+                    ))}
                   </select>
                 </div>
                 <div className="space-y-2">

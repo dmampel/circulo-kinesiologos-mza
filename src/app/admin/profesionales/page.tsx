@@ -1,30 +1,41 @@
 import { getProfesionales } from "./actions";
 import ClientSearch from "./ClientSearch";
 import BotonesProfesional from "./BotonesProfesional";
+import EspecialidadSidebar from "./EspecialidadSidebar";
+import EspecialidadFilter from "./EspecialidadFilter";
+import LocalidadFilter from "./LocalidadFilter";
+import { LocalidadRepository } from "@/lib/repositories/LocalidadRepository";
 import Link from "next/link";
 import { Plus, User, MapPin, Check, Ban } from "lucide-react";
 import { cn } from "@/lib/utils";
+import { EspecialidadRepository } from "@/lib/repositories/EspecialidadRepository";
 
 export default async function ProfesionalesAdminPage({
   searchParams,
 }: {
-  searchParams: Promise<{ q?: string }>;
+  searchParams: Promise<{ q?: string; esp?: string; loc?: string }>;
 }) {
   const resolvedParams = await searchParams;
   const query = resolvedParams?.q || "";
-  const profesionales = await getProfesionales(query);
+  const especialidadId = resolvedParams?.esp || "";
+  const localidadId = resolvedParams?.loc || "";
+  const [profesionales, especialidades, localidades] = await Promise.all([
+    getProfesionales(query, especialidadId, localidadId),
+    EspecialidadRepository.getAll(),
+    LocalidadRepository.getAll(),
+  ]);
 
   return (
     <div className="space-y-8">
-      <div className="flex items-center justify-between">
+      <div className="flex items-start justify-between">
         <div>
           <h1 className="text-3xl font-black text-slate-900 mb-2">Padrón de Profesionales</h1>
           <p className="text-slate-500 font-medium">Gestioná el directorio completo de kinesiólogos.</p>
         </div>
-        
+
         <div className="flex items-center space-x-4">
-          <ClientSearch />
-          <Link 
+          <EspecialidadSidebar especialidades={especialidades} />
+          <Link
             href="/admin/profesionales/nuevo"
             className="bg-blue-600 hover:bg-blue-700 text-white px-5 py-2.5 rounded-2xl font-bold flex items-center shadow-lg shadow-blue-900/20 transition-all"
           >
@@ -43,11 +54,18 @@ export default async function ProfesionalesAdminPage({
         </div>
       ) : (
         <div className="bg-white rounded-[3rem] shadow-sm border border-slate-100 overflow-hidden">
-          <div className="px-8 py-5 border-b border-slate-50 flex items-center gap-3">
-            <h3 className="font-black text-slate-900">Resultados</h3>
-            <span className="px-2 py-0.5 rounded-lg bg-slate-100 text-slate-500 text-xs font-black">
-              {profesionales.length}
-            </span>
+          <div className="px-8 py-6 border-b border-slate-50 flex items-center justify-between gap-4">
+            <div className="flex items-center gap-3">
+              <h3 className="font-black text-slate-900">Resultados</h3>
+              <span className="px-2 py-0.5 rounded-lg bg-slate-100 text-slate-500 text-xs font-black">
+                {profesionales.length}
+              </span>
+            </div>
+            <div className="flex items-center gap-3">
+              <ClientSearch />
+              <EspecialidadFilter especialidades={especialidades} />
+              <LocalidadFilter localidades={localidades} />
+            </div>
           </div>
           <table className="w-full text-left">
             <thead>

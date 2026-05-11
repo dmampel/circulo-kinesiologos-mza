@@ -3,21 +3,30 @@
 import prisma from "@/lib/prisma";
 import { revalidatePath } from "next/cache";
 
-export async function getProfesionales(search?: string) {
-  const where = search ? {
-    OR: [
-      { nombre: { contains: search, mode: "insensitive" as const } },
-      { apellido: { contains: search, mode: "insensitive" as const } },
-      { matricula: { contains: search, mode: "insensitive" as const } },
-    ]
-  } : {};
+export async function getProfesionales(search?: string, especialidadId?: string, localidadId?: string) {
+  const conditions: any[] = [];
+
+  if (search) {
+    conditions.push({
+      OR: [
+        { nombre: { contains: search, mode: "insensitive" as const } },
+        { apellido: { contains: search, mode: "insensitive" as const } },
+        { matricula: { contains: search, mode: "insensitive" as const } },
+      ],
+    });
+  }
+
+  if (especialidadId) {
+    conditions.push({ especialidades: { some: { id: especialidadId } } });
+  }
+
+  if (localidadId) {
+    conditions.push({ localidadId });
+  }
 
   return prisma.profesional.findMany({
-    where,
-    include: {
-      localidad: true,
-      especialidades: true,
-    },
+    where: conditions.length > 0 ? { AND: conditions } : {},
+    include: { localidad: true, especialidades: true },
     orderBy: { apellido: "asc" },
   });
 }

@@ -91,18 +91,31 @@ export default function ClientObrasSociales({ initialObras }: ClientObrasSociale
 
   return (
     <>
-      <div className="flex flex-col md:flex-row justify-between items-start md:items-center gap-4 mb-6">
-        <div className="flex items-center gap-4">
-          <p className="text-sm text-slate-500 flex items-center">
-            <GripVertical className="h-4 w-4 mr-2" />
-            Arrastrá para reordenar.{" "}
-            {isReordering && (
-              <span className="ml-2 text-blue-500 font-bold animate-pulse">Guardando...</span>
-            )}
-          </p>
-        </div>
-        <div className="flex items-center gap-3">
-          <div className="flex items-center space-x-2 bg-white p-2 rounded-xl border border-slate-100 shadow-sm">
+      <div className="flex justify-between items-center mb-6">
+        <p className="text-sm text-slate-500 flex items-center">
+          <GripVertical className="h-4 w-4 mr-2" />
+          Arrastrá para reordenar.
+          {isReordering && (
+            <span className="ml-2 text-blue-500 font-bold animate-pulse">Guardando...</span>
+          )}
+        </p>
+        <button
+          onClick={() => openModal()}
+          className="bg-blue-600 hover:bg-blue-700 text-white px-4 py-2 rounded-xl font-bold flex items-center shadow-lg shadow-blue-900/20 transition-all shrink-0"
+        >
+          <Plus className="mr-2 h-4 w-4" /> Nueva Obra Social
+        </button>
+      </div>
+
+      <div className="bg-white rounded-[2rem] border border-slate-100 shadow-sm overflow-hidden">
+        <div className="px-6 py-4 border-b border-slate-50 flex items-center justify-between gap-4">
+          <div className="flex items-center gap-3">
+            <h3 className="font-black text-slate-900 text-sm">Obras Sociales y Convenios</h3>
+            <span className="px-2 py-0.5 rounded-lg bg-slate-100 text-slate-500 text-xs font-black">
+              {obrasFiltradas.length}
+            </span>
+          </div>
+          <div className="flex items-center space-x-2 bg-slate-50 p-2 rounded-xl border border-slate-100">
             <Search className="ml-2 h-4 w-4 text-slate-400 shrink-0" />
             <input
               type="text"
@@ -112,21 +125,6 @@ export default function ClientObrasSociales({ initialObras }: ClientObrasSociale
               className="bg-transparent border-none focus:ring-0 text-sm font-medium pr-4 outline-none w-44"
             />
           </div>
-          <button
-            onClick={() => openModal()}
-            className="bg-blue-600 hover:bg-blue-700 text-white px-4 py-2 rounded-xl font-bold flex items-center shadow-lg shadow-blue-900/20 transition-all shrink-0"
-          >
-            <Plus className="mr-2 h-4 w-4" /> Nueva Obra Social
-          </button>
-        </div>
-      </div>
-
-      <div className="bg-white rounded-[2rem] border border-slate-100 shadow-sm overflow-hidden">
-        <div className="px-6 py-4 border-b border-slate-50 flex items-center gap-3">
-          <h3 className="font-black text-slate-900 text-sm">Obras Sociales y Convenios</h3>
-          <span className="px-2 py-0.5 rounded-lg bg-slate-100 text-slate-500 text-xs font-black">
-            {obrasFiltradas.length}
-          </span>
         </div>
         {obrasFiltradas.length === 0 ? (
           <div className="p-12 text-center text-slate-500 font-medium">

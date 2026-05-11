@@ -13,11 +13,10 @@ export default async function CircularesAdminPage({
   const { q } = await searchParams;
   const query = q?.trim().toLowerCase() ?? "";
 
-  type CircularItem = Awaited<ReturnType<typeof CircularRepository.getAll>>[number];
   const todasLasCirculares = await CircularRepository.getAll();
   const circulares = query
     ? todasLasCirculares.filter(
-        (c: CircularItem) =>
+        (c: (typeof todasLasCirculares)[number]) =>
           c.titulo.toLowerCase().includes(query) ||
           c.etiqueta.toLowerCase().includes(query)
       )
@@ -32,23 +31,23 @@ export default async function CircularesAdminPage({
             Publicá avisos administrativos y comunicaciones exclusivas para socios.
           </p>
         </div>
-        <div className="flex items-center gap-3">
-          <AdminSearch placeholder="Buscar circular..." />
-          <Link
-            href="/admin/circulares/nueva"
-            className="flex items-center px-6 py-4 rounded-2xl bg-blue-600 text-white font-bold hover:bg-blue-700 transition-all shadow-xl shadow-blue-100 shrink-0"
-          >
-            <Plus className="mr-2 h-5 w-5" /> Nueva Circular
-          </Link>
-        </div>
+        <Link
+          href="/admin/circulares/nueva"
+          className="flex items-center px-6 py-4 rounded-2xl bg-blue-600 text-white font-bold hover:bg-blue-700 transition-all shadow-xl shadow-blue-100 shrink-0"
+        >
+          <Plus className="mr-2 h-5 w-5" /> Nueva Circular
+        </Link>
       </div>
 
       <div className="bg-white rounded-[3rem] shadow-sm border border-slate-100 overflow-hidden">
-        <div className="p-8 border-b border-slate-50 flex items-center gap-3">
-          <h3 className="font-black text-slate-900">Todas las Circulares</h3>
-          <span className="px-2 py-0.5 rounded-lg bg-slate-100 text-slate-500 text-xs font-black">
-            {circulares.length}
-          </span>
+        <div className="px-8 py-6 border-b border-slate-50 flex items-center justify-between gap-4">
+          <div className="flex items-center gap-3">
+            <h3 className="font-black text-slate-900">Todas las Circulares</h3>
+            <span className="px-2 py-0.5 rounded-lg bg-slate-100 text-slate-500 text-xs font-black">
+              {circulares.length}
+            </span>
+          </div>
+          <AdminSearch placeholder="Buscar circular..." />
         </div>
 
         {circulares.length === 0 ? (
@@ -85,7 +84,7 @@ export default async function CircularesAdminPage({
                 </tr>
               </thead>
               <tbody className="divide-y divide-slate-50">
-                {circulares.map((c) => (
+                {circulares.map((c: (typeof todasLasCirculares)[number]) => (
                   <tr key={c.id} className="hover:bg-slate-50/50 transition-colors group">
                     <td className="px-8 py-6">
                       <div className="flex flex-col gap-1.5">

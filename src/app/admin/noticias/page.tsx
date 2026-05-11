@@ -36,23 +36,23 @@ export default async function NoticiasAdminPage({
             Publicá novedades, eventos y comunicados institucionales.
           </p>
         </div>
-        <div className="flex items-center gap-3">
-          <AdminSearch placeholder="Buscar noticia..." />
-          <Link
-            href="/admin/noticias/nueva"
-            className="flex items-center px-6 py-4 rounded-2xl bg-blue-600 text-white font-bold hover:bg-blue-700 transition-all shadow-xl shadow-blue-100 shrink-0"
-          >
-            <Plus className="mr-2 h-5 w-5" /> Nueva Noticia
-          </Link>
-        </div>
+        <Link
+          href="/admin/noticias/nueva"
+          className="flex items-center px-6 py-4 rounded-2xl bg-blue-600 text-white font-bold hover:bg-blue-700 transition-all shadow-xl shadow-blue-100 shrink-0"
+        >
+          <Plus className="mr-2 h-5 w-5" /> Nueva Noticia
+        </Link>
       </div>
 
       <div className="bg-white rounded-[3rem] shadow-sm border border-slate-100 overflow-hidden">
-        <div className="p-8 border-b border-slate-50 flex items-center gap-3">
-          <h3 className="font-black text-slate-900">Todas las Noticias</h3>
-          <span className="px-2 py-0.5 rounded-lg bg-slate-100 text-slate-500 text-xs font-black">
-            {noticias.length}
-          </span>
+        <div className="px-8 py-6 border-b border-slate-50 flex items-center justify-between gap-4">
+          <div className="flex items-center gap-3">
+            <h3 className="font-black text-slate-900">Todas las Noticias</h3>
+            <span className="px-2 py-0.5 rounded-lg bg-slate-100 text-slate-500 text-xs font-black">
+              {noticias.length}
+            </span>
+          </div>
+          <AdminSearch placeholder="Buscar noticia..." />
         </div>
 
         {noticias.length === 0 ? (
