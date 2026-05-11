@@ -66,6 +66,26 @@ export class CapacitacionRepository {
     });
   }
 
+  static async getProximasInscripcionesSocio(profesionalId: string) {
+    const hoy = new Date();
+    hoy.setHours(0, 0, 0, 0);
+    return prisma.inscripcionCapacitacion.findMany({
+      where: {
+        profesionalId,
+        estado: { not: "CANCELADA" },
+        capacitacion: {
+          fechaInicio: { gte: hoy },
+          publicada: true,
+        },
+      },
+      include: {
+        capacitacion: true,
+      },
+      orderBy: { capacitacion: { fechaInicio: "asc" } },
+      take: 15,
+    });
+  }
+
   static async inscribir(profesionalId: string, capacitacionId: string) {
     return prisma.$transaction(async (tx) => {
       const capacitacion = await tx.capacitacion.findUnique({
