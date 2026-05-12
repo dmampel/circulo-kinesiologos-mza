@@ -30,7 +30,7 @@ export default function CarnetDigital({ profesional, slug }: Props) {
       </div>
 
       {/* Contenido Principal (Glass Layer) */}
-      <div className="absolute inset-0 p-8 flex flex-col justify-between z-10">
+      <div className="absolute inset-0 p-5 sm:p-8 flex flex-col justify-between z-10">
         {/* Header del Carnet */}
         <div className="flex items-start justify-between">
           <div className="flex items-center gap-3">
@@ -59,10 +59,10 @@ export default function CarnetDigital({ profesional, slug }: Props) {
 
         {/* Info del Profesional */}
         <div className="flex items-end justify-between">
-          <div className="flex items-center gap-6">
+          <div className="flex items-center gap-3 sm:gap-6">
             {/* Foto o Iniciales */}
-            <div className="h-28 w-28 rounded-[2rem] bg-white/10 backdrop-blur-xl border border-white/20 p-1.5 overflow-hidden shadow-xl">
-              <div className="h-full w-full rounded-[1.6rem] bg-white/5 flex items-center justify-center text-white overflow-hidden">
+            <div className="h-20 w-20 sm:h-28 sm:w-28 rounded-[1.5rem] sm:rounded-[2rem] bg-white/10 backdrop-blur-xl border border-white/20 p-1.5 overflow-hidden shadow-xl shrink-0">
+              <div className="h-full w-full rounded-[1.2rem] sm:rounded-[1.6rem] bg-white/5 flex items-center justify-center text-white overflow-hidden">
                 {profesional.foto_url ? (
                   <img 
                     src={profesional.foto_url} 
@@ -81,7 +81,7 @@ export default function CarnetDigital({ profesional, slug }: Props) {
               <p className="text-blue-400 text-[10px] font-black uppercase tracking-widest">
                 Profesional Colegiado
               </p>
-              <h3 className="text-2xl lg:text-3xl font-black text-white tracking-tighter leading-none uppercase">
+              <h3 className="text-xl sm:text-2xl lg:text-3xl font-black text-white tracking-tighter leading-none uppercase">
                 {profesional.apellido} <br />
                 <span className="text-white/80">{profesional.nombre}</span>
               </h3>

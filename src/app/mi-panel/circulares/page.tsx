@@ -70,7 +70,7 @@ export default async function CircularesHistorialPage() {
                 key={circular.id}
                 href={`/mi-panel/circulares/${circular.id}`}
                 className={cn(
-                  "group flex gap-5 bg-white border rounded-2xl p-6 transition-all duration-200",
+                  "group flex gap-3 sm:gap-5 bg-white border rounded-2xl p-4 sm:p-6 transition-all duration-200",
                   isRead 
                     ? "border-slate-100 opacity-80" 
                     : "border-blue-200 shadow-sm shadow-blue-100"

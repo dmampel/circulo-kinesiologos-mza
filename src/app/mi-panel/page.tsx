@@ -175,7 +175,7 @@ export default async function DashboardPage() {
 
       {/* 2. Hero & Carnet */}
       <section className="relative">
-        <div className="grid grid-cols-1 lg:grid-cols-12 gap-12 items-center">
+        <div className="grid grid-cols-1 lg:grid-cols-12 gap-8 lg:gap-12 items-center">
           {/* Left Column: Digital Card */}
           <div className="lg:col-span-6 flex justify-center lg:justify-start">
             <div
@@ -203,7 +203,7 @@ export default async function DashboardPage() {
               <div className="space-y-3">
                 <Link
                   href="/mi-panel/perfil"
-                  className="flex items-center gap-4 p-5 bg-white border border-slate-100 rounded-2xl hover:border-blue-200 hover:shadow-md transition-all group w-full"
+                  className="flex items-center gap-4 p-4 sm:p-5 bg-white border border-slate-100 rounded-2xl hover:border-blue-200 hover:shadow-md transition-all group w-full"
                 >
                   <div className="h-12 w-12 rounded-xl bg-slate-50 flex items-center justify-center text-slate-400 group-hover:bg-blue-600 group-hover:text-white transition-all shrink-0">
                     <UserCircle className="h-6 w-6" />
@@ -227,7 +227,7 @@ export default async function DashboardPage() {
 
                 <Link
                   href="/mi-panel/capacitaciones"
-                  className="flex items-center gap-4 p-5 bg-white border border-slate-100 rounded-2xl hover:border-blue-200 hover:shadow-md transition-all group w-full"
+                  className="flex items-center gap-4 p-4 sm:p-5 bg-white border border-slate-100 rounded-2xl hover:border-blue-200 hover:shadow-md transition-all group w-full"
                 >
                   <div className="h-12 w-12 rounded-xl bg-slate-50 flex items-center justify-center text-slate-400 group-hover:bg-blue-600 group-hover:text-white transition-all shrink-0">
                     <BookOpen className="h-6 w-6" />
@@ -280,7 +280,7 @@ export default async function DashboardPage() {
                   <span className="text-[9px] font-black uppercase tracking-widest text-slate-300">
                     {DIAS_CORTO[dia.getDay()]}
                   </span>
-                  <div className={`h-8 w-8 flex items-center justify-center rounded-full text-sm font-black transition-colors ${esHoy ? "bg-blue-600 text-white" : "text-slate-500"}`}>
+                  <div className={`h-7 w-7 sm:h-8 sm:w-8 flex items-center justify-center rounded-full text-xs sm:text-sm font-black transition-colors ${esHoy ? "bg-blue-600 text-white" : "text-slate-500"}`}>
                     {dia.getDate()}
                   </div>
                   <div className={`h-1 w-1 rounded-full ${tieneEvento ? (esHoy ? "bg-blue-400" : "bg-slate-300") : "opacity-0"}`} />
@@ -356,7 +356,7 @@ export default async function DashboardPage() {
       )}
 
       {/* 4. Content Grid */}
-      <div className="grid grid-cols-1 lg:grid-cols-12 gap-16 border-t border-slate-100 pt-10">
+      <div className="grid grid-cols-1 lg:grid-cols-12 gap-8 lg:gap-16 border-t border-slate-100 pt-10">
         <div className="lg:col-span-8">
           <div className="flex items-center justify-between mb-8">
             <h2 className="text-2xl font-bold text-slate-900 tracking-tight">
@@ -370,13 +370,13 @@ export default async function DashboardPage() {
             </Link>
           </div>
 
-          <div className="space-y-0 relative before:absolute before:left-[11px] before:top-4 before:bottom-4 before:w-[1px] before:bg-slate-100">
+          <div className="space-y-0 relative before:absolute before:left-[9px] sm:before:left-[11px] before:top-4 before:bottom-4 before:w-[1px] before:bg-slate-100">
             {circulares.length === 0 ? (
               <div className="pl-10 text-slate-400 text-sm italic py-4">No hay circulares publicadas por el momento.</div>
             ) : circulares.map((circular, i) => {
               const isRead = (circular as any).lecturas?.length > 0;
               return (
-              <div key={circular.id} className="group relative pl-10 py-6 first:pt-0">
+              <div key={circular.id} className="group relative pl-8 sm:pl-10 py-6 first:pt-0">
                 <div className={`absolute left-0 top-[38px] h-[22px] w-[22px] rounded-full border-4 border-white z-10 transition-colors ${isRead ? "bg-slate-200" : "bg-blue-600 animate-pulse"}`} />
                 <div className="space-y-1.5">
                   <div className="flex items-center gap-3">
@@ -408,7 +408,7 @@ export default async function DashboardPage() {
         {/* Right Column: Beneficios + Soporte */}
         <aside className="lg:col-span-4 space-y-6">
           {beneficios.length > 0 && (
-            <div className="p-6 rounded-[1.5rem] bg-white border border-slate-100 shadow-sm">
+            <div className="p-4 sm:p-6 rounded-2xl sm:rounded-[1.5rem] bg-white border border-slate-100 shadow-sm">
               <div className="flex items-center justify-between mb-5">
                 <h3 className="text-[10px] font-black uppercase tracking-widest text-slate-400">
                   Tus Beneficios
@@ -457,7 +457,7 @@ export default async function DashboardPage() {
             </div>
           )}
 
-          <div className="p-6 rounded-[1.5rem] bg-slate-50 border border-slate-100 shadow-sm relative overflow-hidden">
+          <div className="p-4 sm:p-6 rounded-2xl sm:rounded-[1.5rem] bg-slate-50 border border-slate-100 shadow-sm relative overflow-hidden">
             <h5 className="text-[9px] font-black uppercase tracking-widest mb-3 text-slate-400">
               Soporte
             </h5>

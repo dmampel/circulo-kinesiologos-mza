@@ -1,4 +1,5 @@
 import Sidebar from "@/components/socio/Sidebar";
+import MobileSidebarShell from "@/components/socio/MobileSidebarShell";
 import { createClient } from "@/utils/supabase/server";
 import { ProfesionalRepository } from "@/lib/repositories/ProfesionalRepository";
 import { CircularRepository } from "@/lib/repositories/CircularRepository";
@@ -26,10 +27,14 @@ export default async function PortalLayout({
   }
 
   return (
-    <div className="flex h-screen bg-slate-50 overflow-hidden">
-      <Sidebar unreadCirculares={unreadCount} />
-      <main className="flex-grow overflow-y-auto">
-        <div className="mx-auto max-w-6xl py-5 px-5">{children}</div>
+    <div className="min-h-screen bg-slate-50 lg:flex lg:h-screen lg:overflow-hidden">
+      <MobileSidebarShell>
+        <Sidebar unreadCirculares={unreadCount} />
+      </MobileSidebarShell>
+      <main className="flex-1 lg:overflow-y-auto">
+        <div className="mx-auto max-w-6xl py-5 px-4 sm:px-6 lg:px-5 pt-16 lg:pt-5">
+          {children}
+        </div>
       </main>
     </div>
   );

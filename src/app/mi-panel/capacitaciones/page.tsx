@@ -78,7 +78,7 @@ export default async function CapacitacionesSocioPage() {
         <p className="text-sm text-slate-500 font-medium pt-1">Anotate a cursos, congresos y jornadas de actualización.</p>
       </div>
 
-      <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
+      <div className="grid grid-cols-1 lg:grid-cols-3 gap-6 lg:gap-8">
         {/* Cartelera (Columna Izquierda 2/3) */}
         <div className="lg:col-span-2 space-y-6">
           <h2 className="text-xl font-black text-slate-900 flex items-center">
@@ -97,7 +97,7 @@ export default async function CapacitacionesSocioPage() {
                 const sinCupo = c.cupoMaximo ? c._count.inscripciones >= c.cupoMaximo : false;
 
                 return (
-                  <div key={c.id} className="bg-white rounded-3xl border border-slate-100 p-6 flex flex-col md:flex-row gap-6 hover:shadow-lg transition-all duration-300">
+                  <div key={c.id} className="bg-white rounded-3xl border border-slate-100 p-4 sm:p-6 flex flex-col md:flex-row gap-6 hover:shadow-lg transition-all duration-300">
                     <div className="flex-1 space-y-4">
                       <div>
                         <div className="flex items-center gap-2 mb-2">
@@ -176,7 +176,7 @@ export default async function CapacitacionesSocioPage() {
           {/* Próximamente */}
           <div className="space-y-4">
             <h2 className="text-xl font-black text-slate-900">Próximas</h2>
-            <div className="bg-slate-50 rounded-3xl border border-slate-100 p-6 space-y-4">
+            <div className="bg-slate-50 rounded-3xl border border-slate-100 p-4 sm:p-6 space-y-4">
               {inscripcionesProximas.length === 0 ? (
                 <p className="text-sm text-slate-400 font-medium text-center py-4">No tenés eventos próximos.</p>
               ) : (
@@ -190,7 +190,7 @@ export default async function CapacitacionesSocioPage() {
           {/* Historial */}
           <div className="space-y-4">
             <h2 className="text-xl font-black text-slate-900">Historial</h2>
-            <div className="bg-slate-50 rounded-3xl border border-slate-100 p-6 space-y-4">
+            <div className="bg-slate-50 rounded-3xl border border-slate-100 p-4 sm:p-6 space-y-4">
               {inscripcionesHistorial.length === 0 ? (
                 <p className="text-sm text-slate-400 font-medium text-center py-4">No tenés inscripciones anteriores.</p>
               ) : (
