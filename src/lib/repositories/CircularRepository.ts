@@ -2,6 +2,7 @@ import prisma from "@/lib/prisma";
 import { Circular } from "@prisma/client";
 
 export class CircularRepository {
+  // Rebuild trigger
   static async getAll() {
     return prisma.circular.findMany({
       orderBy: { createdAt: "desc" },
@@ -51,6 +52,48 @@ export class CircularRepository {
   static async delete(id: string) {
     return prisma.circular.delete({
       where: { id },
+    });
+  }
+
+  // --- Métodos de Lectura ---
+
+  static async markAsRead(circularId: string, profesionalId: string) {
+    return prisma.lecturaCircular.upsert({
+      where: {
+        circularId_profesionalId: {
+          circularId,
+          profesionalId,
+        },
+      },
+      update: {},
+      create: {
+        circularId,
+        profesionalId,
+      },
+    });
+  }
+
+  static async countUnread(profesionalId: string) {
+    return prisma.circular.count({
+      where: {
+        publicada: true,
+        lecturas: {
+          none: { profesionalId },
+        },
+      },
+    });
+  }
+
+  static async getAllPublishedWithStatus(profesionalId: string, limit?: number) {
+    return prisma.circular.findMany({
+      where: { publicada: true },
+      include: {
+        lecturas: {
+          where: { profesionalId },
+        },
+      },
+      orderBy: { publicada_en: "desc" },
+      ...(limit ? { take: limit } : {}),
     });
   }
 }

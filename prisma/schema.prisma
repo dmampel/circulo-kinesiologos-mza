@@ -50,6 +50,7 @@ model Profesional {
 
   especialidades            Especialidad[]
   inscripcionesCapacitacion InscripcionCapacitacion[]
+  lecturasCirculares        LecturaCircular[]
 
   // Auth y Sistema
   userId String?  @unique // ID de Supabase Auth
@@ -96,9 +97,22 @@ model Circular {
   archivo_url  String?
   publicada    Boolean   @default(false)
   publicada_en DateTime?
+  lecturas     LecturaCircular[]
 
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
+}
+
+model LecturaCircular {
+  id             String      @id @default(cuid())
+  circularId     String
+  profesionalId  String
+  readAt         DateTime    @default(now())
+
+  circular       Circular    @relation(fields: [circularId], references: [id], onDelete: Cascade)
+  profesional    Profesional @relation(fields: [profesionalId], references: [id], onDelete: Cascade)
+
+  @@unique([circularId, profesionalId])
 }
 
 model ObraSocial {

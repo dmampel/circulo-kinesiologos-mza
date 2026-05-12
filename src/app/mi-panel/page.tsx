@@ -66,7 +66,9 @@ export default async function DashboardPage() {
 
   const profesional = await ProfesionalRepository.findByUserId(user.id);
   const beneficios = await BeneficioRepository.findRandom(3);
-  const circulares = await CircularRepository.getPublishedLatest(3);
+  const circulares = profesional
+    ? await CircularRepository.getAllPublishedWithStatus(profesional.id, 3)
+    : [];
 
   if (!profesional) {
     return (
@@ -371,21 +373,23 @@ export default async function DashboardPage() {
           <div className="space-y-0 relative before:absolute before:left-[11px] before:top-4 before:bottom-4 before:w-[1px] before:bg-slate-100">
             {circulares.length === 0 ? (
               <div className="pl-10 text-slate-400 text-sm italic py-4">No hay circulares publicadas por el momento.</div>
-            ) : circulares.map((circular, i) => (
+            ) : circulares.map((circular, i) => {
+              const isRead = (circular as any).lecturas?.length > 0;
+              return (
               <div key={circular.id} className="group relative pl-10 py-6 first:pt-0">
-                <div className="absolute left-0 top-[38px] first:top-[38px] h-[22px] w-[22px] rounded-full border-4 border-white bg-slate-100 group-hover:bg-blue-600 transition-colors z-10" />
+                <div className={`absolute left-0 top-[38px] h-[22px] w-[22px] rounded-full border-4 border-white z-10 transition-colors ${isRead ? "bg-slate-200" : "bg-blue-600 animate-pulse"}`} />
                 <div className="space-y-1.5">
                   <div className="flex items-center gap-3">
                     <span className="text-[10px] font-bold text-slate-400 uppercase tracking-widest">
                       {new Intl.DateTimeFormat("es-AR", { day: "2-digit", month: "long", year: "numeric" }).format(circular.publicada_en || circular.createdAt)}
                     </span>
                     <span className="h-1 w-1 rounded-full bg-slate-200" />
-                    <span className="text-[10px] font-black text-blue-600 uppercase tracking-widest">
+                    <span className={`text-[10px] font-black uppercase tracking-widest ${isRead ? "text-slate-400" : "text-blue-600"}`}>
                       {circular.etiqueta}
                     </span>
                   </div>
                   <Link href={`/mi-panel/circulares/${circular.id}`} className="block">
-                    <h3 className="text-lg font-bold text-slate-900 group-hover:text-blue-700 transition-colors leading-tight">
+                    <h3 className={`text-lg font-bold leading-tight transition-colors ${isRead ? "text-slate-400" : "text-slate-900 group-hover:text-blue-700"}`}>
                       {circular.titulo}
                     </h3>
                   </Link>
@@ -397,7 +401,7 @@ export default async function DashboardPage() {
                   </Link>
                 </div>
               </div>
-            ))}
+            );})}
           </div>
         </div>
 

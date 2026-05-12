@@ -40,7 +40,7 @@ const toolItems = [
   { title: "KineClub", href: "/kineclub", icon: Star },
 ];
 
-export default function Sidebar() {
+export default function Sidebar({ unreadCirculares = 0 }: { unreadCirculares?: number }) {
   const pathname = usePathname();
   const router = useRouter();
   const supabase = createClient();
@@ -72,6 +72,9 @@ export default function Sidebar() {
       <nav className="space-y-2">
         {navItems.map((item) => {
           const isActive = pathname === item.href;
+          const isCirculares = item.href === "/mi-panel/circulares";
+          const hasUnread = isCirculares && unreadCirculares > 0;
+
           return (
             <Link
               key={item.href}
@@ -89,12 +92,23 @@ export default function Sidebar() {
                   isActive ? "scale-110" : "group-hover:scale-110"
                 )} />
                 <span className="font-bold text-sm tracking-tight">{item.title}</span>
+                
+                {hasUnread && !isActive && (
+                  <span className="flex h-5 w-5 items-center justify-center rounded-full bg-red-500 text-[10px] font-black text-white shadow-sm shadow-red-200">
+                    {unreadCirculares}
+                  </span>
+                )}
               </div>
-              {isActive && (
+              
+              {isActive ? (
                 <motion.div
                   layoutId="active-indicator"
                   className="h-1.5 w-1.5 bg-blue-600 rounded-full"
                 />
+              ) : (
+                hasUnread && isActive && (
+                   <div className="h-1.5 w-1.5 bg-red-500 rounded-full" />
+                )
               )}
             </Link>
           );

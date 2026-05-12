@@ -2,6 +2,7 @@ import { createClient } from "@/utils/supabase/server";
 import { CircularRepository } from "@/lib/repositories/CircularRepository";
 import { redirect, notFound } from "next/navigation";
 import Link from "next/link";
+import { ReadTracker } from "./ReadTracker";
 import { ArrowLeft, ExternalLink, FileText, Image as ImageIcon, File } from "lucide-react";
 
 interface Props {
@@ -45,6 +46,7 @@ export default async function CircularDetallePage({ params }: Props) {
 
   return (
     <div className="max-w-2xl mx-auto space-y-6 pb-16 animate-in fade-in duration-500">
+      <ReadTracker circularId={id} />
       {/* Breadcrumb */}
       <div className="flex items-center gap-2 pt-2">
         <Link
