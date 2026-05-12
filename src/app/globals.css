@@ -45,4 +45,8 @@ body {
   * {
     @apply border-slate-200 outline-none;
   }
+
+  a, button, [role="button"], label[for], summary {
+    cursor: pointer;
+  }
 }

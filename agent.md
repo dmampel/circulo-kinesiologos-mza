@@ -6,9 +6,9 @@
 
 ## Estado Actual
 
-**Última sesión:** 2026-05-11
+**Última sesión:** 2026-05-12
 
-El módulo de Circulares Internas está completo y commiteado. El portal del socio tiene dashboard, carnet, perfil, capacitaciones y ahora circulares. El admin tiene CRUD completo para circulares, noticias, capacitaciones, beneficios y solicitudes.
+Dos changes archivados y pusheados: seguimiento de lectura de circulares (`circulares-leidas`) y responsive mobile del portal del socio (`portal-socio-responsive`). El portal es ahora navegable en mobile con drawer sidebar.
 
 ---
 
@@ -21,8 +21,8 @@ El módulo de Circulares Internas está completo y commiteado. El portal del soc
 | `/mi-panel/carnet` | Carnet digital con flip 3D y QR |
 | `/mi-panel/perfil` | Autogestión de datos y foto de perfil |
 | `/mi-panel/capacitaciones` | Lista + detalle + inscripción |
-| `/mi-panel/circulares` | Historial completo (cards premium) |
-| `/mi-panel/circulares/[id]` | Detalle + preview de PDF/imagen inline |
+| `/mi-panel/circulares` | Historial con indicador leída/no leída (dot azul pulsante) |
+| `/mi-panel/circulares/[id]` | Detalle + preview PDF/imagen + registra lectura automáticamente |
 
 ### Admin (`/admin`)
 | Módulo | Estado |
@@ -43,6 +43,9 @@ El módulo de Circulares Internas está completo y commiteado. El portal del soc
 - **`redirect()` fuera del try/catch** — en Next.js 15, redirect lanza internamente. Ponerlo dentro de un try/catch sin re-throw rompe la navegación.
 - **Preview de archivos sin Client Component** — `<iframe>` para PDFs y `<img>` para imágenes funcionan directo en Server Components.
 - **Sidebar del socio** — Client Component necesario por `usePathname()` para el estado activo de navegación.
+- **`revalidatePath` en Server Components** — prohibido en Next.js 15 durante el render. Mover siempre a un Server Action o a un Client Component con `useEffect` (patrón: `ReadTracker.tsx`).
+- **Drawer mobile** — `MobileSidebarShell` es Client Component separado que envuelve al Sidebar. Así el `layout.tsx` sigue siendo Server Component. Estado del drawer: `useState` + `useEffect(pathname)` para cerrar al navegar + `useEffect(open)` para body scroll lock.
+- **Carnet en mobile** — `p-8` y `h-28 w-28` se aplastaban en `aspect-[1.6/1]` a 375px. Usar `p-5 sm:p-8` y `h-20 w-20 sm:h-28 sm:w-28`.
 
 ---
 
@@ -60,7 +63,7 @@ El módulo de Circulares Internas está completo y commiteado. El portal del soc
 
 | Archivo | Métodos clave |
 |---------|--------------|
-| `CircularRepository.ts` | getAll, getPublishedLatest(n), getAllPublished, getPublishedById, getById, create, update, delete |
+| `CircularRepository.ts` | getAll, getPublishedLatest(n), getAllPublished, getPublishedById, getById, create, update, delete, markAsRead, countUnread, getAllPublishedWithStatus(id, limit?) |
 | `CapacitacionRepository.ts` | findPublicadas, findPublicadaById, getInscripcionSocio, etc. |
 | `ProfesionalRepository.ts` | findByUserId, update |
 | `BeneficioRepository.ts` | getAll, getActivos |
