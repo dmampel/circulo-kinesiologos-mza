@@ -28,6 +28,7 @@ CKM-Web es la plataforma institucional y de gestión para el Círculo de Kinesi�
    - **Checklist de Tareas:** SIEMPRE antes de ejecutar la fase `sdd-archive`, volver al archivo `tasks.md` y marcar todas las tareas finalizadas con `[x]`.
    - **Persistence:** TRAS CADA CHANGE archivado, realizar un `git commit` (siguiendo Work Units) y un `git push` al repositorio remoto.
 4. **Validation**: Usar esquemas de validación (Zod) para todos los inputs de usuario.
+5. **RLS Obligatorio**: Cada tabla nueva creada en Supabase DEBE tener Row-Level Security habilitado. Ejecutar `ALTER TABLE "NombreTabla" ENABLE ROW LEVEL SECURITY;` en el SQL Editor de Supabase después de cada `prisma db push`. El sitio usa Prisma con `service_role` (bypasea RLS), por lo que no se necesitan políticas adicionales.
 
 ---
 

@@ -40,6 +40,9 @@ La página MUST mostrar hasta 3 beneficios KineClub con `activa = true`, junto c
 - **WHEN** no existen beneficios con `activa = true`
 - **THEN** la sección KineClub no se renderiza
 
+### Requirement: Home presenta el Círculo de forma visual e institucional
+El home público SHALL presentar la institución con animaciones de scroll que den dinamismo a la experiencia. Las secciones MUST aparecer progresivamente al hacer scroll, usando `ScrollReveal` como wrapper. Las grillas de cards MUST usar stagger para sus ítems.
+
 ### Requirement: Home es Server Component
 La página de inicio MUST ser un React Server Component que realiza todos los fetches en el servidor.
 
