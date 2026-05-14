@@ -11,6 +11,7 @@ import {
 import Link from "next/link";
 import { cn } from "@/lib/utils";
 import AdminSearch from "../_components/AdminSearch";
+import { eliminarNoticiaAction } from "./actions";
 
 export default async function NoticiasAdminPage({
   searchParams,
@@ -153,12 +154,15 @@ export default async function NoticiasAdminPage({
                         >
                           <Edit className="h-4 w-4" />
                         </Link>
-                        <button
-                          className="p-2 rounded-lg bg-slate-50 text-slate-400 hover:text-red-600 hover:bg-red-50 transition-all"
-                          title="Eliminar"
-                        >
-                          <Trash2 className="h-4 w-4" />
-                        </button>
+                        <form action={eliminarNoticiaAction.bind(null, n.id)}>
+                          <button
+                            type="submit"
+                            className="p-2 rounded-lg bg-slate-50 text-slate-400 hover:text-red-600 hover:bg-red-50 transition-all"
+                            title="Eliminar"
+                          >
+                            <Trash2 className="h-4 w-4" />
+                          </button>
+                        </form>
                       </div>
                     </td>
                   </tr>

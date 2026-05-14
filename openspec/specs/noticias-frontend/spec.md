@@ -39,6 +39,17 @@ The system MUST safely convert Markdown text into HTML, applying consistent styl
 - AND the system MUST apply Tailwind typography styling via the `prose` class
 - AND the system MUST NOT use `dangerouslySetInnerHTML`.
 
+### Requirement: NoticiaRepository.update
+
+The system MUST expose an `update(id, data)` method on `NoticiaRepository` that persists changes to an existing noticia.
+
+#### Scenario: Actualización exitosa
+
+- GIVEN a valid noticia `id` and a partial data object
+- WHEN `NoticiaRepository.update(id, data)` is called
+- THEN the system MUST call `prisma.noticia.update({ where: { id }, data })`
+- AND MUST return the updated record.
+
 ### Requirement: SEO Metadata
 
 The system MUST dynamically generate the `<title>` and `<meta name="description">` tags for the page based on the article's specific data.

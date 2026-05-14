@@ -18,4 +18,8 @@ export class NoticiaRepository {
       where: { slug },
     });
   }
+
+  static async update(id: string, data: Parameters<typeof prisma.noticia.update>[0]["data"]) {
+    return prisma.noticia.update({ where: { id }, data });
+  }
 }

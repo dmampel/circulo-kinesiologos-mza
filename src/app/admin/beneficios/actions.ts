@@ -81,3 +81,7 @@ export async function eliminarBeneficio(id: string) {
   }
 }
 
+export async function eliminarBeneficioAction(id: string): Promise<void> {
+  await eliminarBeneficio(id);
+}
+

@@ -13,6 +13,7 @@ import CategoriaFilter from "./CategoriaFilter";
 import { CategoriaRepository } from "@/lib/repositories/CategoriaRepository";
 import AdminSearch from "../_components/AdminSearch";
 import SafeLogoImage from "../_components/SafeLogoImage";
+import { eliminarBeneficioAction } from "./actions";
 
 export default async function BeneficiosAdminPage({
   searchParams,
@@ -163,9 +164,14 @@ export default async function BeneficiosAdminPage({
                         >
                           <Edit className="h-4 w-4" />
                         </Link>
-                        <button className="p-2 rounded-lg bg-slate-50 text-slate-400 hover:text-red-600 transition-all">
-                          <Trash2 className="h-4 w-4" />
-                        </button>
+                        <form action={eliminarBeneficioAction.bind(null, b.id)}>
+                          <button
+                            type="submit"
+                            className="p-2 rounded-lg bg-slate-50 text-slate-400 hover:text-red-600 transition-all"
+                          >
+                            <Trash2 className="h-4 w-4" />
+                          </button>
+                        </form>
                       </div>
                     </td>
                   </tr>
