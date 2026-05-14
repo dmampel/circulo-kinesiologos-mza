@@ -108,6 +108,13 @@ export class ProfesionalRepository {
     });
   }
 
+  static async findById(id: string) {
+    return prisma.profesional.findUnique({
+      where: { id },
+      select: { id: true, nombre: true, apellido: true, matricula: true },
+    });
+  }
+
   static async update(userId: string, data: UpdateProfesionalData) {
     return prisma.profesional.update({
       where: { userId },

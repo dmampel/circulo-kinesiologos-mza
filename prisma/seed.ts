@@ -7,7 +7,7 @@ const prisma = new PrismaClient();
 async function main() {
   console.log('🌱 Iniciando seed...');
 
-  const dataPath = path.join(process.cwd(), '../data_seed.json');
+  const dataPath = path.join(process.cwd(), '../resources/data_seed.json');
   const rawData = fs.readFileSync(dataPath, 'utf-8');
   const { localidades, especialidades, profesionales } = JSON.parse(rawData);
 
@@ -108,6 +108,33 @@ async function main() {
         publicada: true,
       },
     });
+  }
+
+  // Seed Comision Directiva
+  const profs = await prisma.profesional.findMany({ take: 7 });
+  if (profs.length >= 7) {
+    console.log('📊 Cargando Comisión Directiva...');
+    const cargos = [
+      "Presidente", "Vicepresidente/a", "Secretario/a", 
+      "Tesorero/a", "1° Vocal Titular", "2° Vocal Titular", "Vocal Suplente"
+    ];
+
+    for (let i = 0; i < cargos.length; i++) {
+      await prisma.autoridad.upsert({
+        where: { id: `seed-autoridad-${i}` },
+        update: {
+          cargo: cargos[i],
+          orden: i,
+          profesionalId: profs[i].id
+        },
+        create: {
+          id: `seed-autoridad-${i}`,
+          cargo: cargos[i],
+          orden: i,
+          profesionalId: profs[i].id
+        }
+      });
+    }
   }
 
   console.log('✅ Seed completado con éxito.');

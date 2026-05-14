@@ -1,23 +1,11 @@
 import { FileText, Scale, DollarSign, ClipboardList, ArrowUpRight } from "lucide-react";
+import { AutoridadRepository } from "@/lib/repositories/AutoridadRepository";
 
-// TODO: replace with real data
-const PRESIDENTE = {
-  nombre: "Lic. Nombre Apellido",
-  cargo: "Presidente",
-  iniciales: "NA",
-};
+// TODO: move to a utility if needed
+function getInitials(nombre: string, apellido: string): string {
+  return `${nombre.charAt(0)}${apellido.charAt(0)}`.toUpperCase();
+}
 
-// TODO: replace with real data
-const COMISION_DIRECTIVA: Array<{ nombre: string; cargo: string; iniciales: string }> = [
-  { nombre: "Lic. Nombre Apellido", cargo: "Vicepresidente/a", iniciales: "NA" },
-  { nombre: "Lic. Nombre Apellido", cargo: "Secretario/a", iniciales: "NA" },
-  { nombre: "Lic. Nombre Apellido", cargo: "Tesorero/a", iniciales: "NA" },
-  { nombre: "Lic. Nombre Apellido", cargo: "1° Vocal Titular", iniciales: "NA" },
-  { nombre: "Lic. Nombre Apellido", cargo: "2° Vocal Titular", iniciales: "NA" },
-  { nombre: "Lic. Nombre Apellido", cargo: "Vocal Suplente", iniciales: "NA" },
-];
-
-// TODO: replace with real data
 const HITOS: Array<{ año: string; titulo: string; desc: string }> = [
   {
     año: "1960",
@@ -73,7 +61,6 @@ const DOCUMENTOS: Array<{ titulo: string; desc: string; href: string; icon: stri
   },
 ];
 
-// TODO: replace with real stats
 const STATS = [
   { num: "65+", label: "Años de trayectoria" },
   { num: "500+", label: "Socios activos" },
@@ -95,17 +82,19 @@ function DocumentIcon({ name }: { name: string }) {
   }
 }
 
-export default function InstitucionalPage() {
+export default async function InstitucionalPage() {
+  const autoridades = await AutoridadRepository.findAll();
+  
+  const presidente = autoridades.find(a => a.cargo.toLowerCase() === 'presidente');
+  const restoComision = autoridades.filter(a => a.cargo.toLowerCase() !== 'presidente');
+
   return (
     <div className="bg-white">
 
-      {/* ── HERO — sin texto, pura atmósfera ── */}
+      {/* ── HERO ── */}
       <section className="relative h-screen bg-slate-950 overflow-hidden">
-        
-        {/* Glows */}
         <div className="absolute top-1/4 left-1/3 w-[700px] h-[700px] bg-blue-600/20 rounded-full blur-[200px] pointer-events-none" />
         <div className="absolute bottom-0 right-1/4 w-[500px] h-[500px] bg-blue-400/10 rounded-full blur-[160px] pointer-events-none" />
-        {/* Círculos concéntricos decorativos */}
         <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[38vw] h-[38vw] rounded-full border border-white/[0.05]" />
         <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[58vw] h-[58vw] rounded-full border border-white/[0.03]" />
         <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[76vw] h-[76vw] rounded-full border border-white/[0.02]" />
@@ -117,11 +106,10 @@ export default function InstitucionalPage() {
             </p>
           </div>
         </div>
-        {/* Línea inferior */}
         <div className="absolute bottom-0 left-0 right-0 h-px bg-gradient-to-r from-transparent via-blue-500/70 to-transparent" />
       </section>
 
-      {/* ── STATEMENT — tipografía a escala máxima ── */}
+      {/* ── STATEMENT ── */}
       <section className="bg-white py-24 md:py-40">
         <div className="mx-auto max-w-5xl px-6">
           <h1 className="text-5xl md:text-7xl lg:text-8xl font-black text-slate-900 tracking-tighter leading-[0.88] mb-16 md:mb-24">
@@ -139,7 +127,7 @@ export default function InstitucionalPage() {
         </div>
       </section>
 
-      {/* ── STATS — números que hablan ── */}
+      {/* ── STATS ── */}
       <section className="border-y border-slate-100">
         <div className="mx-auto max-w-5xl px-6 py-16 md:py-20">
           <div className="grid grid-cols-3 divide-x divide-slate-100">
@@ -153,7 +141,7 @@ export default function InstitucionalPage() {
         </div>
       </section>
 
-      {/* ── MISIÓN + VISIÓN — split full-bleed, sin contenedor ── */}
+      {/* ── MISIÓN + VISIÓN ── */}
       <section className="grid grid-cols-1 lg:grid-cols-2">
         <div className="bg-slate-950 py-24 md:py-36 px-8 md:px-16 xl:px-24">
           <span className="text-xs font-black text-blue-400 uppercase tracking-[0.3em] block mb-10">
@@ -178,7 +166,7 @@ export default function InstitucionalPage() {
         </div>
       </section>
 
-      {/* ── HISTORIA — años como elemento visual ── */}
+      {/* ── HISTORIA ── */}
       <section className="bg-white py-24 md:py-40">
         <div className="mx-auto max-w-5xl px-6">
           <h2 className="text-xs font-black text-slate-400 uppercase tracking-[0.3em] mb-20">
@@ -191,7 +179,6 @@ export default function InstitucionalPage() {
                 i < HITOS.length - 1 ? "border-b border-slate-100" : ""
               }`}
             >
-              {/* Año watermark */}
               <span className="absolute right-0 top-1/2 -translate-y-1/2 text-[6rem] md:text-[8rem] font-black text-slate-50 leading-none select-none pointer-events-none">
                 {hito.año}
               </span>
@@ -209,55 +196,81 @@ export default function InstitucionalPage() {
         </div>
       </section>
 
-      {/* ── COMISIÓN DIRECTIVA — escala editorial ── */}
+      {/* ── COMISIÓN DIRECTIVA ── */}
       <section className="bg-slate-950 py-24 md:py-40">
         <div className="mx-auto max-w-5xl px-6">
           <h2 className="text-xs font-black text-slate-500 uppercase tracking-[0.3em] mb-20">
             Comisión Directiva
           </h2>
 
-          {/* Presidente — tipografía masiva */}
-          <div className="pb-16 mb-2 border-b border-slate-800">
-            <span className="text-xs font-black text-blue-400 uppercase tracking-[0.3em] block mb-10">
-              Presidencia
-            </span>
-            <div className="flex flex-col md:flex-row items-start md:items-end gap-8 md:gap-12">
-              <div className="h-24 w-24 md:h-32 md:w-32 rounded-[2rem] bg-blue-600 flex items-center justify-center text-4xl font-black text-white shrink-0">
-                {PRESIDENTE.iniciales}
+          {/* Presidente */}
+          {presidente && (
+            <div className="pb-16 mb-2 border-b border-slate-800">
+              <span className="text-xs font-black text-blue-400 uppercase tracking-[0.3em] block mb-10">
+                Presidencia
+              </span>
+              <div className="flex flex-col md:flex-row items-start md:items-end gap-8 md:gap-12">
+                <div className="h-24 w-24 md:h-32 md:w-32 rounded-[2rem] bg-blue-600 flex items-center justify-center text-4xl font-black text-white shrink-0 overflow-hidden">
+                  {presidente.profesional.foto_url ? (
+                    <img 
+                      src={presidente.profesional.foto_url} 
+                      alt={presidente.profesional.full_name || ""} 
+                      className="h-full w-full object-cover"
+                    />
+                  ) : (
+                    getInitials(presidente.profesional.nombre, presidente.profesional.apellido)
+                  )}
+                </div>
+                <p className="text-4xl md:text-6xl lg:text-7xl font-black text-white tracking-tighter leading-none">
+                  {presidente.profesional.full_name || `${presidente.profesional.nombre} ${presidente.profesional.apellido}`}
+                </p>
               </div>
-              <p className="text-4xl md:text-6xl lg:text-7xl font-black text-white tracking-tighter leading-none">
-                {PRESIDENTE.nombre}
-              </p>
             </div>
-          </div>
+          )}
 
           {/* Resto de la comisión */}
           <div>
-            {COMISION_DIRECTIVA.map((miembro, i) => (
+            {restoComision.map((miembro, i) => (
               <div
-                key={i}
+                key={miembro.id}
                 className={`flex items-center gap-6 py-7 ${
-                  i < COMISION_DIRECTIVA.length - 1 ? "border-b border-slate-800/40" : ""
+                  i < restoComision.length - 1 ? "border-b border-slate-800/40" : ""
                 }`}
               >
                 <div
-                  className={`h-11 w-11 rounded-xl ${AVATAR_COLORS[i % AVATAR_COLORS.length]} flex items-center justify-center text-sm font-black text-white shrink-0`}
+                  className={`h-11 w-11 rounded-xl ${AVATAR_COLORS[i % AVATAR_COLORS.length]} flex items-center justify-center text-sm font-black text-white shrink-0 overflow-hidden`}
                 >
-                  {miembro.iniciales}
+                  {miembro.profesional.foto_url ? (
+                    <img 
+                      src={miembro.profesional.foto_url} 
+                      alt={miembro.profesional.full_name || ""} 
+                      className="h-full w-full object-cover"
+                    />
+                  ) : (
+                    getInitials(miembro.profesional.nombre, miembro.profesional.apellido)
+                  )}
                 </div>
                 <div className="flex-1 min-w-0">
                   <span className="text-xs font-black text-slate-500 uppercase tracking-widest block mb-1">
                     {miembro.cargo}
                   </span>
-                  <p className="text-white font-semibold">{miembro.nombre}</p>
+                  <p className="text-white font-semibold">
+                    {miembro.profesional.full_name || `${miembro.profesional.nombre} ${miembro.profesional.apellido}`}
+                  </p>
                 </div>
               </div>
             ))}
           </div>
+          
+          {autoridades.length === 0 && (
+            <p className="text-slate-500 text-center py-20 italic">
+              Información de la comisión directiva en proceso de actualización.
+            </p>
+          )}
         </div>
       </section>
 
-      {/* ── DOCUMENTOS — lista con flechas, sin cards ── */}
+      {/* ── DOCUMENTOS ── */}
       <section className="bg-white py-24 md:py-40">
         <div className="mx-auto max-w-5xl px-6">
           <h2 className="text-xs font-black text-slate-400 uppercase tracking-[0.3em] mb-16">
@@ -323,7 +336,6 @@ export default function InstitucionalPage() {
           </div>
         </div>
 
-        {/* Mapa full-bleed */}
         <div className="w-full h-[28rem] md:h-[36rem]">
           <iframe
             src="https://maps.google.com/maps?q=Eusebio+Blanco+148%2C+Capital%2C+Mendoza%2C+Argentina&t=&z=15&ie=UTF8&iwloc=&output=embed"

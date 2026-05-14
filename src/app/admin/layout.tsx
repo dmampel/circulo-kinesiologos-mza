@@ -30,6 +30,7 @@ const SIDEBAR_LINKS = [
   { name: "Obras Sociales", href: "/admin/obras-sociales", icon: Briefcase },
   { name: "KineClub", href: "/admin/beneficios", icon: Ticket },
   { name: "Noticias", href: "/admin/noticias", icon: FileText },
+  { name: "Autoridades", href: "/admin/autoridades", icon: ShieldCheck },
   { name: "Circulares", href: "/admin/circulares", icon: Megaphone },
   { name: "Capacitaciones", href: "/admin/capacitaciones", icon: BookOpen },
 ];

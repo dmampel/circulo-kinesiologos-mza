@@ -6,9 +6,9 @@
 
 ## Estado Actual
 
-**Última sesión:** 2026-05-12
+**Última sesión:** 2026-05-14
 
-Dos changes archivados y pusheados: seguimiento de lectura de circulares (`circulares-leidas`) y responsive mobile del portal del socio (`portal-socio-responsive`). El portal es ahora navegable en mobile con drawer sidebar.
+Change `admin-crud-fixes` archivado y pusheado. CRUD del admin ahora completo en noticias (edición + eliminación) y eliminación funcional en beneficios.
 
 ---
 
@@ -28,7 +28,7 @@ Dos changes archivados y pusheados: seguimiento de lectura de circulares (`circu
 | Módulo | Estado |
 |--------|--------|
 | Solicitudes | Aprobación con creación de cuenta Supabase |
-| Noticias | CRUD completo |
+| Noticias | CRUD completo (edición vía `/admin/noticias/editar/[id]`) |
 | Capacitaciones | CRUD con Zod, edición, inscripciones |
 | Beneficios/KineClub | CRUD con logos de empresas |
 | Circulares | CRUD + upload a Supabase Storage |
@@ -40,6 +40,7 @@ Dos changes archivados y pusheados: seguimiento de lectura de circulares (`circu
 - **Etiquetas de circulares como texto libre** — no hay CRUD de categorías para no agregar fricción al flujo de publicación rápida.
 - **Zod en todas las Server Actions** — validación en el servidor, throw de Error si falla (no return `{ success: false }` porque los forms son Server Components sin estado).
 - **Storage cleanup explícito** — `deleteStorageFile()` en `actions.ts` limpia el bucket `circulares-adjuntos` al eliminar o reemplazar archivos. El error se swallows intencionalmente (no-crítico).
+- **Form actions void wrappers** — `form action={fn.bind(null, id)}` requiere que `fn` retorne `Promise<void>`. Si la action retorna `{ success, error }`, crear un wrapper `xxxAction(id): Promise<void>` que la envuelve. No modificar la original (puede ser llamada desde client components).
 - **`redirect()` fuera del try/catch** — en Next.js 15, redirect lanza internamente. Ponerlo dentro de un try/catch sin re-throw rompe la navegación.
 - **Preview de archivos sin Client Component** — `<iframe>` para PDFs y `<img>` para imágenes funcionan directo en Server Components.
 - **Sidebar del socio** — Client Component necesario por `usePathname()` para el estado activo de navegación.
@@ -67,7 +68,7 @@ Dos changes archivados y pusheados: seguimiento de lectura de circulares (`circu
 | `CapacitacionRepository.ts` | findPublicadas, findPublicadaById, getInscripcionSocio, etc. |
 | `ProfesionalRepository.ts` | findByUserId, update |
 | `BeneficioRepository.ts` | getAll, getActivos |
-| `NoticiaRepository.ts` | getAll, getPublicadas, etc. |
+| `NoticiaRepository.ts` | getLatest, getById, getBySlug, update |
 
 ---
 
@@ -77,3 +78,4 @@ Dos changes archivados y pusheados: seguimiento de lectura de circulares (`circu
 - Todo cambio significativo va por OPSX (`openspec new change`) → apply → archive → commit + push.
 - El socio se autentica via Supabase Auth. El auth guard en las páginas del portal usa `createClient` de `@/utils/supabase/server`.
 - Supabase Storage bucket para circulares: `circulares-adjuntos` (acceso público).
+- **Pendiente:** change `institucional-comision-directiva` tiene cambios sin commitear (`prisma/schema.prisma`, `AutoridadRepository.ts`, `institucional/page.tsx`). Ver `openspec/changes/admin-autoridades-crud/`.

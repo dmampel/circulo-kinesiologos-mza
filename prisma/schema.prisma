@@ -51,6 +51,7 @@ model Profesional {
   especialidades            Especialidad[]
   inscripcionesCapacitacion InscripcionCapacitacion[]
   lecturasCirculares        LecturaCircular[]
+  autoridades               Autoridad[]
 
   // Auth y Sistema
   userId String?  @unique // ID de Supabase Auth
@@ -213,4 +214,15 @@ model InscripcionCapacitacion {
   updatedAt       DateTime          @updatedAt
 
   @@unique([capacitacionId, profesionalId])
+}
+
+model Autoridad {
+  id            String      @id @default(cuid())
+  cargo         String
+  orden         Int         @default(0)
+  profesionalId String
+  profesional   Profesional @relation(fields: [profesionalId], references: [id], onDelete: Cascade)
+
+  createdAt     DateTime    @default(now())
+  updatedAt     DateTime    @updatedAt
 }
