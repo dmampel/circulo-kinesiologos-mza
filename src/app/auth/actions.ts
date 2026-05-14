@@ -3,6 +3,7 @@
 import { createClient } from "@/utils/supabase/server";
 import { revalidatePath } from "next/cache";
 import { redirect } from "next/navigation";
+import { headers } from "next/headers";
 
 export async function login(formData: FormData) {
   const supabase = await createClient();
@@ -55,6 +56,23 @@ export async function logout() {
   await supabase.auth.signOut();
   revalidatePath("/", "layout");
   redirect("/login");
+}
+
+export async function requestPasswordReset(formData: FormData) {
+  const supabase = await createClient();
+  const email = formData.get("email") as string;
+  const headersList = await headers();
+  const origin = headersList.get("origin") ?? "";
+
+  const { error } = await supabase.auth.resetPasswordForEmail(email, {
+    redirectTo: `${origin}/auth/callback?next=/auth/set-password`,
+  });
+
+  if (error) {
+    redirect("/forgot-password?error=No se pudo enviar el correo. Intentá de nuevo.");
+  }
+
+  redirect("/forgot-password?message=sent");
 }
 
 export async function updatePassword(formData: FormData) {

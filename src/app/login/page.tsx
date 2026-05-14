@@ -2,11 +2,12 @@ import { login } from "@/app/auth/actions";
 import { ShieldCheck, Mail, Lock, ArrowRight } from "lucide-react";
 import Link from "next/link";
 
-export default function LoginPage({
+export default async function LoginPage({
   searchParams,
 }: {
-  searchParams: { error?: string; message?: string };
+  searchParams: Promise<{ error?: string; message?: string }>;
 }) {
+  const params = await searchParams;
   return (
     <div className="min-h-screen bg-slate-50 flex items-center justify-center p-4">
       <div className="max-w-md w-full">
@@ -28,22 +29,22 @@ export default function LoginPage({
           <h1 className="text-2xl font-black text-slate-900 mb-2">Bienvenido</h1>
           <p className="text-sm text-slate-500 mb-6">Ingresá tus credenciales para acceder al panel.</p>
 
-          {searchParams.error && (
+          {params.error && (
             <div className="mb-6 p-4 bg-red-50 border border-red-100 rounded-2xl flex items-start gap-3 animate-in fade-in slide-in-from-top-1">
               <ShieldCheck className="h-5 w-5 text-red-500 shrink-0 mt-0.5" />
               <p className="text-xs font-bold text-red-600 leading-relaxed">
-                {searchParams.error === "Could not authenticate user" 
+                {params.error === "Could not authenticate user" 
                   ? "Credenciales incorrectas. Por favor verificá tu email y contraseña." 
-                  : searchParams.error}
+                  : params.error}
               </p>
             </div>
           )}
 
-          {searchParams.message && (
+          {params.message && (
             <div className="mb-6 p-4 bg-blue-50 border border-blue-100 rounded-2xl flex items-start gap-3">
               <Mail className="h-5 w-5 text-blue-500 shrink-0 mt-0.5" />
               <p className="text-xs font-bold text-blue-600 leading-relaxed">
-                {searchParams.message}
+                {params.message}
               </p>
             </div>
           )}
@@ -63,20 +64,20 @@ export default function LoginPage({
               />
             </div>
             <div className="space-y-2">
-              <div className="flex justify-between items-center ml-1">
-                <label className="text-xs font-black text-slate-400 uppercase flex items-center">
-                  <Lock className="mr-2 h-3 w-3" /> Contraseña
-                </label>
-                <Link href="#" className="text-[10px] font-bold text-blue-600 hover:underline">¿Olvidaste tu contraseña?</Link>
-              </div>
-              <input 
+              <label className="text-xs font-black text-slate-400 uppercase ml-1 flex items-center">
+                <Lock className="mr-2 h-3 w-3" /> Contraseña
+              </label>
+              <input
                 id="password"
                 name="password"
-                type="password" 
+                type="password"
                 required
-                className="w-full px-6 py-4 rounded-2xl bg-slate-50 border-transparent focus:bg-white focus:border-blue-600 focus:ring-4 focus:ring-blue-100 transition-all text-sm font-medium" 
-                placeholder="••••••••" 
+                className="w-full px-6 py-4 rounded-2xl bg-slate-50 border-transparent focus:bg-white focus:border-blue-600 focus:ring-4 focus:ring-blue-100 transition-all text-sm font-medium"
+                placeholder="••••••••"
               />
+              <div className="flex justify-end">
+                <Link href="/forgot-password" className="text-[10px] font-bold text-blue-600 hover:underline">¿Olvidaste tu contraseña?</Link>
+              </div>
             </div>
 
             <button 
