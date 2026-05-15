@@ -13,6 +13,19 @@ export class NoticiaRepository {
     });
   }
 
+  static async getPaginated(page = 1, pageSize = 15) {
+    const skip = (page - 1) * pageSize;
+    const [items, total] = await Promise.all([
+      prisma.noticia.findMany({
+        orderBy: { publicada_en: "desc" },
+        skip,
+        take: pageSize,
+      }),
+      prisma.noticia.count(),
+    ]);
+    return { items, total, totalPages: Math.ceil(total / pageSize), page };
+  }
+
   static async getBySlug(slug: string) {
     return prisma.noticia.findUnique({
       where: { slug },

@@ -9,14 +9,16 @@ export default function ConditionalLayout({ children }: { children: React.ReactN
   const isAdmin = pathname?.startsWith("/admin");
   const isPortal = pathname?.startsWith("/mi-panel");
   const isInstitucional = pathname?.startsWith("/institucional");
+  const isDiario = pathname?.startsWith("/noticias/diario");
+  const isNoticias = pathname === "/noticias";
 
   return (
     <>
-      {!isAdmin && !isPortal && <Navbar />}
+      {!isAdmin && !isPortal && !isDiario && <Navbar />}
       <main className="flex-grow">
         {children}
       </main>
-      {!isAdmin && !isPortal && !isInstitucional && <Footer />}
+      {!isAdmin && !isPortal && !isInstitucional && !isDiario && !isNoticias && <Footer />}
     </>
   );
 }

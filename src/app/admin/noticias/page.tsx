@@ -140,7 +140,7 @@ export default async function NoticiasAdminPage({
                     <td className="px-8 py-6 text-right">
                       <div className="flex items-center justify-end space-x-2">
                         <Link
-                          href={`/noticias/${n.slug}`}
+                          href={`/noticias?noticia=${n.slug}`}
                           target="_blank"
                           className="p-2 rounded-lg bg-slate-50 text-slate-400 hover:text-blue-600 hover:bg-white hover:shadow-sm transition-all"
                           title="Ver en la web"

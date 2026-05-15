@@ -309,7 +309,7 @@ export default async function Home() {
                     {ultimasNoticias.map((noticia) => (
                       <StaggerItem key={noticia.id}>
                         <Link
-                          href={`/noticias/${noticia.slug}`}
+                          href={`/noticias?noticia=${noticia.slug}`}
                           className="group block rounded-2xl overflow-hidden border border-slate-100 hover:shadow-md hover:-translate-y-0.5 transition-all bg-white"
                         >
                           <div className="h-44 overflow-hidden bg-gradient-to-br from-blue-50 to-indigo-100">

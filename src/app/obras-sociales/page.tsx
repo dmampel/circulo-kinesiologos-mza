@@ -2,9 +2,7 @@ import {
   Search,
   ShieldCheck,
   FileText,
-  ExternalLink,
-  Info,
-  ImageIcon,
+  ArrowRight,
 } from "lucide-react";
 import Link from "next/link";
 import { ObraSocialRepository } from "@/lib/repositories/ObraSocialRepository";
@@ -118,29 +116,27 @@ export default async function ObrasSocialesPage() {
         </div>
 
         {/* Aviso para Profesionales */}
-        <div className="mt-20 bg-slate-900 rounded-[3rem] p-10 lg:p-16 text-white relative overflow-hidden">
-          <div className="relative z-10 lg:flex items-center justify-between gap-12">
-            <div className="max-w-2xl mb-8 lg:mb-0">
-              <div className="inline-flex items-center px-3 py-1 rounded-full bg-blue-600 text-[10px] font-black tracking-widest uppercase mb-6">
-                Atención Profesionales
-              </div>
-              <h2 className="text-3xl font-bold mb-4">
-                ¿Dudas sobre facturación o convenios?
-              </h2>
-              <p className="text-slate-400 leading-relaxed">
-                Recordá que podés descargar los instructivos de facturación
-                actualizados desde el panel privado de socios.
-              </p>
-            </div>
+        <div className="mt-20 py-16 border-t border-slate-100">
+          <p className="text-blue-600 text-xs font-black uppercase tracking-widest mb-6">
+            Atención Profesionales
+          </p>
+          <h2 className="text-4xl lg:text-6xl font-black text-slate-900 tracking-tighter leading-[0.95] mb-6 max-w-3xl">
+            ¿Dudas sobre facturación{" "}
+            <span className="text-slate-400">o convenios?</span>
+          </h2>
+          <p className="text-slate-500 leading-relaxed mb-10 max-w-xl">
+            Recordá que podés descargar los instructivos de facturación
+            actualizados desde el panel privado de socios.
+          </p>
+          <div className="flex flex-col items-end gap-1">
             <Link
               href="/mi-panel"
-              className="inline-flex items-center px-8 py-4 rounded-2xl bg-white text-slate-900 font-bold hover:bg-blue-50 transition-all whitespace-nowrap"
+              className="inline-flex items-center gap-2 text-blue-600 font-black text-lg hover:text-blue-500 transition-colors"
             >
-              Ir a mi Panel <ExternalLink className="ml-2 h-5 w-5" />
+              Ir a mi Panel <ArrowRight className="h-5 w-5" />
             </Link>
+            <p className="text-slate-400 text-sm">Exclusivo para socios activos</p>
           </div>
-          {/* Decorative pattern */}
-          <div className="absolute top-0 right-0 w-64 h-64 bg-blue-600/10 rounded-full -mr-32 -mt-32 blur-3xl" />
         </div>
       </div>
     </div>

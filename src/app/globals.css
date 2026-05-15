@@ -1,5 +1,5 @@
 @import "tailwindcss";
-@plugin "@tailwindcss/typography";
+@plugin "../../node_modules/@tailwindcss/typography";
 
 @theme {
   --font-sans: var(--font-geist-sans);
@@ -26,6 +26,39 @@
     --background: oklch(1 0 0);
     --foreground: oklch(0.145 0 0);
   }
+}
+
+/* Textura de papel tipo diario */
+.paper-texture {
+  position: relative;
+}
+
+/* Capa 1: grano fino */
+.paper-texture::before {
+  content: '';
+  position: fixed;
+  inset: 0;
+  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='300' height='300'%3E%3Cfilter id='noise'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.75' numOctaves='4' stitchTiles='stitch'/%3E%3CfeColorMatrix type='saturate' values='0'/%3E%3C/filter%3E%3Crect width='300' height='300' filter='url(%23noise)' opacity='1'/%3E%3C/svg%3E");
+  background-repeat: repeat;
+  background-size: 180px 180px;
+  opacity: 0.1;
+  pointer-events: none;
+  z-index: 999;
+  mix-blend-mode: multiply;
+}
+
+/* Capa 2: arrugas grandes */
+.paper-texture::after {
+  content: '';
+  position: fixed;
+  inset: 0;
+  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='600' height='600'%3E%3Cfilter id='wrinkle'%3E%3CfeTurbulence type='turbulence' baseFrequency='0.012 0.008' numOctaves='6' seed='5' stitchTiles='stitch'/%3E%3CfeColorMatrix type='saturate' values='0'/%3E%3CfeBlend in='SourceGraphic' mode='multiply'/%3E%3C/filter%3E%3Crect width='600' height='600' filter='url(%23wrinkle)' opacity='1'/%3E%3C/svg%3E");
+  background-repeat: repeat;
+  background-size: 600px 600px;
+  opacity: 0.12;
+  pointer-events: none;
+  z-index: 998;
+  mix-blend-mode: multiply;
 }
 
 body {

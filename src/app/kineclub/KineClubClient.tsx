@@ -174,17 +174,42 @@ export default function KineClubClient({ beneficios, currentCat, categorias }: P
           )}
         </div>
 
-        <div className="mt-16 md:mt-24 text-center bg-blue-50 p-8 md:p-16 rounded-[2.5rem] md:rounded-[4rem] border border-blue-100">
-          <h2 className="text-3xl font-black text-slate-900 mb-4">¿Cómo utilizo los beneficios?</h2>
-          <p className="text-slate-600 max-w-xl mx-auto mb-10 leading-relaxed">
-            Es muy simple: presentá tu carnet digital o físico en cualquiera de los comercios adheridos y empezá a disfrutar.
-          </p>
-          <div className="flex flex-col sm:flex-row items-center justify-center gap-4">
-            <Link href="/admin" className="px-10 py-5 bg-blue-600 text-white rounded-2xl font-bold shadow-lg shadow-blue-200">
-              Ver mi Carnet Digital
+        <div className="mt-24 md:mt-32 border-t border-slate-200 pt-16 md:pt-20 grid grid-cols-1 lg:grid-cols-2 gap-12 lg:gap-24 items-end">
+          {/* Izquierda: copy */}
+          <div>
+            <p className="text-blue-600 text-xs font-black uppercase tracking-widest mb-6">
+              ¿Cómo funciona?
+            </p>
+            <h2 className="text-5xl lg:text-6xl font-black text-slate-900 tracking-tighter leading-[0.95] mb-6">
+              Presentá tu carnet.{" "}
+              <span className="text-slate-400">Así de simple.</span>
+            </h2>
+            <p className="text-slate-500 leading-relaxed max-w-md">
+              Mostrá tu carnet digital o físico en cualquiera de los comercios adheridos y empezá a disfrutar los descuentos exclusivos para socios.
+            </p>
+          </div>
+
+          {/* Derecha: CTAs apilados */}
+          <div className="flex flex-col divide-y divide-slate-200">
+            <Link
+              href="/mi-panel/carnet"
+              className="group flex items-center justify-between py-6 text-slate-900 hover:text-blue-600 transition-colors"
+            >
+              <div>
+                <p className="font-black text-xl tracking-tight">Ver mi Carnet Digital</p>
+                <p className="text-slate-400 text-sm font-normal mt-0.5">Accedé desde tu panel de socio</p>
+              </div>
+              <ChevronRight className="h-5 w-5 shrink-0 group-hover:translate-x-1 transition-transform" />
             </Link>
-            <Link href="/registro" className="px-10 py-5 bg-white text-slate-900 border-2 border-slate-200 rounded-2xl font-bold hover:bg-slate-50 transition-all">
-              Aún no soy socio
+            <Link
+              href="/registro"
+              className="group flex items-center justify-between py-6 text-slate-900 hover:text-blue-600 transition-colors"
+            >
+              <div>
+                <p className="font-black text-xl tracking-tight">Aún no soy socio</p>
+                <p className="text-slate-400 text-sm font-normal mt-0.5">Asociate sin costo de inscripción</p>
+              </div>
+              <ChevronRight className="h-5 w-5 shrink-0 group-hover:translate-x-1 transition-transform" />
             </Link>
           </div>
         </div>
