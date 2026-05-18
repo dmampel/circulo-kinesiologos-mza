@@ -132,7 +132,7 @@ export default function TurnoDetailModal({ turno, pacientes, onClose, onEstadoCh
         initial={{ x: "100%" }}
         animate={{ x: 0 }}
         exit={{ x: "100%" }}
-        transition={{ duration: 0.28, ease: [0.32, 0.72, 0, 1] }}
+        transition={{ type: "spring", damping: 28, stiffness: 200, mass: 0.8 }}
       >
         {/* Header */}
         <div className="flex items-start justify-between p-6 border-b border-slate-100">
