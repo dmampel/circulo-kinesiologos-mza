@@ -52,6 +52,8 @@ model Profesional {
   inscripcionesCapacitacion InscripcionCapacitacion[]
   lecturasCirculares        LecturaCircular[]
   autoridades               Autoridad[]
+  pacientes                 Paciente[]
+  turnos                    Turno[]
 
   // Auth y Sistema
   userId String?  @unique // ID de Supabase Auth
@@ -228,6 +230,42 @@ model InscripcionCapacitacion {
   updatedAt       DateTime          @updatedAt
 
   @@unique([capacitacionId, profesionalId])
+}
+
+enum EstadoTurno {
+  PENDIENTE
+  CONFIRMADO
+  CANCELADO
+  COMPLETADO
+}
+
+model Paciente {
+  id            String      @id @default(cuid())
+  nombre        String
+  apellido      String
+  telefono      String?
+  email         String?
+  notas         String?     @db.Text
+  profesionalId String
+  profesional   Profesional @relation(fields: [profesionalId], references: [id], onDelete: Cascade)
+  turnos        Turno[]
+  createdAt     DateTime    @default(now())
+  updatedAt     DateTime    @updatedAt
+}
+
+model Turno {
+  id            String      @id @default(cuid())
+  fecha         DateTime
+  duracion      Int         @default(50)
+  motivo        String?
+  notas         String?     @db.Text
+  estado        EstadoTurno @default(PENDIENTE)
+  profesionalId String
+  profesional   Profesional @relation(fields: [profesionalId], references: [id], onDelete: Cascade)
+  pacienteId    String
+  paciente      Paciente    @relation(fields: [pacienteId], references: [id])
+  createdAt     DateTime    @default(now())
+  updatedAt     DateTime    @updatedAt
 }
 
 model Autoridad {

@@ -13,7 +13,10 @@ import {
   AlertCircle,
   BookOpen,
   Calendar,
+  CalendarDays,
+  Clock,
 } from "lucide-react";
+import { TurnoRepository } from "@/lib/repositories/TurnoRepository";
 import Link from "next/link";
 
 // ─── Helpers ─────────────────────────────────────────────────────────────────
@@ -90,6 +93,7 @@ export default async function DashboardPage() {
 
   const proximasInscripciones =
     await CapacitacionRepository.getProximasInscripcionesSocio(profesional.id);
+  const turnosHoy = await TurnoRepository.getTodayByProfesional(profesional.id);
 
   const hoy = new Date();
   const lunes = getLunesDeSemana(hoy);
@@ -128,7 +132,7 @@ export default async function DashboardPage() {
       <div className="flex flex-col md:flex-row md:items-center justify-between gap-6 border-b border-slate-200 pb-8">
         <div className="space-y-1">
           <p className="text-[10px] font-black text-blue-600 uppercase tracking-[0.3em]">
-            Panel Profesional • CKM
+            Panel Profesional • CKFM
           </p>
           <h1 className="text-4xl lg:text-5xl font-black text-slate-900 tracking-tighter leading-none uppercase">
             Que bueno verte,{" "}
@@ -147,7 +151,7 @@ export default async function DashboardPage() {
                 Matricula
               </p>
               <p className="text-sm font-black text-slate-900 tracking-tight">
-                M.P. {profesional.matricula}
+                {profesional.matricula}
               </p>
             </div>
             <div className="h-8 w-[1px] bg-slate-200" />
@@ -156,7 +160,7 @@ export default async function DashboardPage() {
                 Especialidad
               </p>
               <p className="text-xs font-bold text-slate-700">
-                Kinesiología Gral.
+                {profesional.especialidades.map((e) => e.nombre).join(", ")}
               </p>
             </div>
             <div className="h-8 w-[1px] bg-slate-200" />
@@ -248,7 +252,65 @@ export default async function DashboardPage() {
         </div>
       </section>
 
-      {/* 3. Agenda Semanal */}
+      {/* 3. Turnos de Hoy */}
+      {turnosHoy.length > 0 && (
+        <section className="border-t border-slate-100 pt-10">
+          <div className="flex items-center justify-between mb-5">
+            <div className="space-y-0.5">
+              <p className="text-[10px] font-black text-blue-600 uppercase tracking-[0.2em]">
+                Hoy
+              </p>
+              <h2 className="text-2xl font-bold text-slate-900 tracking-tight">
+                Turnos del día
+              </h2>
+            </div>
+            <Link
+              href="/mi-panel/turnos"
+              className="text-[10px] font-black text-blue-600 uppercase tracking-[0.2em] hover:underline"
+            >
+              Ver agenda
+            </Link>
+          </div>
+          <div className="space-y-0 relative before:absolute before:left-[9px] sm:before:left-[11px] before:top-2 before:bottom-2 before:w-[1px] before:bg-slate-100">
+            {turnosHoy.map((turno) => {
+              const hora = new Intl.DateTimeFormat("es-AR", {
+                hour: "2-digit",
+                minute: "2-digit",
+                timeZone: "America/Argentina/Mendoza",
+              }).format(new Date(turno.fecha));
+              const ESTADO_COLOR: Record<string, string> = {
+                PENDIENTE: "bg-amber-400",
+                CONFIRMADO: "bg-blue-500",
+                COMPLETADO: "bg-green-500",
+                CANCELADO: "bg-slate-300",
+              };
+              return (
+                <Link
+                  key={turno.id}
+                  href={`/mi-panel/turnos/${turno.id}/editar`}
+                  className="group relative pl-8 sm:pl-10 py-4 flex items-center gap-4 hover:bg-slate-50 -mx-3 px-3 rounded-xl transition-colors"
+                >
+                  <div className={`absolute left-0 top-1/2 -translate-y-1/2 h-5 w-5 rounded-full border-4 border-white z-10 ${ESTADO_COLOR[turno.estado] ?? "bg-slate-300"}`} />
+                  <span className="text-xs font-black tabular-nums text-slate-400 shrink-0 w-14">
+                    {hora}
+                  </span>
+                  <p className="flex-1 text-sm font-bold text-slate-800 group-hover:text-blue-700 transition-colors">
+                    {turno.paciente.apellido}, {turno.paciente.nombre}
+                  </p>
+                  {turno.motivo && (
+                    <span className="text-[11px] text-slate-400 hidden sm:block shrink-0 max-w-[160px] truncate">
+                      {turno.motivo}
+                    </span>
+                  )}
+                  <ArrowUpRight className="h-3.5 w-3.5 text-slate-200 group-hover:text-blue-400 shrink-0 transition-colors" />
+                </Link>
+              );
+            })}
+          </div>
+        </section>
+      )}
+
+      {/* 4. Agenda Semanal */}
       {proximasInscripciones.length > 0 && (
         <section className="border-t border-slate-100 pt-10">
           <div className="flex items-center justify-between mb-6">

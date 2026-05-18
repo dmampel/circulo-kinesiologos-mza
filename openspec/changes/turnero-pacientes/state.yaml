@@ -1,0 +1,5 @@
+phase: tasks
+status: approved
+next: apply
+change: turnero-pacientes
+artifact_store: openspec

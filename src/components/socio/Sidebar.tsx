@@ -15,6 +15,8 @@ import {
   BookOpen,
   Megaphone,
   Home,
+  CalendarDays,
+  Users,
 } from "lucide-react";
 import { clsx } from "clsx";
 import { twMerge } from "tailwind-merge";
@@ -32,6 +34,8 @@ const navItems = [
   { title: "Mi Perfil", href: "/mi-panel/perfil", icon: UserCircle },
   { title: "Capacitaciones", href: "/mi-panel/capacitaciones", icon: BookOpen },
   { title: "Circulares", href: "/mi-panel/circulares", icon: Megaphone },
+  { title: "Turnos", href: "/mi-panel/turnos", icon: CalendarDays },
+  { title: "Pacientes", href: "/mi-panel/turnos/pacientes", icon: Users },
 ];
 
 const toolItems = [
@@ -71,7 +75,14 @@ export default function Sidebar({ unreadCirculares = 0 }: { unreadCirculares?: n
       {/* Main Navigation */}
       <nav className="space-y-2">
         {navItems.map((item) => {
-          const isActive = pathname === item.href;
+          let isActive = false;
+          if (item.href === "/mi-panel") {
+            isActive = pathname === item.href;
+          } else if (item.href === "/mi-panel/turnos") {
+            isActive = pathname === item.href || (pathname.startsWith(item.href + "/") && !pathname.startsWith("/mi-panel/turnos/pacientes"));
+          } else {
+            isActive = pathname === item.href || pathname.startsWith(item.href + "/");
+          }
           const isCirculares = item.href === "/mi-panel/circulares";
           const hasUnread = isCirculares && unreadCirculares > 0;
 
