@@ -1,5 +1,6 @@
 import { notFound } from "next/navigation";
 import { NoticiaRepository } from "@/lib/repositories/NoticiaRepository";
+import { CategoriaNoticiaRepository } from "@/lib/repositories/CategoriaNoticiaRepository";
 import EditarNoticiaForm from "./EditarNoticiaForm";
 
 export default async function EditarNoticiaPage({
@@ -8,9 +9,12 @@ export default async function EditarNoticiaPage({
   params: Promise<{ id: string }>;
 }) {
   const { id } = await params;
-  const noticia = await NoticiaRepository.getById(id);
+  const [noticia, categorias] = await Promise.all([
+    NoticiaRepository.getById(id),
+    CategoriaNoticiaRepository.getAll(),
+  ]);
 
   if (!noticia) notFound();
 
-  return <EditarNoticiaForm noticia={noticia} />;
+  return <EditarNoticiaForm noticia={noticia} categorias={categorias} />;
 }

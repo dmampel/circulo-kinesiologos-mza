@@ -27,7 +27,7 @@ export default function SearchBar() {
   };
 
   return (
-    <div className={`relative flex items-center transition-opacity ${isPending ? "opacity-60" : ""}`}>
+    <div className={`relative flex items-center justify-end transition-opacity ${isPending ? "opacity-60" : ""}`}>
       <Search className="absolute left-3 h-3.5 w-3.5 text-slate-400 pointer-events-none" />
       <input
         type="text"

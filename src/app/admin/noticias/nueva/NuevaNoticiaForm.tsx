@@ -13,24 +13,23 @@ import {
 } from "lucide-react";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
-import { actualizarNoticia } from "../../actions";
-import type { Noticia, CategoriaNoticia } from "@prisma/client";
+import { crearNoticia } from "../actions";
+import type { CategoriaNoticia } from "@prisma/client";
 
 interface Props {
-  noticia: Noticia;
   categorias: CategoriaNoticia[];
 }
 
-export default function EditarNoticiaForm({ noticia, categorias }: Props) {
+export default function NuevaNoticiaForm({ categorias }: Props) {
   const router = useRouter();
   const [isPending, setIsPending] = useState(false);
   const [formData, setFormData] = useState({
-    titulo: noticia.titulo,
-    resumen: noticia.resumen ?? "",
-    contenido: noticia.contenido,
-    imagen_url: noticia.imagen_url ?? "",
-    publicada: noticia.publicada,
-    categoriaId: noticia.categoriaId ?? "",
+    titulo: "",
+    resumen: "",
+    contenido: "",
+    imagen_url: "",
+    publicada: false,
+    categoriaId: "",
   });
 
   const handleChange = (
@@ -48,18 +47,19 @@ export default function EditarNoticiaForm({ noticia, categorias }: Props) {
     setIsPending(true);
 
     const data = new FormData(e.target as HTMLFormElement);
-    const result = await actualizarNoticia(noticia.id, data);
+    const result = await crearNoticia(data);
 
     if (result.success) {
       router.push("/admin/noticias");
     } else {
-      alert("Error al guardar los cambios: " + result.error);
+      alert("Error al crear la noticia: " + result.error);
       setIsPending(false);
     }
   };
 
   return (
     <div className="max-w-4xl mx-auto space-y-8 animate-in fade-in duration-500 pb-20">
+      {/* Header */}
       <div className="flex items-center justify-between">
         <div className="flex items-center space-x-4">
           <Link
@@ -68,12 +68,14 @@ export default function EditarNoticiaForm({ noticia, categorias }: Props) {
           >
             <ArrowLeft className="h-6 w-6" />
           </Link>
-          <h1 className="text-3xl font-black text-slate-900">Editar Noticia</h1>
+          <h1 className="text-3xl font-black text-slate-900">Nueva Noticia</h1>
         </div>
       </div>
 
       <form onSubmit={handleSubmit} className="space-y-8">
         <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
+
+          {/* Columna Principal */}
           <div className="lg:col-span-2 space-y-8">
             <div className="bg-white rounded-[2.5rem] p-8 lg:p-10 border border-slate-100 shadow-sm space-y-6">
               <div className="space-y-2">
@@ -129,6 +131,7 @@ export default function EditarNoticiaForm({ noticia, categorias }: Props) {
             </div>
           </div>
 
+          {/* Sidebar */}
           <div className="space-y-8">
             <div className="bg-white rounded-[2.5rem] p-8 border border-slate-100 shadow-sm space-y-6">
 
@@ -162,6 +165,7 @@ export default function EditarNoticiaForm({ noticia, categorias }: Props) {
 
               <hr className="border-slate-100" />
 
+              {/* Imagen */}
               <div className="space-y-4">
                 <label className="text-xs font-black text-slate-400 uppercase tracking-widest">
                   Imagen de Portada (URL)
@@ -177,17 +181,11 @@ export default function EditarNoticiaForm({ noticia, categorias }: Props) {
                   />
                   <div className="relative group aspect-video rounded-3xl bg-slate-50 border-2 border-dashed border-slate-200 overflow-hidden flex items-center justify-center transition-all hover:border-blue-400">
                     {formData.imagen_url ? (
-                      <img
-                        src={formData.imagen_url}
-                        alt="Preview"
-                        className="h-full w-full object-cover"
-                      />
+                      <img src={formData.imagen_url} alt="Preview" className="h-full w-full object-cover" />
                     ) : (
                       <div className="flex flex-col items-center text-slate-300">
                         <ImageIcon className="h-10 w-10 mb-2" />
-                        <span className="text-[10px] font-black uppercase tracking-widest">
-                          Vista Previa
-                        </span>
+                        <span className="text-[10px] font-black uppercase tracking-widest">Vista Previa</span>
                       </div>
                     )}
                   </div>
@@ -196,10 +194,11 @@ export default function EditarNoticiaForm({ noticia, categorias }: Props) {
 
               <hr className="border-slate-50" />
 
+              {/* Publicar */}
               <div className="flex items-center justify-between p-4 bg-slate-50 rounded-2xl">
                 <div className="flex items-center space-x-3">
                   <Eye className="h-5 w-5 text-slate-400" />
-                  <span className="text-sm font-bold text-slate-700">¿Publicada?</span>
+                  <span className="text-sm font-bold text-slate-700">¿Publicar ahora?</span>
                 </div>
                 <label className="relative inline-flex items-center cursor-pointer">
                   <input
@@ -209,7 +208,7 @@ export default function EditarNoticiaForm({ noticia, categorias }: Props) {
                     onChange={handleChange}
                     className="sr-only peer"
                   />
-                  <div className="w-11 h-6 bg-slate-200 peer-focus:outline-none rounded-full peer peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:border-gray-300 after:border after:rounded-full after:h-5 after:w-5 after:transition-all peer-checked:bg-blue-600"></div>
+                  <div className="w-11 h-6 bg-slate-200 peer-focus:outline-none rounded-full peer peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:border-gray-300 after:border after:rounded-full after:h-5 after:w-5 after:transition-all peer-checked:bg-blue-600" />
                 </label>
               </div>
 
@@ -219,13 +218,9 @@ export default function EditarNoticiaForm({ noticia, categorias }: Props) {
                 className="w-full flex items-center justify-center py-4 rounded-2xl bg-blue-600 text-white font-black shadow-xl shadow-blue-100 hover:bg-blue-700 transition-all disabled:opacity-50"
               >
                 {isPending ? (
-                  <>
-                    Guardando... <Loader2 className="ml-2 h-5 w-5 animate-spin" />
-                  </>
+                  <>Guardando... <Loader2 className="ml-2 h-5 w-5 animate-spin" /></>
                 ) : (
-                  <>
-                    Guardar Cambios <Save className="ml-2 h-5 w-5" />
-                  </>
+                  <>Guardar Noticia <Save className="ml-2 h-5 w-5" /></>
                 )}
               </button>
             </div>
@@ -236,16 +231,13 @@ export default function EditarNoticiaForm({ noticia, categorias }: Props) {
               </h4>
               <ul className="text-xs space-y-3 font-medium text-slate-400">
                 <li className="flex items-start">
-                  <CheckCircle2 className="h-3 w-3 mr-2 text-blue-500 mt-0.5" /> Cambiar el título
-                  regenera el slug (URL).
+                  <CheckCircle2 className="h-3 w-3 mr-2 text-blue-500 mt-0.5" /> Usá títulos directos y cortos.
                 </li>
                 <li className="flex items-start">
-                  <CheckCircle2 className="h-3 w-3 mr-2 text-blue-500 mt-0.5" /> El resumen aparece
-                  en la portada.
+                  <CheckCircle2 className="h-3 w-3 mr-2 text-blue-500 mt-0.5" /> El resumen aparecerá en la portada.
                 </li>
                 <li className="flex items-start">
-                  <CheckCircle2 className="h-3 w-3 mr-2 text-blue-500 mt-0.5" /> Imágenes
-                  horizontales (16:9) recomendadas.
+                  <CheckCircle2 className="h-3 w-3 mr-2 text-blue-500 mt-0.5" /> Imágenes horizontales (16:9) recomendadas.
                 </li>
               </ul>
             </div>

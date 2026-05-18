@@ -80,9 +80,7 @@ export default async function NoticiasPage({ searchParams }: Props) {
       </div>
 
       {/* ── BARRA TÍTULO + BÚSQUEDA ── */}
-      <div className="px-6 lg:px-14 py-4 border-b border-slate-100 flex items-end justify-between gap-4 bg-slate-50/80">
-        <p className="text-2xl font-medium text-slate-500 tracking-tight leading-[1.05]">Últimas novedades</p>
-        
+      <div className="px-6 lg:px-14 py-4 border-b border-slate-100 flex items-end justify-end gap-4 bg-slate-50/80">
         <Suspense fallback={null}>
           <SearchBar />
         </Suspense>

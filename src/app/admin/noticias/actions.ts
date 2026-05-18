@@ -14,6 +14,7 @@ export async function crearNoticia(formData: FormData) {
     const contenido = formData.get("contenido") as string;
     const publicada = formData.get("publicada") === "on";
     const imagen_url = formData.get("imagen_url") as string;
+    const categoriaId = (formData.get("categoriaId") as string) || null;
 
     // 2. Generar Slug
     const slug = titulo
@@ -34,6 +35,7 @@ export async function crearNoticia(formData: FormData) {
         imagen_url,
         publicada,
         publicada_en: publicada ? new Date() : null,
+        categoriaId,
       },
     });
 
@@ -55,6 +57,7 @@ export async function actualizarNoticia(id: string, formData: FormData) {
     const contenido = formData.get("contenido") as string;
     const publicada = formData.get("publicada") === "on";
     const imagen_url = formData.get("imagen_url") as string;
+    const categoriaId = (formData.get("categoriaId") as string) || null;
 
     const slug = titulo
       .toLowerCase()
@@ -76,6 +79,7 @@ export async function actualizarNoticia(id: string, formData: FormData) {
       imagen_url,
       publicada,
       publicada_en,
+      categoriaId,
     });
 
     revalidatePath("/admin/noticias");
