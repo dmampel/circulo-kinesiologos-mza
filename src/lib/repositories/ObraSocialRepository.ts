@@ -7,4 +7,8 @@ export class ObraSocialRepository {
       orderBy: { orden: "asc" },
     });
   }
+
+  static async countActive() {
+    return prisma.obraSocial.count({ where: { activa: true } });
+  }
 }

@@ -74,6 +74,24 @@ async function main() {
     }
   }
 
+  const CATEGORIAS_NOTICIA = [
+    { nombre: "Institucional", slug: "institucional", icono: "Building2", color: "blue" },
+    { nombre: "Eventos", slug: "eventos", icono: "Calendar", color: "orange" },
+    { nombre: "Capacitación", slug: "capacitacion", icono: "GraduationCap", color: "green" },
+    { nombre: "Convenios", slug: "convenios", icono: "Handshake", color: "purple" },
+  ];
+
+  console.log(`📊 Cargando ${CATEGORIAS_NOTICIA.length} categorías de noticias...`);
+  const categoriasMap: Record<string, string> = {};
+  for (const cat of CATEGORIAS_NOTICIA) {
+    const created = await prisma.categoriaNoticia.upsert({
+      where: { slug: cat.slug },
+      update: cat,
+      create: cat,
+    });
+    categoriasMap[cat.slug] = created.id;
+  }
+
   const NOTICIAS = [
     {
       titulo: "Nuevo Convenio con Obra Social de Mendoza",
@@ -81,6 +99,7 @@ async function main() {
       resumen: "Se ha firmado un acuerdo histórico que mejora los honorarios profesionales para todos nuestros asociados a partir del próximo mes.",
       publicada_en: new Date("2026-05-01"),
       slug: "nuevo-convenio-obra-social-mendoza",
+      categoriaId: categoriasMap["convenios"],
     },
     {
       titulo: "Curso de Especialización en Kinesiología Deportiva",
@@ -88,6 +107,7 @@ async function main() {
       resumen: "Inscripciones abiertas para el nuevo ciclo de capacitaciones 2026 con certificación internacional. Cupos limitados.",
       publicada_en: new Date("2026-04-28"),
       slug: "curso-especializacion-kinesiologia-deportiva",
+      categoriaId: categoriasMap["capacitacion"],
     },
     {
       titulo: "Asamblea General Ordinaria: Convocatoria",
@@ -95,6 +115,7 @@ async function main() {
       resumen: "Invitamos a todos los socios a participar de la próxima asamblea para tratar el balance anual y nuevos proyectos del Círculo.",
       publicada_en: new Date("2026-04-15"),
       slug: "asamblea-general-ordinaria-convocatoria",
+      categoriaId: categoriasMap["institucional"],
     }
   ];
 

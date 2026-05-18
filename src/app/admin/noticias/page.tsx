@@ -12,6 +12,8 @@ import Link from "next/link";
 import { cn } from "@/lib/utils";
 import AdminSearch from "../_components/AdminSearch";
 import { eliminarNoticiaAction } from "./actions";
+import { CategoriaNoticiaRepository } from "@/lib/repositories/CategoriaNoticiaRepository";
+import CategoriaSidebar from "./CategoriaSidebar";
 
 export default async function NoticiasAdminPage({
   searchParams,
@@ -21,12 +23,15 @@ export default async function NoticiasAdminPage({
   const { q } = await searchParams;
   const query = q?.trim() ?? "";
 
-  const noticias = await prisma.noticia.findMany({
-    where: query
-      ? { titulo: { contains: query, mode: "insensitive" } }
-      : undefined,
-    orderBy: { createdAt: "desc" },
-  });
+  const [noticias, categorias] = await Promise.all([
+    prisma.noticia.findMany({
+      where: query
+        ? { titulo: { contains: query, mode: "insensitive" } }
+        : undefined,
+      orderBy: { createdAt: "desc" },
+    }),
+    CategoriaNoticiaRepository.getAll(),
+  ]);
 
   return (
     <div className="space-y-8 animate-in fade-in duration-500">
@@ -37,12 +42,15 @@ export default async function NoticiasAdminPage({
             Publicá novedades, eventos y comunicados institucionales.
           </p>
         </div>
-        <Link
-          href="/admin/noticias/nueva"
-          className="flex items-center px-6 py-4 rounded-2xl bg-blue-600 text-white font-bold hover:bg-blue-700 transition-all shadow-xl shadow-blue-100 shrink-0"
-        >
-          <Plus className="mr-2 h-5 w-5" /> Nueva Noticia
-        </Link>
+        <div className="flex items-center gap-3 shrink-0">
+          <CategoriaSidebar categorias={categorias} />
+          <Link
+            href="/admin/noticias/nueva"
+            className="flex items-center px-6 py-4 rounded-2xl bg-blue-600 text-white font-bold hover:bg-blue-700 transition-all shadow-xl shadow-blue-100"
+          >
+            <Plus className="mr-2 h-5 w-5" /> Nueva Noticia
+          </Link>
+        </div>
       </div>
 
       <div className="bg-white rounded-[3rem] shadow-sm border border-slate-100 overflow-hidden">

@@ -115,6 +115,10 @@ export class ProfesionalRepository {
     });
   }
 
+  static async countActive() {
+    return prisma.profesional.count({ where: { status: "ACTIVO" } });
+  }
+
   static async update(userId: string, data: UpdateProfesionalData) {
     return prisma.profesional.update({
       where: { userId },

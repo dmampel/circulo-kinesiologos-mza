@@ -86,6 +86,10 @@ model Noticia {
   publicada    Boolean   @default(false)
   publicada_en DateTime?
 
+  // Relaciones
+  categoriaId String?
+  categoria   CategoriaNoticia? @relation(fields: [categoriaId], references: [id])
+
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
 }
@@ -149,6 +153,16 @@ model CategoriaBeneficio {
   color      String?
   beneficios BeneficioKineClub[]
   createdAt  DateTime            @default(now())
+}
+
+model CategoriaNoticia {
+  id        String    @id @default(cuid())
+  nombre    String    @unique
+  slug      String    @unique
+  icono     String?
+  color     String?
+  noticias  Noticia[]
+  createdAt DateTime  @default(now())
 }
 
 model Solicitud {
