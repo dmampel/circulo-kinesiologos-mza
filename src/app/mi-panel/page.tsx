@@ -13,8 +13,6 @@ import {
   AlertCircle,
   BookOpen,
   Calendar,
-  CalendarDays,
-  Clock,
 } from "lucide-react";
 import { TurnoRepository } from "@/lib/repositories/TurnoRepository";
 import Link from "next/link";
@@ -38,6 +36,10 @@ function isSameDay(a: Date, b: Date) {
     a.getMonth() === b.getMonth() &&
     a.getFullYear() === b.getFullYear()
   );
+}
+
+function titleCase(str: string) {
+  return str.toLowerCase().split(" ").map((w) => w.charAt(0).toUpperCase() + w.slice(1)).join(" ");
 }
 
 function formatHora(fecha: Date) {
@@ -93,38 +95,90 @@ export default async function DashboardPage() {
 
   const proximasInscripciones =
     await CapacitacionRepository.getProximasInscripcionesSocio(profesional.id);
-  const turnosHoy = await TurnoRepository.getTodayByProfesional(profesional.id);
 
   const hoy = new Date();
   const lunes = getLunesDeSemana(hoy);
+  const turnosSemana = await TurnoRepository.getByProfesionalAndWeek(profesional.id, lunes);
+
   const diasSemana = Array.from({ length: 7 }, (_, i) => {
     const d = new Date(lunes);
     d.setDate(lunes.getDate() + i);
     return d;
   });
 
-  const eventosPorDia = new Map<string, typeof proximasInscripciones>();
-  for (const insc of proximasInscripciones) {
-    const d = new Date(insc.capacitacion.fechaInicio);
-    const key = `${d.getFullYear()}-${d.getMonth()}-${d.getDate()}`;
-    if (!eventosPorDia.has(key)) eventosPorDia.set(key, []);
-    eventosPorDia.get(key)!.push(insc);
+  // ── Unified agenda ────────────────────────────────────────────────────────
+  type AgendaItem =
+    | { kind: "turno"; id: string; ts: number; hora: string; nombre: string; motivo: string | null; estado: string }
+    | { kind: "cap"; id: string; capacitacionId: string; ts: number; hora: string | null; titulo: string; modalidad: string; estadoInscripcion: string };
+
+  function dayKeyAR(date: Date): string {
+    const parts = new Intl.DateTimeFormat("es-AR", {
+      year: "numeric", month: "2-digit", day: "2-digit",
+      timeZone: "America/Argentina/Mendoza",
+    }).formatToParts(new Date(date));
+    const y = parts.find(p => p.type === "year")!.value;
+    const m = parts.find(p => p.type === "month")!.value;
+    const d = parts.find(p => p.type === "day")!.value;
+    return `${y}-${m}-${d}`;
   }
 
-  const diasConEventos = Array.from(
-    new Map(
-      proximasInscripciones.map(({ capacitacion }) => {
-        const d = new Date(capacitacion.fechaInicio);
-        const key = `${d.getFullYear()}-${d.getMonth()}-${d.getDate()}`;
-        return [key, d];
-      })
-    )
-  ).sort(([, a], [, b]) => a.getTime() - b.getTime());
+  const agendaPorDia = new Map<string, AgendaItem[]>();
 
-  const eventosFuera = proximasInscripciones.filter(({ capacitacion }) => {
-    const d = new Date(capacitacion.fechaInicio);
-    return !diasSemana.some((wd) => isSameDay(d, wd));
+  for (const t of turnosSemana) {
+    const key = dayKeyAR(t.fecha);
+    if (!agendaPorDia.has(key)) agendaPorDia.set(key, []);
+    agendaPorDia.get(key)!.push({
+      kind: "turno",
+      id: t.id,
+      ts: new Date(t.fecha).getTime(),
+      hora: new Intl.DateTimeFormat("es-AR", {
+        hour: "2-digit", minute: "2-digit", timeZone: "America/Argentina/Mendoza",
+      }).format(new Date(t.fecha)),
+      nombre: `${titleCase(t.paciente.apellido)}, ${titleCase(t.paciente.nombre)}`,
+      motivo: t.motivo,
+      estado: t.estado,
+    });
+  }
+
+  for (const { id, estado, capacitacion } of proximasInscripciones) {
+    const key = dayKeyAR(capacitacion.fechaInicio);
+    if (!agendaPorDia.has(key)) agendaPorDia.set(key, []);
+    const horaInicio = formatHora(new Date(capacitacion.fechaInicio));
+    const horaFin = capacitacion.fechaFin ? formatHora(new Date(capacitacion.fechaFin)) : null;
+    agendaPorDia.get(key)!.push({
+      kind: "cap",
+      id,
+      capacitacionId: capacitacion.id,
+      ts: new Date(capacitacion.fechaInicio).getTime(),
+      hora: horaInicio ? (horaFin ? `${horaInicio} – ${horaFin}` : horaInicio) : null,
+      titulo: capacitacion.titulo,
+      modalidad: capacitacion.modalidad,
+      estadoInscripcion: estado,
+    });
+  }
+
+  // sort each day's items by time
+  for (const items of agendaPorDia.values()) {
+    items.sort((a, b) => (a.ts ?? 0) - (b.ts ?? 0));
+  }
+
+
+  const diasConAgenda = Array.from(agendaPorDia.entries())
+    .map(([key, items]) => ({ key, items, date: new Date(items[0].ts) }))
+    .sort((a, b) => a.date.getTime() - b.date.getTime());
+
+  const diasConEventos = diasConAgenda.filter(({ key }) => {
+    const [y, m, d] = key.split("-").map(Number);
+    return diasSemana.some(wd => wd.getFullYear() === y && wd.getMonth() + 1 === m && wd.getDate() === d);
   });
+
+  const eventosFuera = diasConAgenda.filter(({ key }) => {
+    const [y, m, d] = key.split("-").map(Number);
+    return !diasSemana.some(wd => wd.getFullYear() === y && wd.getMonth() + 1 === m && wd.getDate() === d);
+  });
+
+  const turnosFuera = eventosFuera.reduce((acc, { items }) => acc + items.filter(e => e.kind === "turno").length, 0);
+  const capsFuera = eventosFuera.reduce((acc, { items }) => acc + items.filter(e => e.kind === "cap").length, 0);
 
   return (
     <div className="max-w-6xl mx-auto space-y-10 pb-5">
@@ -252,16 +306,16 @@ export default async function DashboardPage() {
         </div>
       </section>
 
-      {/* 3. Turnos de Hoy */}
-      {turnosHoy.length > 0 && (
+      {/* 3. Agenda unificada (turnos + capacitaciones) */}
+      {agendaPorDia.size > 0 && (
         <section className="border-t border-slate-100 pt-10">
-          <div className="flex items-center justify-between mb-5">
+          <div className="flex items-center justify-between mb-6">
             <div className="space-y-0.5">
               <p className="text-[10px] font-black text-blue-600 uppercase tracking-[0.2em]">
-                Hoy
+                Agenda
               </p>
               <h2 className="text-2xl font-bold text-slate-900 tracking-tight">
-                Turnos del día
+                Tu Semana
               </h2>
             </div>
             <Link
@@ -271,72 +325,14 @@ export default async function DashboardPage() {
               Ver agenda
             </Link>
           </div>
-          <div className="space-y-0 relative before:absolute before:left-[9px] sm:before:left-[11px] before:top-2 before:bottom-2 before:w-[1px] before:bg-slate-100">
-            {turnosHoy.map((turno) => {
-              const hora = new Intl.DateTimeFormat("es-AR", {
-                hour: "2-digit",
-                minute: "2-digit",
-                timeZone: "America/Argentina/Mendoza",
-              }).format(new Date(turno.fecha));
-              const ESTADO_COLOR: Record<string, string> = {
-                PENDIENTE: "bg-amber-400",
-                CONFIRMADO: "bg-blue-500",
-                COMPLETADO: "bg-green-500",
-                CANCELADO: "bg-slate-300",
-              };
-              return (
-                <Link
-                  key={turno.id}
-                  href={`/mi-panel/turnos/${turno.id}/editar`}
-                  className="group relative pl-8 sm:pl-10 py-4 flex items-center gap-4 hover:bg-slate-50 -mx-3 px-3 rounded-xl transition-colors"
-                >
-                  <div className={`absolute left-0 top-1/2 -translate-y-1/2 h-5 w-5 rounded-full border-4 border-white z-10 ${ESTADO_COLOR[turno.estado] ?? "bg-slate-300"}`} />
-                  <span className="text-xs font-black tabular-nums text-slate-400 shrink-0 w-14">
-                    {hora}
-                  </span>
-                  <p className="flex-1 text-sm font-bold text-slate-800 group-hover:text-blue-700 transition-colors">
-                    {turno.paciente.apellido}, {turno.paciente.nombre}
-                  </p>
-                  {turno.motivo && (
-                    <span className="text-[11px] text-slate-400 hidden sm:block shrink-0 max-w-[160px] truncate">
-                      {turno.motivo}
-                    </span>
-                  )}
-                  <ArrowUpRight className="h-3.5 w-3.5 text-slate-200 group-hover:text-blue-400 shrink-0 transition-colors" />
-                </Link>
-              );
-            })}
-          </div>
-        </section>
-      )}
 
-      {/* 4. Agenda Semanal */}
-      {proximasInscripciones.length > 0 && (
-        <section className="border-t border-slate-100 pt-10">
-          <div className="flex items-center justify-between mb-6">
-            <div className="space-y-0.5">
-              <p className="text-[10px] font-black text-blue-600 uppercase tracking-[0.2em]">
-                Agenda
-              </p>
-              <h2 className="text-2xl font-bold text-slate-900 tracking-tight">
-                Tu agenda
-              </h2>
-            </div>
-            <Link
-              href="/mi-panel/capacitaciones"
-              className="text-[10px] font-black text-blue-600 uppercase tracking-[0.2em] hover:underline"
-            >
-              Ver todas
-            </Link>
-          </div>
-
-          {/* Week strip — sin card, solo la franja */}
+          {/* Week strip */}
           <div className="grid grid-cols-7 mb-8">
             {diasSemana.map((dia, i) => {
               const esHoy = isSameDay(dia, hoy);
-              const tieneEvento = proximasInscripciones.some(({ capacitacion }) =>
-                isSameDay(new Date(capacitacion.fechaInicio), dia)
-              );
+              const key = `${String(dia.getFullYear())}-${String(dia.getMonth() + 1).padStart(2, "0")}-${String(dia.getDate()).padStart(2, "0")}`;
+              const tieneEventos = agendaPorDia.has(key);
+              const tieneTurnos = agendaPorDia.get(key)?.some(e => e.kind === "turno") ?? false;
               return (
                 <div key={i} className="flex flex-col items-center gap-1 py-2">
                   <span className="text-[9px] font-black uppercase tracking-widest text-slate-300">
@@ -345,74 +341,91 @@ export default async function DashboardPage() {
                   <div className={`h-7 w-7 sm:h-8 sm:w-8 flex items-center justify-center rounded-full text-xs sm:text-sm font-black transition-colors ${esHoy ? "bg-blue-600 text-white" : "text-slate-500"}`}>
                     {dia.getDate()}
                   </div>
-                  <div className={`h-1 w-1 rounded-full ${tieneEvento ? (esHoy ? "bg-blue-400" : "bg-slate-300") : "opacity-0"}`} />
+                  <div className={`h-1 w-1 rounded-full ${tieneEventos ? (tieneTurnos ? "bg-blue-400" : "bg-slate-300") : "opacity-0"}`} />
                 </div>
               );
             })}
           </div>
 
-          {/* Events list grouped by day — agenda style, no cards */}
+          {/* Unified timeline */}
           <div className="space-y-6">
-              {diasConEventos.map(([key, diaDate]) => {
-                const eventos = eventosPorDia.get(key) ?? [];
-                const esHoy = isSameDay(diaDate, hoy);
-                return (
-                  <div key={key}>
-                    {/* Day label */}
-                    <p className={`text-[10px] font-black uppercase tracking-[0.2em] mb-3 ${esHoy ? "text-blue-600" : "text-slate-400"}`}>
-                      {DIAS_CORTO[diaDate.getDay()]} · {diaDate.getDate()} {MESES_CORTO[diaDate.getMonth()]}
-                      {esHoy && <span className="ml-2 normal-case tracking-normal font-bold">— Hoy</span>}
-                    </p>
-
-                    <div className="space-y-0">
-                      {eventos.map(({ id, estado, capacitacion }, idx) => {
-                        const horaInicio = formatHora(new Date(capacitacion.fechaInicio));
-                        const horaFin = capacitacion.fechaFin
-                          ? formatHora(new Date(capacitacion.fechaFin))
-                          : null;
-                        const dot = MODALIDAD_COLORS[capacitacion.modalidad]?.icon ?? "text-blue-500";
+            {diasConEventos.map(({ key, items, date: diaDate }) => {
+              const esHoy = isSameDay(diaDate, hoy);
+              return (
+                <div key={key}>
+                  <p className={`text-[10px] font-black uppercase tracking-[0.2em] mb-3 ${esHoy ? "text-blue-600" : "text-slate-400"}`}>
+                    {DIAS_CORTO[diaDate.getDay()]} · {diaDate.getDate()} {MESES_CORTO[diaDate.getMonth()]}
+                    {esHoy && <span className="ml-2 normal-case tracking-normal font-bold">— Hoy</span>}
+                  </p>
+                  <div className="space-y-0">
+                    {items.map((item, idx) => {
+                      if (item.kind === "turno") {
+                        const ESTADO_DOT: Record<string, string> = {
+                          PENDIENTE: "bg-amber-400", CONFIRMADO: "bg-blue-500",
+                          COMPLETADO: "bg-green-500", CANCELADO: "bg-slate-300",
+                        };
                         return (
                           <Link
-                            key={id}
-                            href={`/mi-panel/capacitaciones/${capacitacion.id}`}
-                            className={`group flex items-center gap-4 py-3 hover:bg-slate-50 -mx-3 px-3 rounded-xl transition-colors ${idx > 0 ? "border-t border-slate-50" : ""}`}
+                            key={item.id}
+                            href="/mi-panel/turnos"
+                            className={`group flex items-center gap-4 py-3 hover:bg-slate-50 -mx-3 px-3 rounded-xl transition-colors cursor-pointer ${idx > 0 ? "border-t border-slate-50" : ""}`}
                           >
-                            <div className={`h-2 w-2 rounded-full shrink-0 ${dot.replace("text-", "bg-")}`} />
-                            {horaInicio ? (
-                              <span className="text-xs font-bold text-slate-400 tabular-nums shrink-0 w-24">
-                                {horaInicio}{horaFin ? <> – {horaFin}</> : null}
-                              </span>
-                            ) : (
-                              <span className="text-xs text-slate-300 shrink-0 w-24">Sin hora</span>
-                            )}
-                            <p className="flex-1 text-sm font-semibold text-slate-800 truncate group-hover:text-blue-700 transition-colors">
-                              {capacitacion.titulo}
-                            </p>
-                            <span className="text-[10px] text-slate-400 font-medium hidden sm:block shrink-0">
-                              {capacitacion.modalidad.charAt(0) + capacitacion.modalidad.slice(1).toLowerCase()}
-                            </span>
-                            {estado === "PENDIENTE" && (
-                              <span className="text-[9px] font-black uppercase tracking-widest text-amber-500 shrink-0">
-                                Pendiente
-                              </span>
+                            <div className={`h-2 w-2 rounded-full shrink-0 ${ESTADO_DOT[item.estado] ?? "bg-blue-400"}`} />
+                            <span className="text-xs font-bold text-slate-400 tabular-nums shrink-0 w-24">{item.hora}</span>
+                            <p className="flex-1 text-sm font-bold text-slate-800 group-hover:text-blue-700 transition-colors truncate">{item.nombre}</p>
+                            {item.motivo && (
+                              <span className="text-[11px] text-slate-400 hidden sm:block shrink-0 max-w-[140px] truncate">{item.motivo}</span>
                             )}
                             <ArrowUpRight className="h-3.5 w-3.5 text-slate-200 group-hover:text-blue-400 shrink-0 transition-colors" />
                           </Link>
                         );
-                      })}
-                    </div>
+                      }
+                      const dot = MODALIDAD_COLORS[item.modalidad]?.icon ?? "text-blue-500";
+                      return (
+                        <Link
+                          key={item.id}
+                          href={`/mi-panel/capacitaciones/${item.capacitacionId}`}
+                          className={`group flex items-center gap-4 py-3 hover:bg-slate-50 -mx-3 px-3 rounded-xl transition-colors ${idx > 0 ? "border-t border-slate-50" : ""}`}
+                        >
+                          <div className={`h-2 w-2 rounded-full shrink-0 ${dot.replace("text-", "bg-")}`} />
+                          <span className="text-xs font-bold text-slate-400 tabular-nums shrink-0 w-24">
+                            {item.hora ?? "Sin hora"}
+                          </span>
+                          <p className="flex-1 text-sm font-semibold text-slate-800 truncate group-hover:text-blue-700 transition-colors">
+                            {item.titulo}
+                          </p>
+                          <span className="text-[10px] text-slate-400 font-medium hidden sm:block shrink-0">
+                            {item.modalidad.charAt(0) + item.modalidad.slice(1).toLowerCase()}
+                          </span>
+                          <ArrowUpRight className="h-3.5 w-3.5 text-slate-200 group-hover:text-blue-400 shrink-0 transition-colors" />
+                        </Link>
+                      );
+                    })}
                   </div>
-                );
-              })}
-
-              {eventosFuera.length > 0 && (
-                <div className="flex items-center gap-2 pt-2 border-t border-slate-100">
-                  <Calendar className="h-3.5 w-3.5 text-slate-300 shrink-0" />
-                  <p className="text-[11px] text-slate-400">
-                    {eventosFuera.length} capacitación{eventosFuera.length > 1 ? "es" : ""} más próximamente
-                  </p>
                 </div>
-              )}
+              );
+            })}
+
+            {(turnosFuera > 0 || capsFuera > 0) && (
+              <div className="flex flex-col gap-1 pt-2 border-t border-slate-100">
+                {turnosFuera > 0 && (
+                  <div className="flex items-center gap-2">
+                    <Calendar className="h-3.5 w-3.5 text-slate-300 shrink-0" />
+                    <p className="text-[11px] text-slate-400">
+                      {turnosFuera} {turnosFuera === 1 ? "turno" : "turnos"} la próxima semana
+                    </p>
+                  </div>
+                )}
+                {capsFuera > 0 && (
+                  <div className="flex items-center gap-2">
+                    <Calendar className="h-3.5 w-3.5 text-slate-300 shrink-0" />
+                    <p className="text-[11px] text-slate-400">
+                      {capsFuera} {capsFuera === 1 ? "capacitación" : "capacitaciones"} la próxima semana
+                    </p>
+                  </div>
+                )}
+              </div>
+            )}
           </div>
         </section>
       )}
@@ -435,7 +448,7 @@ export default async function DashboardPage() {
           <div className="space-y-0 relative before:absolute before:left-[9px] sm:before:left-[11px] before:top-4 before:bottom-4 before:w-[1px] before:bg-slate-100">
             {circulares.length === 0 ? (
               <div className="pl-10 text-slate-400 text-sm italic py-4">No hay circulares publicadas por el momento.</div>
-            ) : circulares.map((circular, i) => {
+            ) : circulares.map((circular) => {
               const isRead = (circular as any).lecturas?.length > 0;
               return (
               <div key={circular.id} className="group relative pl-8 sm:pl-10 py-6 first:pt-0">

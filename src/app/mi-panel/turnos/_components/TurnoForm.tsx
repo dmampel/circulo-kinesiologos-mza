@@ -20,6 +20,8 @@ interface TurnoFormProps {
     notas?: string | null;
     estado?: EstadoTurno;
   };
+  onSuccess?: () => void;
+  onCancel?: () => void;
 }
 
 function toDateInputValue(date: Date): string {
@@ -42,7 +44,7 @@ const ESTADOS: { value: EstadoTurno; label: string }[] = [
   { value: "CANCELADO", label: "Cancelado" },
 ];
 
-export default function TurnoForm({ pacientes, id, initialValues }: TurnoFormProps) {
+export default function TurnoForm({ pacientes, id, initialValues, onSuccess, onCancel }: TurnoFormProps) {
   const [loading, setLoading] = useState(false);
   const [deleting, setDeleting] = useState(false);
   const [error, setError] = useState<string | null>(null);
@@ -69,9 +71,17 @@ export default function TurnoForm({ pacientes, id, initialValues }: TurnoFormPro
       if ("warning" in result && result.warning) {
         setWarning(result.warning);
         setLoading(false);
-        setTimeout(() => router.push("/mi-panel/turnos"), 2000);
+        if (onSuccess) {
+          setTimeout(onSuccess, 1500);
+        } else {
+          setTimeout(() => router.push("/mi-panel/turnos"), 2000);
+        }
       } else {
-        router.push("/mi-panel/turnos");
+        if (onSuccess) {
+          onSuccess();
+        } else {
+          router.push("/mi-panel/turnos");
+        }
       }
     } else {
       setError(result.error);
@@ -86,7 +96,11 @@ export default function TurnoForm({ pacientes, id, initialValues }: TurnoFormPro
     setDeleting(true);
     const result = await eliminarTurno(id);
     if (result.success) {
-      router.push("/mi-panel/turnos");
+      if (onSuccess) {
+        onSuccess();
+      } else {
+        router.push("/mi-panel/turnos");
+      }
     } else {
       alert("Error: " + result.error);
       setDeleting(false);

@@ -2,6 +2,7 @@ import { createClient } from "@/utils/supabase/server";
 import { redirect } from "next/navigation";
 import { ProfesionalRepository } from "@/lib/repositories/ProfesionalRepository";
 import { TurnoRepository } from "@/lib/repositories/TurnoRepository";
+import { PacienteRepository } from "@/lib/repositories/PacienteRepository";
 import AgendaSemanal from "./AgendaSemanal";
 
 function getLunesDeSemana(ref: Date): Date {
@@ -49,7 +50,10 @@ export default async function TurnosPage({
   if (!profesional) redirect("/login");
 
   const weekStart = getLunesDeSemana(semana ? new Date(semana) : new Date());
-  const turnos = await TurnoRepository.getByProfesionalAndWeek(profesional.id, weekStart);
+  const [turnos, pacientes] = await Promise.all([
+    TurnoRepository.getByProfesionalAndWeek(profesional.id, weekStart),
+    PacienteRepository.findAll(profesional.id),
+  ]);
 
   const hoy = new Date();
   const turnosHoy = turnos.filter((t) => isSameDayAR(new Date(t.fecha), hoy));
@@ -123,7 +127,7 @@ export default async function TurnosPage({
         </div>
       </div>
 
-      <AgendaSemanal turnos={turnos as any} weekStartISO={weekStart.toISOString()} />
+      <AgendaSemanal turnos={turnos as any} weekStartISO={weekStart.toISOString()} pacientes={pacientes} />
     </div>
   );
 }

@@ -1,17 +1,13 @@
 "use client";
 
+import { useState, useEffect } from "react";
+import { AnimatePresence } from "framer-motion";
 import { useRouter } from "next/navigation";
 import Link from "next/link";
 import { ChevronLeft, ChevronRight, Plus } from "lucide-react";
+import TurnoDetailModal, { TurnoConPacienteDetalle } from "./_components/TurnoDetailModal";
 
-type TurnoConPaciente = {
-  id: string;
-  fecha: Date;
-  duracion: number;
-  motivo: string | null;
-  estado: string;
-  paciente: { id: string; nombre: string; apellido: string };
-};
+type TurnoConPaciente = TurnoConPacienteDetalle;
 
 // ─── Grid constants ───────────────────────────────────────────────────────────
 const START_HOUR = 6;
@@ -43,15 +39,6 @@ function getARTime(date: Date): { hours: number; minutes: number } {
   };
 }
 
-function formatHora(date: Date) {
-  return new Intl.DateTimeFormat("es-AR", {
-    hour: "2-digit",
-    minute: "2-digit",
-    hour12: false,
-    timeZone: "America/Argentina/Mendoza",
-  }).format(new Date(date));
-}
-
 function formatRango(a: Date, b: Date) {
   const fmt = new Intl.DateTimeFormat("es-AR", {
     day: "2-digit",
@@ -79,19 +66,29 @@ function isSameDayAR(a: Date, b: Date) {
 }
 
 // ─── Component ────────────────────────────────────────────────────────────────
+type Paciente = { id: string; nombre: string; apellido: string };
+
 interface AgendaSemanalProps {
   turnos: TurnoConPaciente[];
   weekStartISO: string;
+  pacientes: Paciente[];
 }
 
-export default function AgendaSemanal({ turnos, weekStartISO }: AgendaSemanalProps) {
+export default function AgendaSemanal({ turnos, weekStartISO, pacientes }: AgendaSemanalProps) {
   const router = useRouter();
   const weekStart = new Date(weekStartISO);
+
+  const [localTurnos, setLocalTurnos] = useState<TurnoConPaciente[]>(turnos);
+  const [selectedTurno, setSelectedTurno] = useState<TurnoConPaciente | null>(null);
+
+  useEffect(() => {
+    setLocalTurnos(turnos);
+  }, [turnos]);
 
   const diasSemana = Array.from({ length: 7 }, (_, i) => {
     const d = new Date(weekStart);
     d.setUTCDate(weekStart.getUTCDate() + i);
-    d.setUTCHours(12, 0, 0, 0); // noon UTC = 9 AM AR, mismo día calendario en ambos husos
+    d.setUTCHours(12, 0, 0, 0);
     return d;
   });
 
@@ -101,6 +98,15 @@ export default function AgendaSemanal({ turnos, weekStartISO }: AgendaSemanalPro
     const d = new Date(weekStart);
     d.setUTCDate(d.getUTCDate() + offset * 7);
     router.push(`/mi-panel/turnos?semana=${d.toISOString().split("T")[0]}`);
+  }
+
+  function handleEstadoChange(id: string, nuevoEstado: TurnoConPaciente["estado"]) {
+    setLocalTurnos((prev) =>
+      prev.map((t) => (t.id === id ? { ...t, estado: nuevoEstado } : t))
+    );
+    setSelectedTurno((prev) =>
+      prev?.id === id ? { ...prev, estado: nuevoEstado } : prev
+    );
   }
 
   return (
@@ -134,7 +140,7 @@ export default function AgendaSemanal({ turnos, weekStartISO }: AgendaSemanalPro
       </div>
 
       {/* ── Calendar grid ── */}
-      <div className="bg-white rounded-xl  overflow-hidden">
+      <div className="bg-white rounded-xl overflow-hidden">
         {/* Day headers */}
         <div className="flex border-b border-slate-100">
           <div className="w-14 shrink-0 border-r border-slate-100" />
@@ -190,7 +196,7 @@ export default function AgendaSemanal({ turnos, weekStartISO }: AgendaSemanalPro
 
             {/* Day columns */}
             {diasSemana.map((dia, i) => {
-              const turnosDia = turnos
+              const turnosDia = localTurnos
                 .filter((t) => isSameDayAR(new Date(t.fecha), dia))
                 .sort((a, b) => new Date(a.fecha).getTime() - new Date(b.fecha).getTime());
 
@@ -225,10 +231,10 @@ export default function AgendaSemanal({ turnos, weekStartISO }: AgendaSemanalPro
                     const height = Math.max(t.duracion * PX_PER_MIN, 48);
                     const style = ESTADO_STYLES[t.estado] ?? ESTADO_STYLES.PENDIENTE;
                     return (
-                      <Link
+                      <button
                         key={t.id}
-                        href={`/mi-panel/turnos/${t.id}/editar`}
-                        className={`absolute inset-x-1 rounded-xl border px-2 py-1.5 overflow-hidden hover:shadow-md transition-shadow ${style.card}`}
+                        onClick={() => setSelectedTurno(t)}
+                        className={`absolute inset-x-1 rounded-xl border px-2 py-1.5 overflow-hidden hover:shadow-md transition-shadow text-left w-[calc(100%-8px)] ${style.card}`}
                         style={{ top, height }}
                       >
                         <div className="flex items-center gap-1.5">
@@ -240,7 +246,7 @@ export default function AgendaSemanal({ turnos, weekStartISO }: AgendaSemanalPro
                         {t.motivo && (
                           <p className="text-[10px] opacity-60 truncate mt-0.5">{t.motivo}</p>
                         )}
-                      </Link>
+                      </button>
                     );
                   })}
                 </div>
@@ -249,6 +255,19 @@ export default function AgendaSemanal({ turnos, weekStartISO }: AgendaSemanalPro
           </div>
         </div>
       </div>
+
+      {/* ── Turno detail modal ── */}
+      <AnimatePresence>
+        {selectedTurno && (
+          <TurnoDetailModal
+            key={selectedTurno.id}
+            turno={selectedTurno}
+            pacientes={pacientes}
+            onClose={() => setSelectedTurno(null)}
+            onEstadoChange={handleEstadoChange}
+          />
+        )}
+      </AnimatePresence>
     </div>
   );
 }
