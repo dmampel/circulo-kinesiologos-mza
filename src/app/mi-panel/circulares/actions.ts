@@ -35,8 +35,7 @@ export async function registrarLecturaAction(circularId: string) {
     revalidatePath("/mi-panel/circulares");
     
     return { success: true };
-  } catch (error) {
-    console.error("Error en registrarLecturaAction:", error);
+  } catch {
     return { success: false, error: "No se pudo registrar la lectura." };
   }
 }

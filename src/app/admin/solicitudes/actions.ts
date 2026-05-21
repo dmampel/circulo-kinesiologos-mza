@@ -55,7 +55,6 @@ export async function gestionarSolicitud(id: string, accion: "APROBAR" | "RECHAZ
       );
 
       if (authError) {
-        console.error("Error al invitar usuario a Supabase:", authError);
         return { success: false, error: `Error al crear identidad en Auth: ${authError.message}` };
       }
 
@@ -94,7 +93,6 @@ export async function gestionarSolicitud(id: string, accion: "APROBAR" | "RECHAZ
       return { success: true };
     }
   } catch (error: any) {
-    console.error("Error en gestionarSolicitud:", error);
     return { success: false, error: error.message || "Error al procesar la solicitud" };
   } finally {
     revalidatePath("/admin/solicitudes");

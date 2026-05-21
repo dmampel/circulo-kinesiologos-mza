@@ -36,8 +36,7 @@ export async function updateDatosContacto(
     revalidatePath("/mi-panel");
     revalidatePath("/mi-panel/perfil");
     return { success: true };
-  } catch (error) {
-    console.error("updateDatosContacto error:", error);
+  } catch {
     return { success: false, error: "No se pudieron guardar los cambios. Intentá de nuevo." };
   }
 }
@@ -86,18 +85,13 @@ export async function updateFotoPerfil(
   const profesional = await ProfesionalRepository.findByUserId(user.id);
   if (profesional?.foto_url) {
     try {
-      // La URL pública tiene el formato: .../storage/v1/object/public/profesionales-fotos/{path}
       const url = new URL(profesional.foto_url);
       const pathParts = url.pathname.split("/profesionales-fotos/");
       if (pathParts.length === 2) {
-        const oldPath = pathParts[1];
-        await supabaseAdmin.storage
-          .from("profesionales-fotos")
-          .remove([oldPath]);
+        await supabaseAdmin.storage.from("profesionales-fotos").remove([pathParts[1]]);
       }
     } catch {
-      // No bloquear el flujo si la eliminación falla
-      console.warn("No se pudo eliminar la foto anterior.");
+      // no bloquear el flujo principal si falla el borrado
     }
   }
 
@@ -113,7 +107,6 @@ export async function updateFotoPerfil(
     });
 
   if (uploadError) {
-    console.error("Storage upload error:", uploadError);
     return { success: false, error: "Error al subir la imagen. Intentá de nuevo." };
   }
 
@@ -128,8 +121,7 @@ export async function updateFotoPerfil(
     revalidatePath("/mi-panel");
     revalidatePath("/mi-panel/perfil");
     return { success: true };
-  } catch (error) {
-    console.error("updateFotoPerfil DB error:", error);
+  } catch {
     return { success: false, error: "Imagen subida, pero no se pudo guardar la URL. Contactá soporte." };
   }
 }

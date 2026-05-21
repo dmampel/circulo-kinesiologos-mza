@@ -18,7 +18,6 @@ export async function toggleActiva(id: string, activa: boolean) {
     revalidatePath("/admin/obras-sociales");
     return { success: true };
   } catch (error) {
-    console.error("Error al cambiar estado:", error);
     return { success: false, error: "No se pudo cambiar el estado" };
   }
 }
@@ -31,7 +30,6 @@ export async function deleteObraSocial(id: string) {
     revalidatePath("/admin/obras-sociales");
     return { success: true };
   } catch (error) {
-    console.error("Error al eliminar obra social:", error);
     return { success: false, error: "No se pudo eliminar la obra social" };
   }
 }
@@ -69,7 +67,6 @@ export async function saveObraSocial(data: { id?: string; nombre: string; logo_u
     revalidatePath("/admin/obras-sociales");
     return { success: true };
   } catch (error) {
-    console.error("Error al guardar obra social:", error);
     return { success: false, error: "No se pudo guardar la obra social" };
   }
 }
@@ -88,7 +85,6 @@ export async function updateOrden(items: { id: string; orden: number }[]) {
     revalidatePath("/admin/obras-sociales");
     return { success: true };
   } catch (error) {
-    console.error("Error al actualizar orden:", error);
     return { success: false, error: "No se pudo actualizar el orden" };
   }
 }

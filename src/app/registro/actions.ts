@@ -64,7 +64,6 @@ export async function crearSolicitud(formData: FormData) {
       }
     }));
   } catch (uploadError: any) {
-    console.error("Error en subida paralela:", uploadError);
     return { error: uploadError.message };
   }
 
@@ -121,15 +120,13 @@ export async function crearSolicitud(formData: FormData) {
             </div>
           `
         });
-      } catch (mailError) {
-        console.error("Error enviando mail:", mailError);
-        // No bloqueamos el éxito del registro si falla el mail de aviso
+      } catch {
+        // no bloquear si falla el mail de aviso
       }
     }
 
     revalidatePath("/admin/solicitudes");
   } catch (error: any) {
-    console.error("Error al crear solicitud:", error);
     return { error: `Error DB: ${error.message || "Desconocido"}` };
   }
 

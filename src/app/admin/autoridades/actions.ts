@@ -12,7 +12,6 @@ export async function crearAutoridad(formData: FormData) {
 
     await AutoridadRepository.create({ profesionalId, cargo, orden });
   } catch (error: any) {
-    console.error("Error al crear autoridad:", error);
     return { success: false, error: error.message };
   }
 
@@ -34,7 +33,6 @@ export async function actualizarAutoridad(id: string, formData: FormData) {
       profesionalId
     });
   } catch (error: any) {
-    console.error("Error al actualizar autoridad:", error);
     return { success: false, error: error.message };
   }
 
@@ -51,7 +49,6 @@ export async function eliminarAutoridad(id: string) {
     revalidatePath("/institucional");
     return { success: true };
   } catch (error: any) {
-    console.error("Error al eliminar autoridad:", error);
     return { success: false, error: error.message };
   }
 }

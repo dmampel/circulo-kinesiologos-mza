@@ -45,7 +45,6 @@ export async function crearNoticia(formData: FormData) {
 
     return { success: true };
   } catch (error: any) {
-    console.error("Error al crear noticia:", error);
     return { success: false, error: error.message };
   }
 }

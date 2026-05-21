@@ -30,8 +30,7 @@ export default function BotonInscripcion({
       if (esPago) {
         setShowModal(true);
       }
-    } catch (error) {
-      console.error(error);
+    } catch {
       alert("Hubo un error al procesar tu inscripción.");
     } finally {
       setLoading(false);

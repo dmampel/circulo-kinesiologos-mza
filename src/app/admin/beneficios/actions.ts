@@ -32,7 +32,6 @@ export async function crearBeneficio(formData: FormData) {
 
     return { success: true };
   } catch (error: any) {
-    console.error("Error al crear beneficio:", error);
     return { success: false, error: error.message };
   }
 }
@@ -65,7 +64,6 @@ export async function actualizarBeneficio(id: string, formData: FormData) {
 
     return { success: true };
   } catch (error: any) {
-    console.error("Error al actualizar beneficio:", error);
     return { success: false, error: error.message };
   }
 }
