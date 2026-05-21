@@ -58,6 +58,13 @@ export class NoticiaRepository {
     });
   }
 
+  static async findAllSlugsForSitemap() {
+    return prisma.noticia.findMany({
+      select: { slug: true, publicada_en: true },
+      orderBy: { publicada_en: "desc" },
+    });
+  }
+
   static async update(id: string, data: Parameters<typeof prisma.noticia.update>[0]["data"]) {
     return prisma.noticia.update({ where: { id }, data });
   }

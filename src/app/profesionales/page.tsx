@@ -1,6 +1,17 @@
+import type { Metadata } from "next";
 import { LocalidadRepository } from "@/lib/repositories/LocalidadRepository";
 import { EspecialidadRepository } from "@/lib/repositories/EspecialidadRepository";
 import { ProfesionalRepository } from "@/lib/repositories/ProfesionalRepository";
+
+export const metadata: Metadata = {
+  title: "Padrón de Profesionales | Círculo de Kinesiólogos de Mendoza",
+  description: "Buscá kinesiólogos habilitados en Mendoza por nombre, localidad o especialidad. Directorio oficial del Círculo de Kinesiólogos.",
+  openGraph: {
+    title: "Padrón de Profesionales | CKM Mendoza",
+    description: "Directorio oficial de kinesiólogos habilitados en la provincia de Mendoza.",
+    url: "https://www.circulokinesiologos.com.ar/profesionales",
+  },
+};
 import {
   Search,
   MapPin,

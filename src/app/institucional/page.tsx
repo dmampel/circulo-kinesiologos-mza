@@ -1,7 +1,18 @@
+import type { Metadata } from "next";
 import { FileText, Scale, DollarSign, ClipboardList, ArrowUpRight } from "lucide-react";
 import { AutoridadRepository } from "@/lib/repositories/AutoridadRepository";
 import { ProfesionalRepository } from "@/lib/repositories/ProfesionalRepository";
 import { ObraSocialRepository } from "@/lib/repositories/ObraSocialRepository";
+
+export const metadata: Metadata = {
+  title: "Institucional | Círculo de Kinesiólogos de Mendoza",
+  description: "Conocé la historia, misión y autoridades del Círculo de Kinesiólogos de Mendoza. Institución que representa y agrupa a los profesionales de la kinesiología mendocina.",
+  openGraph: {
+    title: "Institucional | CKM Mendoza",
+    description: "Historia, misión y Comisión Directiva del Círculo de Kinesiólogos de Mendoza.",
+    url: "https://www.circulokinesiologos.com.ar/institucional",
+  },
+};
 
 function getInitials(nombre: string, apellido: string): string {
   return `${nombre.charAt(0)}${apellido.charAt(0)}`.toUpperCase();

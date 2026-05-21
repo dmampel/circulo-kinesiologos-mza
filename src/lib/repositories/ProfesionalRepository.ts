@@ -115,6 +115,13 @@ export class ProfesionalRepository {
     });
   }
 
+  static async findAllSlugsForSitemap() {
+    return prisma.profesional.findMany({
+      where: { status: "ACTIVO" },
+      select: { slug: true, updatedAt: true },
+    });
+  }
+
   static async countActive() {
     return prisma.profesional.count({ where: { status: "ACTIVO" } });
   }

@@ -1,7 +1,18 @@
+import type { Metadata } from "next";
 import KineClubClient from "./KineClubClient";
 import { BeneficioRepository } from "@/lib/repositories/BeneficioRepository";
 import { CategoriaRepository } from "@/lib/repositories/CategoriaRepository";
 import { kineClubSearchSchema } from "@/lib/validations/searchParams";
+
+export const metadata: Metadata = {
+  title: "KineClub — Beneficios para Socios | CKM Mendoza",
+  description: "Descubrí los descuentos y beneficios exclusivos para socios del Círculo de Kinesiólogos de Mendoza: farmacias, clínicas, librerías y más.",
+  openGraph: {
+    title: "KineClub | CKM Mendoza",
+    description: "Beneficios y descuentos exclusivos para socios del Círculo de Kinesiólogos de Mendoza.",
+    url: "https://www.circulokinesiologos.com.ar/kineclub",
+  },
+};
 
 interface Props {
   searchParams: Promise<Record<string, string | string[] | undefined>>;

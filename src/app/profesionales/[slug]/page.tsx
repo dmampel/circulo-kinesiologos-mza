@@ -1,3 +1,4 @@
+import type { Metadata } from "next";
 import prisma from "@/lib/prisma";
 import { notFound } from "next/navigation";
 import {
@@ -17,6 +18,31 @@ import WaveTransition from "@/components/WaveTransition";
 
 interface Props {
   params: Promise<{ slug: string }>;
+}
+
+export async function generateMetadata({ params }: Props): Promise<Metadata> {
+  const { slug } = await params;
+  const profesional = await prisma.profesional.findUnique({
+    where: { slug, status: "ACTIVO" },
+    include: { especialidades: true },
+  });
+
+  if (!profesional) return { title: "Profesional | CKM Mendoza" };
+
+  const nombre = `${profesional.nombre} ${profesional.apellido}`;
+  const especialidad = profesional.especialidades?.[0]?.nombre ?? "Kinesiólogo/a";
+  const description = `Perfil de ${nombre} — ${especialidad}. Kinesiólogo/a habilitado/a en Mendoza registrado en el Círculo de Kinesiólogos.`;
+
+  return {
+    title: `${nombre} | CKM Mendoza`,
+    description,
+    openGraph: {
+      title: nombre,
+      description,
+      images: profesional.foto_url ? [profesional.foto_url] : [],
+      url: `https://www.circulokinesiologos.com.ar/profesionales/${slug}`,
+    },
+  };
 }
 
 export default async function PerfilProfesionalPage({ params }: Props) {
