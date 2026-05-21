@@ -1,12 +1,12 @@
 "use client";
 
+import { useState } from "react";
 import Link from "next/link";
 import { usePathname } from "next/navigation";
 import {
   LayoutDashboard,
   Users,
   FileText,
-  Settings,
   LogOut,
   Bell,
   ShieldCheck,
@@ -15,8 +15,10 @@ import {
   Globe,
   BookOpen,
   Megaphone,
+  Menu,
 } from "lucide-react";
 import { cn } from "@/lib/utils";
+import AdminMobileSidebar from "./_components/AdminMobileSidebar";
 
 const SIDEBAR_LINKS = [
   { name: "Resumen", href: "/admin", icon: LayoutDashboard },
@@ -41,6 +43,7 @@ export default function AdminLayout({
   children: React.ReactNode;
 }) {
   const pathname = usePathname();
+  const [mobileOpen, setMobileOpen] = useState(false);
 
   return (
     <div className="flex min-h-screen bg-slate-50 font-sans">
@@ -99,14 +102,26 @@ export default function AdminLayout({
         </div>
       </aside>
 
+      {/* Mobile drawer */}
+      <AdminMobileSidebar open={mobileOpen} onClose={() => setMobileOpen(false)} />
+
       {/* Main Content Area */}
       <main className="flex-grow lg:pl-64">
         {/* Topbar */}
-        <header className="h-20 bg-white border-b sticky top-0 z-10 flex items-center justify-between px-8">
-          <h2 className="text-sm font-black text-slate-400 uppercase tracking-widest">
-            {SIDEBAR_LINKS.find((l) => l.href === pathname)?.name ||
-              "Administración"}
-          </h2>
+        <header className="h-20 bg-white border-b sticky top-0 z-10 flex items-center justify-between px-4 sm:px-8">
+          <div className="flex items-center gap-3">
+            <button
+              onClick={() => setMobileOpen(true)}
+              className="lg:hidden p-2 rounded-xl text-slate-500 hover:bg-slate-100 transition-colors"
+              aria-label="Abrir menú"
+            >
+              <Menu className="h-5 w-5" />
+            </button>
+            <h2 className="text-sm font-black text-slate-400 uppercase tracking-widest">
+              {SIDEBAR_LINKS.find((l) => l.href === pathname)?.name ||
+                "Administración"}
+            </h2>
+          </div>
           <div className="flex items-center space-x-4">
             <div className="text-right hidden sm:block">
               <p className="text-sm font-black text-slate-900">Admin General</p>
