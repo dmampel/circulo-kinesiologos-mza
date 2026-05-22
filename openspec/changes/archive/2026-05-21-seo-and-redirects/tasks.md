@@ -9,4 +9,4 @@
 - [x] 5. OG metadata en `/institucional/page.tsx` (estático)
 - [x] 6. OG metadata en `/kineclub/page.tsx` (estático)
 - [x] 7. OG metadata en `/obras-sociales/page.tsx` (estático)
-- [ ] 8. Redirects 301 en `next.config.ts` (pendiente URL export del WP)
+- [x] 8. Redirects 301 — NO APLICA. El sitio es nuevo, sin contenido migrado del WordPress.

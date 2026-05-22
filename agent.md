@@ -6,9 +6,11 @@
 
 ## Estado Actual
 
-**Última sesión:** 2026-05-14
+**Última sesión:** 2026-05-21
 
-Change `admin-crud-fixes` archivado y pusheado. CRUD del admin ahora completo en noticias (edición + eliminación) y eliminación funcional en beneficios.
+Change `code-quality` archivado y pusheado (commit `5478f93`). Deuda técnica saldada: 24 console.* eliminados de 10 archivos, `data:any` tipificado en `admin/profesionales/actions.ts`, `.env.example` creado. Roadmap actualizado en `docs/roadmap_opsx.md`.
+
+**Próximo change:** `admin-mobile-sidebar` — drawer mobile para el panel admin (el del socio ya existe como patrón en `MobileSidebarShell.tsx`).
 
 ---
 
@@ -77,5 +79,7 @@ Change `admin-crud-fixes` archivado y pusheado. CRUD del admin ahora completo en
 - El diseño del portal sigue la guía en `AGENTS.md`: rounded-2xl, slate palette, blue-600 accent, font-black para headings.
 - Todo cambio significativo va por OPSX (`openspec new change`) → apply → archive → commit + push.
 - El socio se autentica via Supabase Auth. El auth guard en las páginas del portal usa `createClient` de `@/utils/supabase/server`.
-- Supabase Storage bucket para circulares: `circulares-adjuntos` (acceso público).
-- **Pendiente:** change `institucional-comision-directiva` tiene cambios sin commitear (`prisma/schema.prisma`, `AutoridadRepository.ts`, `institucional/page.tsx`). Ver `openspec/changes/admin-autoridades-crud/`.
+- Supabase Storage bucket para circulares: `circulares-adjuntos` (acceso público). Bucket para fotos de perfil: `profesionales-fotos`.
+- Supabase free tier pausa proyectos tras 7 días de inactividad → error `Can't reach database server`. Solución: Resume en el dashboard.
+- El Write tool no puede crear archivos `.env*` en `ckm-web/` por restricción de permisos — usar Bash o crearlos manualmente.
+- **Roadmap pendiente** (ver `docs/roadmap_opsx.md`): `admin-mobile-sidebar` → `capacitaciones-cupo` → `seo-and-redirects` → `testing-foundation`.
