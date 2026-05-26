@@ -1,4 +1,5 @@
 import Link from "next/link";
+import Image from "next/image";
 import { Mail, MapPin, Phone, ArrowUpRight } from "lucide-react";
 
 export default function Footer() {
@@ -13,11 +14,8 @@ export default function Footer() {
         {/* Top: Brand + tagline */}
         <div className="pt-16 pb-12 border-b border-slate-800 flex flex-col lg:flex-row lg:items-end justify-between gap-8">
           <div>
-            <div className="flex items-center gap-3 mb-4">
-              <div className="h-10 w-10 bg-blue-600 rounded-xl flex items-center justify-center shrink-0">
-                <span className="font-black text-white text-sm">CK</span>
-              </div>
-              <span className="font-black text-white text-lg tracking-tight">Círculo de Kinesiólogos</span>
+            <div className="mb-4">
+              <Image src="/logo.png" alt="Círculo de Kinesiólogos de Mendoza" width={120} height={40} className="h-10 w-auto" />
             </div>
             <p className="text-slate-500 text-sm leading-relaxed max-w-sm">
               Representando y acompañando a los profesionales de la kinesiología en Mendoza desde hace décadas.
@@ -92,16 +90,18 @@ export default function Footer() {
             <ul className="space-y-4 text-sm">
               <li className="flex items-start gap-3">
                 <MapPin className="h-4 w-4 text-blue-500 shrink-0 mt-0.5" />
-                <span>Mendoza, Argentina</span>
+                <span>Eusebio Blanco 148, Capital, Mendoza</span>
               </li>
               <li className="flex items-center gap-3">
                 <Phone className="h-4 w-4 text-blue-500 shrink-0" />
-                <span>+54 261 000-0000</span>
+                <a href="tel:+5492613619468" className="hover:text-white transition-colors">
+                  +54 9 261 361-9468
+                </a>
               </li>
               <li className="flex items-center gap-3">
                 <Mail className="h-4 w-4 text-blue-500 shrink-0" />
-                <a href="mailto:contacto@circulokine.com.ar" className="hover:text-white transition-colors break-all">
-                  contacto@circulokine.com.ar
+                <a href="mailto:presidencia@kinesiologosmza.com" className="hover:text-white transition-colors break-all">
+                  presidencia@kinesiologosmza.com
                 </a>
               </li>
             </ul>

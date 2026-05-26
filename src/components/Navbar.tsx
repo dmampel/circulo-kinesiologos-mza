@@ -1,6 +1,7 @@
 "use client";
 
 import Link from "next/link";
+import Image from "next/image";
 import { useEffect, useState } from "react";
 import { Menu, X, User, LogOut } from "lucide-react";
 import { cn } from "@/lib/utils";
@@ -52,18 +53,8 @@ export default function Navbar() {
       <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
         <div className="flex h-20 justify-between items-center">
           {/* Logo */}
-          <Link href="/" className="flex items-center space-x-2">
-            <div className="h-10 w-10 bg-blue-600 rounded-lg flex items-center justify-center">
-              <span className="text-white font-bold text-xl">CK</span>
-            </div>
-            <div className="flex flex-col">
-              <span className="text-sm font-bold leading-tight text-slate-900">
-                Círculo de Kinesiólogos
-              </span>
-              <span className="text-[10px] font-medium tracking-widest text-slate-500 uppercase">
-                Mendoza
-              </span>
-            </div>
+          <Link href="/">
+            <Image src="/logo.png" alt="Círculo de Kinesiólogos de Mendoza" width={120} height={40} className="h-10 w-auto" />
           </Link>
 
           {/* Desktop Nav */}

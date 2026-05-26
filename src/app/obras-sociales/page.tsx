@@ -1,12 +1,11 @@
 import type { Metadata } from "next";
 import {
-  Search,
   ShieldCheck,
-  FileText,
   ArrowRight,
 } from "lucide-react";
 import Link from "next/link";
 import { ObraSocialRepository } from "@/lib/repositories/ObraSocialRepository";
+import ObrasSocialesGrid from "./ObrasSocialesGrid";
 
 export const metadata: Metadata = {
   title: "Obras Sociales | Círculo de Kinesiólogos de Mendoza",
@@ -45,15 +44,6 @@ export default async function ObrasSocialesPage() {
             provincia.
           </p>
 
-          {/* Buscador de Obras Sociales */}
-          <div className="mt-12 relative max-w-xl mx-auto">
-            <Search className="absolute left-4 top-1/2 -translate-y-1/2 h-5 w-5 text-slate-400" />
-            <input
-              type="text"
-              placeholder="Buscar obra social o prepaga..."
-              className="w-full pl-11 pr-4 py-4 rounded-2xl bg-white/10 border border-white/10 text-white placeholder:text-slate-400 focus:border-blue-500 focus:ring-4 focus:ring-blue-500/20 focus:bg-white/20 transition-all text-sm font-medium backdrop-blur-md"
-            />
-          </div>
         </div>
 
         {/* Glow Effects */}
@@ -75,56 +65,7 @@ export default async function ObrasSocialesPage() {
       </div>
 
       <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8 -mt-48 relative z-20">
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
-          {obrasSociales.length === 0 ? (
-            <div className="col-span-full text-center py-20 text-slate-500 font-bold">
-              Aún no hay obras sociales cargadas en el sistema.
-            </div>
-          ) : (
-            obrasSociales.map((os) => (
-              <div
-                key={os.id}
-                className="bg-white/60 backdrop-blur-2xl p-6 rounded-[2rem] shadow-sm border border-slate-100 hover:shadow-xl hover:shadow-slate-200/50 transition-all group flex flex-col h-full"
-              >
-                <div className="h-24 w-full rounded-2xl bg-slate-50 flex items-center justify-center mb-6 group-hover:bg-blue-50/50 transition-colors overflow-hidden border border-slate-100 p-4">
-                  {os.logo_url ? (
-                    <img
-                      src={os.logo_url}
-                      alt={os.nombre}
-                      className="h-full w-full object-contain mix-blend-multiply transition-transform group-hover:scale-105"
-                    />
-                  ) : (
-                    <ShieldCheck className="h-10 w-10 text-slate-300 group-hover:text-blue-400 transition-colors" />
-                  )}
-                </div>
-                <h3 className="text-lg font-bold text-slate-900 mb-2 flex-grow">
-                  {os.nombre}
-                </h3>
-                <div className="flex items-center text-[10px] font-black text-green-600 uppercase tracking-wider mb-6 mt-auto">
-                  <div className="h-2 w-2 rounded-full bg-green-500 mr-2" />
-                  Convenio Activo
-                </div>
-
-                <div className="flex items-center space-x-2 mt-auto">
-                  {os.convenio_url ? (
-                    <a
-                      href={os.convenio_url}
-                      target="_blank"
-                      rel="noopener noreferrer"
-                      className="flex-1 inline-flex items-center justify-center py-2.5 rounded-xl bg-slate-50 text-slate-900 text-xs font-bold hover:bg-blue-50 hover:text-blue-600 transition-all"
-                    >
-                      <FileText className="mr-2 h-4 w-4" /> Vademécum
-                    </a>
-                  ) : (
-                    <span className="flex-1 inline-flex items-center justify-center py-2.5 rounded-xl bg-slate-50 text-slate-400 text-xs font-bold">
-                      Sin PDF adjunto
-                    </span>
-                  )}
-                </div>
-              </div>
-            ))
-          )}
-        </div>
+        <ObrasSocialesGrid obrasSociales={obrasSociales} />
 
         {/* Aviso para Profesionales */}
         <div className="mt-20 py-16 border-t border-slate-100">

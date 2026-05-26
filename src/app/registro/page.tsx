@@ -115,13 +115,45 @@ export default function RegistroPage() {
   return (
     <div className="bg-slate-50 min-h-screen py-16 lg:py-24">
       <div className="mx-auto max-w-4xl px-4">
-        
+
         {/* Header de Registro */}
-        <div className="text-center mb-16">
+        <div className="text-center mb-12">
           <h1 className="text-4xl font-black text-slate-900 mb-4 tracking-tight">Solicitud de <span className="text-blue-600">Asociación</span></h1>
           <p className="text-slate-500 max-w-xl mx-auto leading-relaxed">
             Completá los datos para iniciar tu trámite de ingreso al Círculo de Kinesiólogos de Mendoza.
           </p>
+        </div>
+
+        {/* Banner: documentación requerida */}
+        <div className="mb-12 bg-amber-50 border border-amber-200 rounded-3xl p-6 lg:p-8">
+          <div className="flex items-start gap-4">
+            <div className="h-10 w-10 rounded-xl bg-amber-100 flex items-center justify-center shrink-0">
+              <Info className="h-5 w-5 text-amber-600" />
+            </div>
+            <div>
+              <p className="text-sm font-black text-amber-900 mb-3 uppercase tracking-widest">Documentación requerida</p>
+              <p className="text-xs text-amber-700 mb-4 leading-relaxed">
+                Antes de completar el formulario, tené listos los siguientes documentos en formato digital (PDF o imagen):
+              </p>
+              <div className="grid grid-cols-1 sm:grid-cols-2 gap-2">
+                {[
+                  "Fotocopia DNI (frente y dorso)",
+                  "Título universitario (frente y dorso)",
+                  "Constancia de CUIT e Ingresos Brutos",
+                  "Póliza de seguro de mala praxis",
+                  "Curriculum Vitae actualizado",
+                  "Matrícula provincial vigente",
+                  "Certificado Superintendencia de Salud",
+                  "Habilitación del consultorio",
+                ].map((doc) => (
+                  <div key={doc} className="flex items-center gap-2 text-xs font-medium text-amber-800">
+                    <div className="h-1.5 w-1.5 rounded-full bg-amber-500 shrink-0" />
+                    {doc}
+                  </div>
+                ))}
+              </div>
+            </div>
+          </div>
         </div>
 
         {/* Stepper */}

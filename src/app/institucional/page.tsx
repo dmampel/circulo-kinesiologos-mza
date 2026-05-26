@@ -1,5 +1,5 @@
 import type { Metadata } from "next";
-import { FileText, Scale, DollarSign, ClipboardList, ArrowUpRight } from "lucide-react";
+import { FileText, ArrowUpRight } from "lucide-react";
 import { AutoridadRepository } from "@/lib/repositories/AutoridadRepository";
 import { ProfesionalRepository } from "@/lib/repositories/ProfesionalRepository";
 import { ObraSocialRepository } from "@/lib/repositories/ObraSocialRepository";
@@ -46,30 +46,11 @@ const HITOS: Array<{ año: string; titulo: string; desc: string }> = [
   },
 ];
 
-const DOCUMENTOS: Array<{ titulo: string; desc: string; href: string; icon: string }> = [
+const DOCUMENTOS: Array<{ titulo: string; desc: string; href: string }> = [
   {
     titulo: "Estatuto Institucional",
     desc: "Reglamento que rige la organización y funcionamiento del Círculo.",
-    href: "/estatuto",
-    icon: "FileText",
-  },
-  {
-    titulo: "Código de Ética",
-    desc: "Normas éticas que guían el ejercicio profesional de nuestros asociados.",
-    href: "#",
-    icon: "Scale",
-  },
-  {
-    titulo: "Aranceles Vigentes",
-    desc: "Tabla de aranceles negociados con obras sociales y prepagas.",
-    href: "#",
-    icon: "DollarSign",
-  },
-  {
-    titulo: "Actas de Comisión",
-    desc: "Registro de resoluciones y acuerdos de la comisión directiva.",
-    href: "#",
-    icon: "ClipboardList",
+    href: "/estatuto.pdf",
   },
 ];
 
@@ -79,15 +60,6 @@ const AVATAR_COLORS = [
   "bg-sky-600", "bg-blue-800", "bg-slate-500",
 ];
 
-function DocumentIcon({ name }: { name: string }) {
-  switch (name) {
-    case "FileText":    return <FileText className="h-5 w-5" />;
-    case "Scale":       return <Scale className="h-5 w-5" />;
-    case "DollarSign":  return <DollarSign className="h-5 w-5" />;
-    case "ClipboardList": return <ClipboardList className="h-5 w-5" />;
-    default:            return <FileText className="h-5 w-5" />;
-  }
-}
 
 export default async function InstitucionalPage() {
   const [autoridades, sociosCount, obrasSocialesCount] = await Promise.all([
@@ -294,16 +266,16 @@ export default async function InstitucionalPage() {
             Documentos Institucionales
           </h2>
           <div>
-            {DOCUMENTOS.map((doc, i) => (
+            {DOCUMENTOS.map((doc) => (
               <a
                 key={doc.titulo}
                 href={doc.href}
-                className={`flex items-center gap-6 py-8 group ${
-                  i < DOCUMENTOS.length - 1 ? "border-b border-slate-100" : ""
-                }`}
+                target="_blank"
+                rel="noopener noreferrer"
+                className="flex items-center gap-6 py-8 group"
               >
                 <div className="h-12 w-12 rounded-xl bg-slate-50 text-slate-300 group-hover:bg-blue-600 group-hover:text-white flex items-center justify-center transition-all duration-300 shrink-0">
-                  <DocumentIcon name={doc.icon} />
+                  <FileText className="h-5 w-5" />
                 </div>
                 <div className="flex-1 min-w-0">
                   <p className="font-black text-xl text-slate-900 mb-1 group-hover:text-blue-600 transition-colors duration-200">

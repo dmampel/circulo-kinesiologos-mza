@@ -1,7 +1,7 @@
 "use client";
 
-import { useState } from "react";
 import Link from "next/link";
+import Image from "next/image";
 import { usePathname } from "next/navigation";
 import {
   LayoutDashboard,
@@ -15,10 +15,9 @@ import {
   Globe,
   BookOpen,
   Megaphone,
-  Menu,
+  Monitor,
 } from "lucide-react";
 import { cn } from "@/lib/utils";
-import AdminMobileSidebar from "./_components/AdminMobileSidebar";
 
 const SIDEBAR_LINKS = [
   { name: "Resumen", href: "/admin", icon: LayoutDashboard },
@@ -43,17 +42,26 @@ export default function AdminLayout({
   children: React.ReactNode;
 }) {
   const pathname = usePathname();
-  const [mobileOpen, setMobileOpen] = useState(false);
 
   return (
     <div className="flex min-h-screen bg-slate-50 font-sans">
+      {/* Mensaje desktop-only en mobile */}
+      <div className="lg:hidden fixed inset-0 z-50 bg-slate-900 flex flex-col items-center justify-center p-8 text-center">
+        <div className="h-20 w-20 rounded-3xl bg-blue-600/20 border border-blue-500/30 flex items-center justify-center mb-8">
+          <Monitor className="h-10 w-10 text-blue-400" />
+        </div>
+        <h2 className="text-2xl font-black text-white mb-4 tracking-tight">
+          Panel de Administración
+        </h2>
+        <p className="text-slate-400 text-sm leading-relaxed max-w-xs">
+          Este panel está optimizado para computadoras de escritorio. Por favor, ingresá desde una pantalla más grande.
+        </p>
+      </div>
       {/* Sidebar */}
       <aside className="w-64 bg-slate-900 text-white fixed h-full z-20 hidden lg:flex flex-col">
         <div className="p-8 border-b border-slate-800">
           <div className="flex items-center space-x-3">
-            <div className="h-8 w-8 bg-blue-600 rounded flex items-center justify-center">
-              <span className="font-bold">CK</span>
-            </div>
+            <Image src="/logo.png" alt="CKM" width={32} height={32} className="h-8 w-auto" />
             <span className="font-black tracking-tight text-lg">
               Panel Admin
             </span>
@@ -102,21 +110,11 @@ export default function AdminLayout({
         </div>
       </aside>
 
-      {/* Mobile drawer */}
-      <AdminMobileSidebar open={mobileOpen} onClose={() => setMobileOpen(false)} />
-
       {/* Main Content Area */}
       <main className="flex-grow lg:pl-64">
         {/* Topbar */}
         <header className="h-20 bg-white border-b sticky top-0 z-10 flex items-center justify-between px-4 sm:px-8">
           <div className="flex items-center gap-3">
-            <button
-              onClick={() => setMobileOpen(true)}
-              className="lg:hidden p-2 rounded-xl text-slate-500 hover:bg-slate-100 transition-colors"
-              aria-label="Abrir menú"
-            >
-              <Menu className="h-5 w-5" />
-            </button>
             <h2 className="text-sm font-black text-slate-400 uppercase tracking-widest">
               {SIDEBAR_LINKS.find((l) => l.href === pathname)?.name ||
                 "Administración"}
