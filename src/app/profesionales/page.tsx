@@ -196,7 +196,7 @@ export default async function ProfesionalesPage({ searchParams }: Props) {
                             M.P. {p.matricula}
                           </span>
                         </div>
-                        <h3 className="text-xl font-black text-slate-900 group-hover:text-blue-600 transition-colors capitalize leading-tight mb-2">
+                        <h3 className="text-xl font-black text-slate-900 group-hover:text-blue-600 transition-colors capitalize leading-tight mb-2 line-clamp-2">
                           {p.apellido}, {p.nombre}
                         </h3>
 
@@ -204,13 +204,26 @@ export default async function ProfesionalesPage({ searchParams }: Props) {
                           <div className="flex items-center text-sm text-slate-500 font-medium">
                             <MapPin className="h-4 w-4 mr-2 text-slate-300 shrink-0" />
                             <span className="truncate">
-                              {p.direccion || p.localidad.nombre}
+                              {p.localidad.nombre}
                             </span>
                           </div>
-                          <div className="flex items-center text-xs text-blue-600 font-bold bg-blue-50/50 w-fit px-3 py-1 rounded-full border border-blue-100/50">
-                            <Award className="h-3.5 w-3.5 mr-1.5" />
-                            {p.especialidades[0]?.nombre ||
-                              "Kinesiología General"}
+                          <div className="flex flex-wrap gap-1 mt-1">
+                            {p.especialidades.length > 0 ? (
+                              p.especialidades.map((e: { id: string; nombre: string }) => (
+                                <span
+                                  key={e.id}
+                                  className="flex items-center text-xs text-blue-600 font-bold bg-blue-50/50 px-3 py-1 rounded-full border border-blue-100/50"
+                                >
+                                  <Award className="h-3.5 w-3.5 mr-1.5 shrink-0" />
+                                  {e.nombre}
+                                </span>
+                              ))
+                            ) : (
+                              <span className="flex items-center text-xs text-blue-600 font-bold bg-blue-50/50 px-3 py-1 rounded-full border border-blue-100/50">
+                                <Award className="h-3.5 w-3.5 mr-1.5 shrink-0" />
+                                Kinesiología General
+                              </span>
+                            )}
                           </div>
                         </div>
                       </div>

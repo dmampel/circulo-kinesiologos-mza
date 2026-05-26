@@ -19,10 +19,12 @@ export default function FilterSelect({ name, defaultValue, options, placeholder,
   const searchParams = useSearchParams();
   const [isPending, startTransition] = useTransition();
 
+  const currentValue = searchParams.get(name) || "";
+
   const handleChange = (e: React.ChangeEvent<HTMLSelectElement>) => {
     const value = e.target.value;
     const params = new URLSearchParams(searchParams);
-    
+
     if (value) {
       params.set(name, value);
     } else {
@@ -43,7 +45,7 @@ export default function FilterSelect({ name, defaultValue, options, placeholder,
       )}
       <select
         name={name}
-        defaultValue={defaultValue}
+        value={currentValue}
         onChange={handleChange}
         className={cn(
           "w-full pl-11 pr-10 py-4 rounded-2xl bg-white border border-slate-200 shadow-lg shadow-blue-900/5 text-slate-900 focus:outline-none focus:ring-4 focus:ring-blue-500/10 focus:border-blue-500/50 transition-all text-sm font-medium appearance-none cursor-pointer",
