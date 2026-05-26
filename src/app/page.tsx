@@ -90,11 +90,11 @@ export default async function Home() {
                 Institución Centenaria · Mendoza
               </div>
               <TextReveal as="h1" variant="words" className="text-5xl lg:text-6xl xl:text-7xl font-black text-white tracking-tighter leading-[1.05] mb-6">
-                La casa de la{" "}
+                Somos{" "}
                 <span className="text-blue-500 underline decoration-blue-500/30 underline-offset-8">
-                  Kinesiología
+                  El Círculo
                 </span>{" "}
-                en Mendoza
+                de Kinesiólogos y Fisioterapeutas 
               </TextReveal>
               <p className="text-slate-400 text-lg leading-relaxed mb-10 max-w-lg">
                 Representamos y acompañamos a los profesionales de la salud kinésica, garantizando la calidad prestacional y el desarrollo continuo de la disciplina.
