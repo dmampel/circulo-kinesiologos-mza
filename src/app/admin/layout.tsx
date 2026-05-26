@@ -1,7 +1,6 @@
 "use client";
 
 import Link from "next/link";
-import Image from "next/image";
 import { usePathname } from "next/navigation";
 import {
   LayoutDashboard,
@@ -21,12 +20,7 @@ import { cn } from "@/lib/utils";
 
 const SIDEBAR_LINKS = [
   { name: "Resumen", href: "/admin", icon: LayoutDashboard },
-  {
-    name: "Solicitudes",
-    href: "/admin/solicitudes",
-    icon: Bell,
-    badge: "NUEVO",
-  },
+  { name: "Solicitudes", href: "/admin/solicitudes", icon: Bell },
   { name: "Profesionales", href: "/admin/profesionales", icon: Users },
   { name: "Obras Sociales", href: "/admin/obras-sociales", icon: Briefcase },
   { name: "KineClub", href: "/admin/beneficios", icon: Ticket },
@@ -60,11 +54,8 @@ export default function AdminLayout({
       {/* Sidebar */}
       <aside className="w-64 bg-slate-900 text-white fixed h-full z-20 hidden lg:flex flex-col">
         <div className="p-8 border-b border-slate-800">
-          <div className="flex items-center space-x-3">
-            <Image src="/logo.png" alt="CKM" width={32} height={32} className="h-8 w-auto" />
-            <span className="font-black tracking-tight text-lg">
-              Panel Admin
-            </span>
+          <div>
+            <p className="font-black tracking-tight text-lg text-white">Panel de Admin</p>
           </div>
         </div>
 

@@ -12,6 +12,7 @@ import {
   CheckCircle2,
   Clock,
   ArrowRight,
+  ExternalLink,
 } from "lucide-react";
 import Link from "next/link";
 import WaveTransition from "@/components/WaveTransition";
@@ -155,20 +156,32 @@ export default async function PerfilProfesionalPage({ params }: Props) {
                 </h3>
 
                 <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
-                  <div className="p-8 rounded-[2rem] bg-slate-50 border border-slate-100 hover:border-blue-200 transition-colors group">
+                  <div className="p-8 rounded-[2rem] border border-slate-100 hover:border-blue-200 transition-colors group">
                     <p className="text-[10px] font-black text-slate-400 uppercase tracking-widest mb-4">
                       Dirección Particular
                     </p>
                     <p className="text-xl font-black text-slate-900 mb-2 leading-tight">
                       {profesional.direccion || "Consultorio habilitado"}
                     </p>
-                    <p className="text-blue-600 font-bold flex items-center uppercase text-xs tracking-wider">
+                    <p className="text-blue-600 font-bold flex items-center uppercase text-xs tracking-wider mb-4">
                       <MapPin className="h-4 w-4 mr-2" />{" "}
                       {profesional.localidad.nombre}, Mendoza
                     </p>
+                    <a
+                      href={`https://www.google.com/maps/search/?api=1&query=${encodeURIComponent(
+                        `${profesional.direccion || ""} ${profesional.localidad.nombre} Mendoza Argentina`.trim()
+                      )}`}
+                      target="_blank"
+                      rel="noopener noreferrer"
+                      className="mt-2 inline-flex items-center gap-2 px-4 py-2.5 rounded-xl bg-white border border-slate-200 text-xs font-bold text-slate-700 hover:border-blue-400 hover:text-blue-600 hover:bg-blue-50 transition-all shadow-sm"
+                    >
+                     
+                      Ver en Google Maps
+                      <ExternalLink className="h-3 w-3 ml-auto text-slate-300" />
+                    </a>
                   </div>
 
-                  <div className="p-8 rounded-[2rem] bg-slate-50 border border-slate-100 hover:border-blue-200 transition-colors group">
+                  <div className="p-8 rounded-[2rem] border border-slate-100 hover:border-blue-200 transition-colors group">
                     <p className="text-[10px] font-black text-slate-400 uppercase tracking-widest mb-4">
                       Días y Horarios
                     </p>
