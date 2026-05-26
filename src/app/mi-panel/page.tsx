@@ -98,6 +98,7 @@ export default async function DashboardPage() {
 
   const hoy = new Date();
   const lunes = getLunesDeSemana(hoy);
+  await TurnoRepository.autoCompletarPasados(profesional.id);
   const turnosSemana = await TurnoRepository.getByProfesionalAndWeek(profesional.id, lunes);
 
   const diasSemana = Array.from({ length: 7 }, (_, i) => {
@@ -217,15 +218,12 @@ export default async function DashboardPage() {
                 {profesional.especialidades.map((e) => e.nombre).join(", ")}
               </p>
             </div>
-            <div className="h-8 w-[1px] bg-slate-200" />
-            <div className="space-y-0.5">
-              <p className="text-[9px] font-bold text-slate-400 uppercase tracking-widest">
-                Vencimiento
-              </p>
-              <p className="text-xs font-bold text-slate-700">Dic 2026</p>
-            </div>
-            <div className="ml-2 px-3 py-1 bg-green-50 text-green-600 rounded-lg text-[9px] font-black uppercase tracking-widest border border-green-100">
-              Activo
+            <div className={`ml-2 px-3 py-1 rounded-lg text-[9px] font-black uppercase tracking-widest border ${
+              profesional.status === "ACTIVO"
+                ? "bg-green-50 text-green-600 border-green-100"
+                : "bg-slate-100 text-slate-400 border-slate-200"
+            }`}>
+              {profesional.status === "ACTIVO" ? "Activo" : "Inactivo"}
             </div>
           </div>
         </div>
@@ -330,11 +328,12 @@ export default async function DashboardPage() {
           <div className="grid grid-cols-7 mb-8">
             {diasSemana.map((dia, i) => {
               const esHoy = isSameDay(dia, hoy);
+              const esPasado = dia < hoy && !esHoy;
               const key = `${String(dia.getFullYear())}-${String(dia.getMonth() + 1).padStart(2, "0")}-${String(dia.getDate()).padStart(2, "0")}`;
               const tieneEventos = agendaPorDia.has(key);
               const tieneTurnos = agendaPorDia.get(key)?.some(e => e.kind === "turno") ?? false;
               return (
-                <div key={i} className="flex flex-col items-center gap-1 py-2">
+                <div key={i} className={`flex flex-col items-center gap-1 py-2 ${esPasado ? "opacity-40" : ""}`}>
                   <span className="text-[9px] font-black uppercase tracking-widest text-slate-300">
                     {DIAS_CORTO[dia.getDay()]}
                   </span>
@@ -351,8 +350,9 @@ export default async function DashboardPage() {
           <div className="space-y-6">
             {diasConEventos.map(({ key, items, date: diaDate }) => {
               const esHoy = isSameDay(diaDate, hoy);
+              const esPasado = diaDate < hoy && !esHoy;
               return (
-                <div key={key}>
+                <div key={key} className={esPasado ? "opacity-50" : ""}>
                   <p className={`text-[10px] font-black uppercase tracking-[0.2em] mb-3 ${esHoy ? "text-blue-600" : "text-slate-400"}`}>
                     {DIAS_CORTO[diaDate.getDay()]} · {diaDate.getDate()} {MESES_CORTO[diaDate.getMonth()]}
                     {esHoy && <span className="ml-2 normal-case tracking-normal font-bold">— Hoy</span>}
@@ -368,7 +368,7 @@ export default async function DashboardPage() {
                           <Link
                             key={item.id}
                             href="/mi-panel/turnos"
-                            className={`group flex items-center gap-4 py-3 hover:bg-slate-50 -mx-3 px-3 rounded-xl transition-colors cursor-pointer ${idx > 0 ? "border-t border-slate-50" : ""}`}
+                            className={`group flex items-center gap-4 py-3 -mx-3 px-3 rounded-xl transition-colors cursor-pointer ${esPasado ? "" : "hover:bg-slate-50"} ${idx > 0 ? "border-t border-slate-50" : ""}`}
                           >
                             <div className={`h-2 w-2 rounded-full shrink-0 ${ESTADO_DOT[item.estado] ?? "bg-blue-400"}`} />
                             <span className="text-xs font-bold text-slate-400 tabular-nums shrink-0 w-24">{item.hora}</span>
@@ -385,7 +385,7 @@ export default async function DashboardPage() {
                         <Link
                           key={item.id}
                           href={`/mi-panel/capacitaciones/${item.capacitacionId}`}
-                          className={`group flex items-center gap-4 py-3 hover:bg-slate-50 -mx-3 px-3 rounded-xl transition-colors ${idx > 0 ? "border-t border-slate-50" : ""}`}
+                          className={`group flex items-center gap-4 py-3 -mx-3 px-3 rounded-xl transition-colors ${esPasado ? "" : "hover:bg-slate-50"} ${idx > 0 ? "border-t border-slate-50" : ""}`}
                         >
                           <div className={`h-2 w-2 rounded-full shrink-0 ${dot.replace("text-", "bg-")}`} />
                           <span className="text-xs font-bold text-slate-400 tabular-nums shrink-0 w-24">

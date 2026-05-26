@@ -138,7 +138,7 @@ export default async function CapacitacionesSocioPage() {
                         )}
                         {c.costo ? (
                           <div className="flex items-center text-green-600">
-                            Costo: ${Number(c.costo).toLocaleString()}
+                            Costo: ${Number(c.costo).toLocaleString("es-AR")}
                           </div>
                         ) : (
                           <div className="flex items-center text-green-600">

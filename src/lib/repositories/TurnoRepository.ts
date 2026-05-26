@@ -87,6 +87,17 @@ export class TurnoRepository {
     return prisma.turno.delete({ where: { id } });
   }
 
+  static async autoCompletarPasados(profesionalId: string) {
+    await prisma.turno.updateMany({
+      where: {
+        profesionalId,
+        fecha: { lt: new Date() },
+        estado: { in: [EstadoTurno.PENDIENTE, EstadoTurno.CONFIRMADO] },
+      },
+      data: { estado: EstadoTurno.COMPLETADO },
+    });
+  }
+
   static async detectarSolapamiento(
     profesionalId: string,
     fecha: Date,
