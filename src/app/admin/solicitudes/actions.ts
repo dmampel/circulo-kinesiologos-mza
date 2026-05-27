@@ -4,14 +4,46 @@ import prisma from "@/lib/prisma";
 import { supabaseAdmin } from "@/lib/supabase/admin";
 import { revalidatePath } from "next/cache";
 import { ProfesionalRepository } from "@/lib/repositories/ProfesionalRepository";
+import { getResend, canSendEmails, FROM_EMAIL } from "@/lib/resend";
 
 export async function gestionarSolicitud(id: string, accion: "APROBAR" | "RECHAZAR") {
   try {
     if (accion === "RECHAZAR") {
+      const solicitud = await prisma.solicitud.findUnique({ where: { id } });
+
       await prisma.solicitud.update({
         where: { id },
         data: { status: "RECHAZADA", revisada_en: new Date() },
       });
+
+      if (solicitud && canSendEmails()) {
+        const resend = getResend();
+        try {
+          await resend.emails.send({
+            from: `Círculo Kinesiólogos <${FROM_EMAIL}>`,
+            to: [solicitud.email],
+            subject: `Actualización sobre tu solicitud de asociación`,
+            html: `
+              <div style="font-family: sans-serif; max-width: 600px; margin: 0 auto; border: 1px solid #eee; border-radius: 10px; overflow: hidden;">
+                <div style="background: #0f172a; padding: 20px; color: white; text-align: center;">
+                  <h1 style="margin: 0;">Círculo de Kinesiólogos</h1>
+                </div>
+                <div style="padding: 30px;">
+                  <p>Hola <strong>${solicitud.nombre}</strong>,</p>
+                  <p>Luego de revisar tu solicitud de asociación, lamentablemente no podemos procesarla en este momento.</p>
+                  <p>Si considerás que hay un error o querés más información, podés contactarnos respondiendo este email.</p>
+                </div>
+                <div style="background: #f8fafc; padding: 20px; text-align: center; color: #64748b; font-size: 12px;">
+                  Este es un mensaje automático del sistema de gestión de Círculo Kinesiólogos.
+                </div>
+              </div>
+            `
+          });
+        } catch {
+          // no bloquear si falla el email de rechazo
+        }
+      }
+
       return { success: true };
     } else {
       // 1. Obtener datos de la solicitud
@@ -89,6 +121,37 @@ export async function gestionarSolicitud(id: string, accion: "APROBAR" | "RECHAZ
         where: { id },
         data: { status: "APROBADA", revisada_en: new Date() },
       });
+
+      // 7. Email de aprobación al profesional
+      if (canSendEmails()) {
+        const resend = getResend();
+        try {
+          await resend.emails.send({
+            from: `Círculo Kinesiólogos <${FROM_EMAIL}>`,
+            to: [solicitud.email],
+            subject: `¡Tu solicitud fue aprobada! Bienvenido/a al Círculo`,
+            html: `
+              <div style="font-family: sans-serif; max-width: 600px; margin: 0 auto; border: 1px solid #eee; border-radius: 10px; overflow: hidden;">
+                <div style="background: #0f172a; padding: 20px; color: white; text-align: center;">
+                  <h1 style="margin: 0;">¡Bienvenido/a!</h1>
+                </div>
+                <div style="padding: 30px;">
+                  <p>Hola <strong>${solicitud.nombre}</strong>,</p>
+                  <p>Tu solicitud de asociación al Círculo de Kinesiólogos de Mendoza fue <strong>aprobada</strong>. ¡Es un placer tenerte como parte de nuestra institución!</p>
+                  <hr style="border: 0; border-top: 1px solid #eee; margin: 20px 0;" />
+                  <p>En breve recibirás un email separado con el enlace para configurar tu contraseña y acceder a tu portal de socio.</p>
+                  <p>Si no lo recibís en los próximos minutos, revisá tu carpeta de spam.</p>
+                </div>
+                <div style="background: #f8fafc; padding: 20px; text-align: center; color: #64748b; font-size: 12px;">
+                  Este es un mensaje automático del sistema de gestión de Círculo Kinesiólogos.
+                </div>
+              </div>
+            `
+          });
+        } catch {
+          // no bloquear si falla el email de aprobación
+        }
+      }
 
       return { success: true };
     }

@@ -4,9 +4,7 @@ import prisma from "@/lib/prisma";
 import { revalidatePath } from "next/cache";
 import { redirect } from "next/navigation";
 import { supabaseAdmin } from "@/lib/supabase/admin";
-import { Resend } from "resend";
-
-const resend = new Resend(process.env.RESEND_API_KEY);
+import { getResend, canSendEmails, FROM_EMAIL, INSTITUTIONAL_EMAIL } from "@/lib/resend";
 
 export async function getLocalidades() {
   return await prisma.localidad.findMany({
@@ -88,12 +86,16 @@ export async function crearSolicitud(formData: FormData) {
       },
     });
     
-    // 4. Enviar mail institucional (Aviso)
-    if (process.env.RESEND_API_KEY && process.env.RESEND_API_KEY !== "re_...") {
+    // 4. Enviar emails transaccionales
+    if (canSendEmails()) {
+      const resend = getResend();
+      const siteUrl = process.env.NEXT_PUBLIC_SITE_URL || 'http://localhost:3000';
+
+      // Aviso institucional
       try {
         await resend.emails.send({
-          from: 'Círculo Kinesiólogos <onboarding@resend.dev>',
-          to: ['institucional@circulokinesiologos.com'], // Cambiar por el real
+          from: `Círculo Kinesiólogos <${FROM_EMAIL}>`,
+          to: [INSTITUTIONAL_EMAIL],
           subject: `Nueva Solicitud de Asociación: ${nombre} ${apellido}`,
           html: `
             <div style="font-family: sans-serif; max-width: 600px; margin: 0 auto; border: 1px solid #eee; border-radius: 10px; overflow: hidden;">
@@ -109,7 +111,7 @@ export async function crearSolicitud(formData: FormData) {
                 <p><strong>Especialidad:</strong> ${especialidadNombre}</p>
                 <hr style="border: 0; border-top: 1px solid #eee; margin: 20px 0;" />
                 <p>Podés revisar la documentación y aprobar la solicitud desde el panel administrativo:</p>
-                <a href="${process.env.NEXT_PUBLIC_SITE_URL || 'http://localhost:3000'}/admin/solicitudes" 
+                <a href="${siteUrl}/admin/solicitudes"
                    style="display: inline-block; background: #2563eb; color: white; padding: 12px 24px; border-radius: 6px; text-decoration: none; font-weight: bold; margin-top: 10px;">
                   Ir al Panel de Control
                 </a>
@@ -121,7 +123,37 @@ export async function crearSolicitud(formData: FormData) {
           `
         });
       } catch {
-        // no bloquear si falla el mail de aviso
+        // no bloquear si falla el aviso institucional
+      }
+
+      // Confirmación al solicitante
+      try {
+        await resend.emails.send({
+          from: `Círculo Kinesiólogos <${FROM_EMAIL}>`,
+          to: [email],
+          subject: `Recibimos tu solicitud de asociación`,
+          html: `
+            <div style="font-family: sans-serif; max-width: 600px; margin: 0 auto; border: 1px solid #eee; border-radius: 10px; overflow: hidden;">
+              <div style="background: #0f172a; padding: 20px; color: white; text-align: center;">
+                <h1 style="margin: 0;">¡Solicitud recibida!</h1>
+              </div>
+              <div style="padding: 30px;">
+                <p>Hola <strong>${nombre}</strong>,</p>
+                <p>Recibimos tu solicitud de asociación al Círculo de Kinesiólogos de Mendoza. Nuestro equipo revisará tu documentación y te contactaremos a la brevedad.</p>
+                <hr style="border: 0; border-top: 1px solid #eee; margin: 20px 0;" />
+                <p><strong>Matrícula:</strong> ${matricula}</p>
+                <p><strong>Especialidad:</strong> ${especialidadNombre}</p>
+                <hr style="border: 0; border-top: 1px solid #eee; margin: 20px 0;" />
+                <p>Si tenés alguna consulta, podés contactarnos respondiendo este email.</p>
+              </div>
+              <div style="background: #f8fafc; padding: 20px; text-align: center; color: #64748b; font-size: 12px;">
+                Este es un mensaje automático del sistema de gestión de Círculo Kinesiólogos.
+              </div>
+            </div>
+          `
+        });
+      } catch {
+        // no bloquear si falla la confirmación al solicitante
       }
     }
 
