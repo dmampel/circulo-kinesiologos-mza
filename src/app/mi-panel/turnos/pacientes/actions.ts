@@ -35,6 +35,7 @@ export async function crearPaciente(formData: FormData): Promise<ActionResult> {
       apellido,
       telefono: (formData.get("telefono") as string) || undefined,
       email: (formData.get("email") as string) || undefined,
+      obraSocial: (formData.get("obraSocial") as string) || undefined,
       notas: (formData.get("notas") as string) || undefined,
       profesionalId,
     });
@@ -62,6 +63,7 @@ export async function actualizarPaciente(id: string, formData: FormData): Promis
       apellido,
       telefono: (formData.get("telefono") as string) || undefined,
       email: (formData.get("email") as string) || undefined,
+      obraSocial: (formData.get("obraSocial") as string) || undefined,
       notas: (formData.get("notas") as string) || undefined,
     });
 

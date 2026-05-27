@@ -48,6 +48,7 @@ export default async function EditarPacientePage({
           apellido: paciente.apellido,
           telefono: paciente.telefono,
           email: paciente.email,
+          obraSocial: paciente.obraSocial,
           notas: paciente.notas,
         }}
       />

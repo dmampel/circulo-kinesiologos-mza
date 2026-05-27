@@ -5,6 +5,7 @@ export interface CreatePacienteData {
   apellido: string;
   telefono?: string;
   email?: string;
+  obraSocial?: string;
   notas?: string;
   profesionalId: string;
 }
@@ -14,6 +15,7 @@ export interface UpdatePacienteData {
   apellido?: string;
   telefono?: string;
   email?: string;
+  obraSocial?: string;
   notas?: string;
 }
 

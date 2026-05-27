@@ -245,6 +245,7 @@ model Paciente {
   apellido      String
   telefono      String?
   email         String?
+  obraSocial    String?
   notas         String?     @db.Text
   profesionalId String
   profesional   Profesional @relation(fields: [profesionalId], references: [id], onDelete: Cascade)

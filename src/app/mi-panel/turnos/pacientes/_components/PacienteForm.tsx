@@ -12,6 +12,7 @@ interface PacienteFormProps {
     apellido: string;
     telefono?: string | null;
     email?: string | null;
+    obraSocial?: string | null;
     notas?: string | null;
   };
 }
@@ -109,6 +110,18 @@ export default function PacienteForm({ id, initialValues }: PacienteFormProps) {
               className="w-full px-4 py-3 rounded-2xl bg-slate-50 border border-transparent focus:border-blue-300 focus:ring-2 focus:ring-blue-100 text-sm font-bold outline-none transition-all"
             />
           </div>
+        </div>
+
+        <div className="space-y-1.5">
+          <label className="text-[10px] font-black text-slate-400 uppercase tracking-widest ml-1">
+            Obra Social
+          </label>
+          <input
+            name="obraSocial"
+            defaultValue={initialValues?.obraSocial ?? ""}
+            placeholder="Ej: OSDE, Swiss Medical, PAMI..."
+            className="w-full px-4 py-3 rounded-2xl bg-slate-50 border border-transparent focus:border-blue-300 focus:ring-2 focus:ring-blue-100 text-sm font-bold outline-none transition-all"
+          />
         </div>
 
         <div className="space-y-1.5">
