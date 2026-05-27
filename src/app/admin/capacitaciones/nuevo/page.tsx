@@ -5,6 +5,8 @@ import { createCapacitacion } from "../actions";
 import { ArrowLeft, Save } from "lucide-react";
 import Link from "next/link";
 
+export const dynamic = "force-dynamic";
+
 export default function NuevaCapacitacionPage() {
   const [state, action, pending] = useActionState(createCapacitacion, null);
 

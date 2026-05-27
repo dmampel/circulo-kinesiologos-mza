@@ -36,23 +36,23 @@ export default function TextReveal({
 
   const itemVariants = {
     hidden: { y: "110%", opacity: 0 },
-    visible: { 
-      y: "0%", 
+    visible: {
+      y: "0%",
       opacity: 1,
-      transition: { duration: 0.8, ease: [0.22, 1, 0.36, 1] }
+      transition: { duration: 0.8, ease: [0.22, 1, 0.36, 1] as const }
     }
   };
 
   const slideVariants = {
     initial: { y: "105%", opacity: 0 },
     animate: { y: "0%", opacity: 1 },
-    transition: { duration: 0.7, ease: [0.25, 0.46, 0.45, 0.94], delay }
+    transition: { duration: 0.7, ease: [0.25, 0.46, 0.45, 0.94] as const, delay }
   };
 
   const blurVariants = {
     initial: { y: "40%", opacity: 0, filter: "blur(10px)" },
     animate: { y: "0%", opacity: 1, filter: "blur(0px)" },
-    transition: { duration: 1.2, ease: [0.22, 1, 0.36, 1], delay }
+    transition: { duration: 1.2, ease: [0.22, 1, 0.36, 1] as const, delay }
   };
 
   if (shouldReduceMotion) return <Tag className={className}>{children}</Tag>;

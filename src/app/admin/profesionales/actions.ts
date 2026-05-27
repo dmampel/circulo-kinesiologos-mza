@@ -1,6 +1,6 @@
 "use server";
 
-import { Prisma } from "@prisma/client";
+import { Prisma, Status } from "@prisma/client";
 import prisma from "@/lib/prisma";
 import { revalidatePath } from "next/cache";
 
@@ -17,7 +17,7 @@ type ProfesionalInput = {
   horarios?: string;
   foto_url?: string;
   localidadId: string;
-  status?: string;
+  status?: Status;
 };
 
 export async function getProfesionales(search?: string, especialidadId?: string, localidadId?: string) {
@@ -120,7 +120,7 @@ export async function saveProfesional(data: ProfesionalInput, especialidadIds: s
           horarios: data.horarios || null,
           foto_url: data.foto_url || null,
           localidadId: data.localidadId,
-          status: data.status || "ACTIVO",
+          status: data.status ?? Status.ACTIVO,
           especialidades: {
             connect: especialidadIds.map(id => ({ id }))
           }

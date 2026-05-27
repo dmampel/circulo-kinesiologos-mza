@@ -5,6 +5,8 @@ import Link from "next/link";
 import { cn } from "@/lib/utils";
 import AdminSearch from "../_components/AdminSearch";
 
+export const dynamic = "force-dynamic";
+
 export default async function CircularesAdminPage({
   searchParams,
 }: {

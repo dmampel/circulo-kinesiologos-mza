@@ -10,6 +10,8 @@ import { Plus, User, MapPin, Check, Ban } from "lucide-react";
 import { cn } from "@/lib/utils";
 import { EspecialidadRepository } from "@/lib/repositories/EspecialidadRepository";
 
+export const dynamic = "force-dynamic";
+
 export default async function ProfesionalesAdminPage({
   searchParams,
 }: {

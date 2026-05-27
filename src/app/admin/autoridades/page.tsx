@@ -10,6 +10,8 @@ import {
 import Link from "next/link";
 import DeleteAutoridadButton from "./_components/DeleteAutoridadButton";
 
+export const dynamic = "force-dynamic";
+
 export default async function AutoridadesAdminPage() {
   const autoridades = await AutoridadRepository.findAll();
 

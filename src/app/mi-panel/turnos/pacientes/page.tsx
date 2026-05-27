@@ -6,6 +6,8 @@ import Link from "next/link";
 import { UserPlus, Pencil, Users } from "lucide-react";
 import DeletePacienteButton from "./_components/DeletePacienteButton";
 
+export const dynamic = "force-dynamic";
+
 export default async function PacientesPage() {
   const supabase = await createClient();
   const { data: { user } } = await supabase.auth.getUser();

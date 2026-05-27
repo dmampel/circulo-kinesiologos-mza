@@ -4,6 +4,8 @@ import { AutoridadRepository } from "@/lib/repositories/AutoridadRepository";
 import { ProfesionalRepository } from "@/lib/repositories/ProfesionalRepository";
 import { ObraSocialRepository } from "@/lib/repositories/ObraSocialRepository";
 
+export const dynamic = "force-dynamic";
+
 export const metadata: Metadata = {
   title: "Institucional | Círculo de Kinesiólogos de Mendoza",
   description: "Conocé la historia, misión y autoridades del Círculo de Kinesiólogos de Mendoza. Institución que representa y agrupa a los profesionales de la kinesiología mendocina.",

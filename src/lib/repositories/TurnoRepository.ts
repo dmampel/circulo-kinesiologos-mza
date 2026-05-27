@@ -29,7 +29,7 @@ export class TurnoRepository {
         fecha: { gte: weekStart, lt: weekEnd },
       },
       include: {
-        paciente: { select: { id: true, nombre: true, apellido: true, telefono: true, email: true } },
+        paciente: { select: { id: true, nombre: true, apellido: true, telefono: true, email: true, obraSocial: true } },
       },
       orderBy: { fecha: "asc" },
     });

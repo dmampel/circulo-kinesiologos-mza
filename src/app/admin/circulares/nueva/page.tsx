@@ -3,6 +3,8 @@ import { ArrowLeft, Save } from "lucide-react";
 import Link from "next/link";
 import { redirect } from "next/navigation";
 
+export const dynamic = "force-dynamic";
+
 export default function NuevaCircularPage() {
   async function action(formData: FormData) {
     "use server";

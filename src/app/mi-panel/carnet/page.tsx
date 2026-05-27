@@ -3,6 +3,8 @@ import { ProfesionalRepository } from "@/lib/repositories/ProfesionalRepository"
 import { redirect } from "next/navigation";
 import CarnetFlip from "@/components/socio/CarnetFlip";
 
+export const dynamic = "force-dynamic";
+
 export default async function CarnetPage() {
   const supabase = await createClient();
   const { data: { user } } = await supabase.auth.getUser();

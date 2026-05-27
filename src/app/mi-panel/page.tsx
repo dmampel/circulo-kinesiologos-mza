@@ -17,6 +17,8 @@ import {
 import { TurnoRepository } from "@/lib/repositories/TurnoRepository";
 import Link from "next/link";
 
+export const dynamic = "force-dynamic";
+
 // ─── Helpers ─────────────────────────────────────────────────────────────────
 
 const DIAS_CORTO = ["DOM", "LUN", "MAR", "MIÉ", "JUE", "VIE", "SÁB"];
@@ -539,12 +541,14 @@ export default async function DashboardPage() {
             <p className="text-xs font-bold text-slate-900 mb-4">
               ¿Dudas administrativas?
             </p>
-            <Link
-              href="#"
+            <a
+              href={`https://wa.me/${process.env.NEXT_PUBLIC_WHATSAPP ?? ""}?text=${encodeURIComponent("Hola, tengo una consulta administrativa.")}`}
+              target="_blank"
+              rel="noopener noreferrer"
               className="inline-flex items-center justify-center px-4 py-2 bg-white border border-slate-200 hover:border-blue-200 hover:text-blue-600 rounded-xl text-[9px] font-black uppercase tracking-widest transition-all shadow-sm"
             >
-              Contactar
-            </Link>
+              Contactar por WhatsApp
+            </a>
           </div>
         </aside>
       </div>

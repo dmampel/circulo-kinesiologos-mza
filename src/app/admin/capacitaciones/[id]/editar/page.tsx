@@ -4,6 +4,8 @@ import { ArrowLeft } from "lucide-react";
 import Link from "next/link";
 import EditarCapacitacionForm from "./EditarCapacitacionForm";
 
+export const dynamic = "force-dynamic";
+
 export default async function EditarCapacitacionPage({
   params,
 }: {

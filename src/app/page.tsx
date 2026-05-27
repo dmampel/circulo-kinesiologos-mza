@@ -26,6 +26,8 @@ import { BeneficioRepository } from "@/lib/repositories/BeneficioRepository";
 import { NoticiaRepository } from "@/lib/repositories/NoticiaRepository";
 import { CapacitacionRepository } from "@/lib/repositories/CapacitacionRepository";
 
+export const dynamic = "force-dynamic";
+
 const TIPO_BADGE: Record<string, string> = {
   CURSO: "bg-blue-100 text-blue-700",
   TALLER: "bg-emerald-100 text-emerald-700",

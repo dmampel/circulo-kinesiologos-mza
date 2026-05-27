@@ -3,6 +3,8 @@ import { notFound } from "next/navigation";
 import EditBeneficioForm from "./EditBeneficioForm";
 import { CategoriaRepository } from "@/lib/repositories/CategoriaRepository";
 
+export const dynamic = "force-dynamic";
+
 interface Props {
   params: Promise<{ id: string }>;
 }

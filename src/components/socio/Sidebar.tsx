@@ -56,7 +56,7 @@ export default function Sidebar({ unreadCirculares = 0 }: { unreadCirculares?: n
   };
 
   return (
-    <aside className="w-80 h-full overflow-y-auto overflow-x-hidden bg-white border-r border-slate-100 flex flex-col px-6 py-5 relative">
+    <aside className="w-80 h-full overflow-hidden bg-white border-r border-slate-100 flex flex-col px-6 py-5 relative">
       {/* Brand */}
       <div className="flex items-center gap-3 px-2 mb-10">
         <div className="h-10 w-10 bg-blue-600 rounded-xl flex items-center justify-center text-white shadow-lg shadow-blue-500/20">

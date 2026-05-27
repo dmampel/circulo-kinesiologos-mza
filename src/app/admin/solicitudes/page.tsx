@@ -10,6 +10,8 @@ import { cn } from "@/lib/utils";
 import BotonesSolicitud from "./BotonesSolicitud";
 import AdminSearch from "../_components/AdminSearch";
 
+export const dynamic = "force-dynamic";
+
 export default async function SolicitudesAdminPage({
   searchParams,
 }: {

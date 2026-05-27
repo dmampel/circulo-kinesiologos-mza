@@ -5,6 +5,8 @@ import { TurnoRepository } from "@/lib/repositories/TurnoRepository";
 import { PacienteRepository } from "@/lib/repositories/PacienteRepository";
 import AgendaSemanal from "./AgendaSemanal";
 
+export const dynamic = "force-dynamic";
+
 function getLunesDeSemana(ref: Date): Date {
   const d = new Date(ref);
   d.setUTCHours(0, 0, 0, 0);

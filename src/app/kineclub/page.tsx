@@ -4,6 +4,8 @@ import { BeneficioRepository } from "@/lib/repositories/BeneficioRepository";
 import { CategoriaRepository } from "@/lib/repositories/CategoriaRepository";
 import { kineClubSearchSchema } from "@/lib/validations/searchParams";
 
+export const dynamic = "force-dynamic";
+
 export const metadata: Metadata = {
   title: "KineClub — Beneficios para Socios | CKM Mendoza",
   description: "Descubrí los descuentos y beneficios exclusivos para socios del Círculo de Kinesiólogos de Mendoza: farmacias, clínicas, librerías y más.",

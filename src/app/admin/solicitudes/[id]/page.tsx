@@ -19,6 +19,8 @@ import { notFound } from "next/navigation";
 import { cn } from "@/lib/utils";
 import BotonesSolicitud from "../BotonesSolicitud";
 
+export const dynamic = "force-dynamic";
+
 interface Props {
   params: Promise<{ id: string }>;
 }

@@ -20,6 +20,7 @@ export type TurnoConPacienteDetalle = {
     apellido: string;
     telefono: string | null;
     email: string | null;
+    obraSocial: string | null;
   };
 };
 
@@ -207,6 +208,14 @@ export default function TurnoDetailModal({ turno, pacientes, onClose, onEstadoCh
                   </div>
                 )}
               </div>
+
+              {/* Obra social */}
+              {turno.paciente.obraSocial && (
+                <div className="bg-slate-50 rounded-xl p-3">
+                  <p className="text-xs font-bold text-slate-400 uppercase tracking-wider mb-1">Obra Social</p>
+                  <p className="text-sm text-slate-700">{turno.paciente.obraSocial}</p>
+                </div>
+              )}
 
               {/* Contact */}
               {(turno.paciente.telefono || turno.paciente.email) && (

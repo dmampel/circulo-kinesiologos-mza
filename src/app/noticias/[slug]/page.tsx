@@ -8,6 +8,8 @@ import { Metadata } from "next";
 import ReactMarkdown from "react-markdown";
 import ShareButton from "./ShareButton";
 
+export const dynamic = "force-dynamic";
+
 interface Props {
   params: Promise<{ slug: string }>;
 }

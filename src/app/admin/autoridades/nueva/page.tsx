@@ -4,6 +4,8 @@ import Link from "next/link";
 import AdminSearch from "../../_components/AdminSearch";
 import AutoridadForm from "../_components/AutoridadForm";
 
+export const dynamic = "force-dynamic";
+
 export default async function NuevaAutoridadPage({
   searchParams,
 }: {

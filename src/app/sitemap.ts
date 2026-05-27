@@ -2,6 +2,8 @@ import { MetadataRoute } from "next";
 import { ProfesionalRepository } from "@/lib/repositories/ProfesionalRepository";
 import { NoticiaRepository } from "@/lib/repositories/NoticiaRepository";
 
+export const dynamic = "force-dynamic";
+
 const BASE_URL = process.env.NEXT_PUBLIC_SITE_URL ?? "https://www.circulokinesiologos.com.ar";
 
 const STATIC_ROUTES: MetadataRoute.Sitemap = [

@@ -3,6 +3,8 @@ import { ArrowLeft, CheckCircle2, XCircle, Clock } from "lucide-react";
 import Link from "next/link";
 import { cambiarEstadoInscripcion } from "../actions";
 
+export const dynamic = "force-dynamic";
+
 export default async function CapacitacionDetallePage({ params }: { params: Promise<{ id: string }> }) {
   const { id } = await params;
   const capacitacion = await CapacitacionRepository.findById(id);

@@ -15,6 +15,8 @@ import { eliminarNoticiaAction } from "./actions";
 import { CategoriaNoticiaRepository } from "@/lib/repositories/CategoriaNoticiaRepository";
 import CategoriaSidebar from "./CategoriaSidebar";
 
+export const dynamic = "force-dynamic";
+
 export default async function NoticiasAdminPage({
   searchParams,
 }: {

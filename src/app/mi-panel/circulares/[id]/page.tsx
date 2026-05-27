@@ -5,6 +5,8 @@ import Link from "next/link";
 import { ReadTracker } from "./ReadTracker";
 import { ArrowLeft, ExternalLink, FileText, Image as ImageIcon, File } from "lucide-react";
 
+export const dynamic = "force-dynamic";
+
 interface Props {
   params: Promise<{ id: string }>;
 }

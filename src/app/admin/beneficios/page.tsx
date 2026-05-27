@@ -15,6 +15,8 @@ import AdminSearch from "../_components/AdminSearch";
 import SafeLogoImage from "../_components/SafeLogoImage";
 import { eliminarBeneficioAction } from "./actions";
 
+export const dynamic = "force-dynamic";
+
 export default async function BeneficiosAdminPage({
   searchParams,
 }: {

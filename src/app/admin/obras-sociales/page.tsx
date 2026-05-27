@@ -1,6 +1,8 @@
 import { getObrasSociales } from "./actions";
 import ClientObrasSociales from "./ClientObrasSociales";
 
+export const dynamic = "force-dynamic";
+
 export default async function ObrasSocialesPage() {
   const obras = await getObrasSociales();
 

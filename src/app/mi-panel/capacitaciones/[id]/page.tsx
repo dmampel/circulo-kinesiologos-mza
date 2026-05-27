@@ -17,6 +17,8 @@ import {
 import BotonInscripcion from "@/components/socio/BotonInscripcion";
 import BotonCancelarInscripcion from "@/components/socio/BotonCancelarInscripcion";
 
+export const dynamic = "force-dynamic";
+
 function tieneHora(fecha: Date): boolean {
   return fecha.getUTCHours() !== 0 || fecha.getUTCMinutes() !== 0;
 }

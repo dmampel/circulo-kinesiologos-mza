@@ -6,6 +6,8 @@ import Link from "next/link";
 import { ArrowLeft } from "lucide-react";
 import PacienteForm from "../../_components/PacienteForm";
 
+export const dynamic = "force-dynamic";
+
 export default async function EditarPacientePage({
   params,
 }: {

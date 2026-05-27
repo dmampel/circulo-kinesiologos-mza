@@ -14,6 +14,8 @@ import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { crearBeneficio } from "../actions";
 
+export const dynamic = "force-dynamic";
+
 export default function NuevoBeneficioPage() {
   const router = useRouter();
   const [isPending, setIsPending] = useState(false);

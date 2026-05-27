@@ -4,6 +4,8 @@ import Link from "next/link";
 import { cn } from "@/lib/utils";
 import AdminSearch from "../_components/AdminSearch";
 
+export const dynamic = "force-dynamic";
+
 type CapacitacionListItem = Awaited<ReturnType<typeof CapacitacionRepository.findAll>>[number];
 
 export default async function CapacitacionesAdminPage({

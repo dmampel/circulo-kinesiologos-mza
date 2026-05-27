@@ -6,6 +6,8 @@ import Link from "next/link";
 import { ArrowRight, FileText, Megaphone } from "lucide-react";
 import { cn } from "@/lib/utils";
 
+export const dynamic = "force-dynamic";
+
 export default async function CircularesHistorialPage() {
   const supabase = await createClient();
   const {

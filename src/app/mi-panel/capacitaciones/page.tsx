@@ -7,6 +7,8 @@ import { BookOpen, Calendar, MapPin, CheckCircle2, Clock, XCircle } from "lucide
 import BotonInscripcion from "@/components/socio/BotonInscripcion";
 import BotonCancelarInscripcion from "@/components/socio/BotonCancelarInscripcion";
 
+export const dynamic = "force-dynamic";
+
 function InscripcionCard({ insc, profesionalId }: { insc: Inscripcion; profesionalId: string }) {
   return (
     <div className="bg-white rounded-2xl p-4 border border-slate-100 shadow-sm relative overflow-hidden group">

@@ -4,6 +4,8 @@ import { redirect } from "next/navigation";
 import { AlertCircle } from "lucide-react";
 import PerfilForm from "@/components/socio/PerfilForm";
 
+export const dynamic = "force-dynamic";
+
 export const metadata = {
   title: "Mi Perfil | CKM Portal",
   description: "Gestioná tus datos de contacto y foto de perfil profesional.",

@@ -15,6 +15,8 @@ import {
 import Link from "next/link";
 import { cn } from "@/lib/utils";
 
+export const dynamic = "force-dynamic";
+
 export default async function AdminDashboard() {
   const [
     profesionalesCount,

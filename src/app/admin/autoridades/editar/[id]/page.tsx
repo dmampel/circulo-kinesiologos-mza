@@ -4,6 +4,8 @@ import Link from "next/link";
 import { notFound } from "next/navigation";
 import AutoridadForm from "../../_components/AutoridadForm";
 
+export const dynamic = "force-dynamic";
+
 export default async function EditarAutoridadPage({
   params,
 }: {

@@ -3,6 +3,8 @@ import { NoticiaRepository } from "@/lib/repositories/NoticiaRepository";
 import { CategoriaNoticiaRepository } from "@/lib/repositories/CategoriaNoticiaRepository";
 import EditarNoticiaForm from "./EditarNoticiaForm";
 
+export const dynamic = "force-dynamic";
+
 export default async function EditarNoticiaPage({
   params,
 }: {

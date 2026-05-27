@@ -3,7 +3,7 @@
 import { useState } from "react";
 import { saveProfesional } from "./actions";
 import { useRouter } from "next/navigation";
-import { Localidad, Especialidad, Profesional } from "@prisma/client";
+import { Localidad, Especialidad, Profesional, Status } from "@prisma/client";
 
 interface FormProfesionalProps {
   profesional?: Profesional & { especialidades?: Especialidad[] };
@@ -25,18 +25,18 @@ export default function FormProfesional({ profesional, localidades, especialidad
     const formData = new FormData(e.currentTarget);
     const data = {
       id: profesional?.id,
-      nombre: formData.get("nombre"),
-      apellido: formData.get("apellido"),
-      matricula: formData.get("matricula"),
-      dni: formData.get("dni"),
-      email: formData.get("email"),
-      telefono: formData.get("telefono"),
-      whatsapp: formData.get("whatsapp"),
-      direccion: formData.get("direccion"),
-      horarios: formData.get("horarios"),
-      foto_url: formData.get("foto_url"),
-      localidadId: formData.get("localidadId"),
-      status: formData.get("status") || "ACTIVO",
+      nombre: formData.get("nombre") as string,
+      apellido: formData.get("apellido") as string,
+      matricula: formData.get("matricula") as string,
+      dni: formData.get("dni") as string | undefined,
+      email: formData.get("email") as string | undefined,
+      telefono: formData.get("telefono") as string | undefined,
+      whatsapp: formData.get("whatsapp") as string | undefined,
+      direccion: formData.get("direccion") as string | undefined,
+      horarios: formData.get("horarios") as string | undefined,
+      foto_url: formData.get("foto_url") as string | undefined,
+      localidadId: formData.get("localidadId") as string,
+      status: (formData.get("status") as Status) ?? Status.ACTIVO,
     };
 
     const res = await saveProfesional(data, selectedEspecialidades);

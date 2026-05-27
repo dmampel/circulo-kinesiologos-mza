@@ -2,6 +2,8 @@ import Link from "next/link";
 import { ArrowLeft } from "lucide-react";
 import PacienteForm from "../_components/PacienteForm";
 
+export const dynamic = "force-dynamic";
+
 export default function NuevoPacientePage() {
   return (
     <div className="max-w-2xl mx-auto space-y-8 pb-8">
