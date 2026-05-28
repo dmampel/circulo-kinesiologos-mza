@@ -1,3 +1,4 @@
+import Image from "next/image";
 import Link from "next/link";
 import { notFound } from "next/navigation";
 import { ArrowLeft, Newspaper } from "lucide-react";
@@ -62,11 +63,12 @@ export default async function NoticiaDetallePage({ params }: Props) {
 
             {/* Imagen hero */}
             {noticia.imagen_url ? (
-              <div className="aspect-video overflow-hidden bg-slate-100">
-                <img
+              <div className="relative aspect-video overflow-hidden bg-slate-100">
+                <Image
                   src={noticia.imagen_url}
                   alt={noticia.titulo}
-                  className="w-full h-full object-cover"
+                  fill
+                  className="object-cover"
                 />
               </div>
             ) : (
@@ -142,12 +144,13 @@ export default async function NoticiaDetallePage({ params }: Props) {
                     href={`/noticias/${n.slug}`}
                     className="group bg-white rounded-xl overflow-hidden shadow-sm border border-slate-200/60 hover:shadow-md hover:-translate-y-0.5 transition-all duration-200"
                   >
-                    <div className="aspect-video overflow-hidden bg-slate-100">
+                    <div className="relative aspect-video overflow-hidden bg-slate-100">
                       {n.imagen_url ? (
-                        <img
+                        <Image
                           src={n.imagen_url}
                           alt={n.titulo}
-                          className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-300"
+                          fill
+                          className="object-cover group-hover:scale-105 transition-transform duration-300"
                         />
                       ) : (
                         <div className="w-full h-full flex items-center justify-center">

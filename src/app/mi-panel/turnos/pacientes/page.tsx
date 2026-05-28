@@ -67,13 +67,14 @@ export default async function PacientesPage() {
                   <div className="h-10 w-10 rounded-2xl bg-blue-50 flex items-center justify-center text-blue-600 font-black text-sm shrink-0">
                     {p.apellido.charAt(0).toUpperCase()}
                   </div>
-                  <div>
+                  <div className="">
                     <p className="font-black text-slate-900 text-sm">
                       {p.apellido}, {p.nombre}
                     </p>
                     <p className="text-[11px] text-slate-400 font-medium">
-                      {[p.telefono, p.email].filter(Boolean).join(" · ") || "Sin datos de contacto"}
+                      {[p.telefono, p.email, p.obraSocial].filter(Boolean).join(" · ") || "Sin datos adicionales"}
                     </p>
+                    
                   </div>
                 </div>
 

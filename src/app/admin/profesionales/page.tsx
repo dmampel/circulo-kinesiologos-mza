@@ -1,3 +1,4 @@
+import Image from "next/image";
 import { getProfesionales } from "./actions";
 import ClientSearch from "./ClientSearch";
 import BotonesProfesional from "./BotonesProfesional";
@@ -84,9 +85,9 @@ export default async function ProfesionalesAdminPage({
                 <tr key={p.id} className="hover:bg-slate-50/50 transition-colors group">
                   <td className="px-8 py-6">
                     <div className="flex items-center space-x-4">
-                      <div className="h-12 w-12 rounded-xl bg-blue-50 flex items-center justify-center text-blue-600 font-bold overflow-hidden">
+                      <div className="relative h-12 w-12 rounded-xl bg-blue-50 flex items-center justify-center text-blue-600 font-bold overflow-hidden">
                         {p.foto_url ? (
-                          <img src={p.foto_url} alt={p.nombre} className="h-full w-full object-cover" />
+                          <Image src={p.foto_url} alt={p.nombre} fill className="object-cover" />
                         ) : (
                           `${p.nombre[0]}${p.apellido[0]}`
                         )}

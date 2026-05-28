@@ -1,4 +1,5 @@
 import type { Metadata } from "next";
+import Image from "next/image";
 import { LocalidadRepository } from "@/lib/repositories/LocalidadRepository";
 import { EspecialidadRepository } from "@/lib/repositories/EspecialidadRepository";
 import { ProfesionalRepository } from "@/lib/repositories/ProfesionalRepository";
@@ -178,12 +179,13 @@ export default async function ProfesionalesPage({ searchParams }: Props) {
                     className="bg-white p-7 rounded-[2.5rem] border border-slate-100 shadow-sm hover:shadow-xl hover:shadow-blue-500/5 hover:-translate-y-1 transition-all duration-300 group flex flex-col h-full"
                   >
                     <div className="flex items-start gap-6 mb-6">
-                      <div className="h-20 w-20 rounded-[1.5rem] bg-blue-50 flex items-center justify-center text-blue-600 overflow-hidden shrink-0 border border-blue-100 group-hover:scale-105 transition-transform duration-500">
+                      <div className="relative h-20 w-20 rounded-[1.5rem] bg-blue-50 flex items-center justify-center text-blue-600 overflow-hidden shrink-0 border border-blue-100 group-hover:scale-105 transition-transform duration-500">
                         {p.foto_url ? (
-                          <img
+                          <Image
                             src={p.foto_url}
                             alt={p.full_name || ""}
-                            className="h-full w-full object-cover"
+                            fill
+                            className="object-cover"
                           />
                         ) : (
                           <span className="text-xl font-black">

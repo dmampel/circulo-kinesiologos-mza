@@ -1,3 +1,4 @@
+import Image from "next/image";
 import Link from "next/link";
 import { Newspaper } from "lucide-react";
 import { NoticiaRepository } from "@/lib/repositories/NoticiaRepository";
@@ -119,12 +120,13 @@ export default async function NoticiasPage({ searchParams }: Props) {
                     href={`/noticias/${n.slug}`}
                     className="group bg-white rounded-2xl overflow-hidden border border-slate-100 hover:border-slate-200 hover:shadow-md hover:-translate-y-0.5 transition-all duration-200"
                   >
-                    <div className="aspect-video overflow-hidden bg-slate-100">
+                    <div className="relative aspect-video overflow-hidden bg-slate-100">
                       {n.imagen_url ? (
-                        <img
+                        <Image
                           src={n.imagen_url}
                           alt={n.titulo}
-                          className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-300"
+                          fill
+                          className="object-cover group-hover:scale-105 transition-transform duration-300"
                         />
                       ) : (
                         <div className="w-full h-full flex items-center justify-center">
@@ -234,9 +236,9 @@ export default async function NoticiasPage({ searchParams }: Props) {
                       href={`/noticias/${n.slug}`}
                       className="flex gap-3 px-4 py-3 hover:bg-slate-50 transition-colors group"
                     >
-                      <div className="w-14 h-12 shrink-0 rounded-lg overflow-hidden bg-slate-100">
+                      <div className="relative w-14 h-12 shrink-0 rounded-lg overflow-hidden bg-slate-100">
                         {n.imagen_url ? (
-                          <img src={n.imagen_url} alt={n.titulo} className="w-full h-full object-cover" />
+                          <Image src={n.imagen_url} alt={n.titulo} fill className="object-cover" />
                         ) : (
                           <div className="w-full h-full flex items-center justify-center">
                             <Newspaper className="h-3.5 w-3.5 text-slate-300" />

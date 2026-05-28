@@ -1,3 +1,4 @@
+import Image from "next/image";
 import Link from "next/link";
 import {
   Search,
@@ -192,7 +193,7 @@ export default async function Home() {
                 Convenios
               </span>
               <TextReveal className="text-4xl lg:text-5xl font-black text-slate-900 tracking-tighter leading-tight mb-6">
-                {obrasSociales.length - 9}+ obras sociales{" "}
+                {obrasSociales.length}+ obras sociales{" "}
                 <span className="text-slate-400">con convenio activo</span>
               </TextReveal>
               <p className="text-slate-500 leading-relaxed mb-10">
@@ -257,6 +258,7 @@ export default async function Home() {
                 >
                   <div className="flex items-start gap-4 mb-4">
                     {b.logo_url ? (
+                      // eslint-disable-next-line @next/next/no-img-element
                       <img
                         src={b.logo_url}
                         alt={b.empresa}
@@ -314,9 +316,9 @@ export default async function Home() {
                           href={`/noticias?noticia=${noticia.slug}`}
                           className="group block rounded-2xl overflow-hidden border border-slate-100 hover:shadow-md hover:-translate-y-0.5 transition-all bg-white"
                         >
-                          <div className="h-44 overflow-hidden bg-gradient-to-br from-blue-50 to-indigo-100">
+                          <div className="relative h-44 overflow-hidden bg-gradient-to-br from-blue-50 to-indigo-100">
                             {noticia.imagen_url
-                              ? <img src={noticia.imagen_url} alt={noticia.titulo} className="h-full w-full object-cover group-hover:scale-105 transition-transform duration-500" />
+                              ? <Image src={noticia.imagen_url} alt={noticia.titulo} fill className="object-cover group-hover:scale-105 transition-transform duration-500" />
                               : <div className="h-full w-full flex items-center justify-center"><Newspaper className="h-8 w-8 text-blue-200" /></div>
                             }
                           </div>

@@ -1,5 +1,6 @@
 "use client";
 
+import Image from "next/image";
 import { useState, useRef } from "react";
 import { QRCodeCanvas } from "qrcode.react";
 import { ShieldCheck, Copy, Check, MessageCircle, Mail } from "lucide-react";
@@ -133,9 +134,9 @@ export default function CarnetFlip({ profesional }: Props) {
               <div className="flex items-end justify-between">
                 <div className="flex items-center gap-3 sm:gap-6">
                   <div className="h-20 w-20 sm:h-28 sm:w-28 rounded-[1.5rem] sm:rounded-[2rem] bg-white/10 backdrop-blur-xl border border-white/20 p-1.5 overflow-hidden shadow-xl shrink-0">
-                    <div className="h-full w-full rounded-[1.2rem] sm:rounded-[1.6rem] bg-white/5 flex items-center justify-center overflow-hidden">
+                    <div className="relative h-full w-full rounded-[1.2rem] sm:rounded-[1.6rem] bg-white/5 flex items-center justify-center overflow-hidden">
                       {profesional.foto_url ? (
-                        <img src={profesional.foto_url} alt={profesional.nombre} className="h-full w-full object-cover" />
+                        <Image src={profesional.foto_url} alt={profesional.nombre} fill className="object-cover" />
                       ) : (
                         <span className="text-4xl font-black text-white opacity-40">
                           {profesional.nombre[0]}{profesional.apellido[0]}
@@ -194,7 +195,7 @@ export default function CarnetFlip({ profesional }: Props) {
                   <QRCodeCanvas value={url} size={140} bgColor="#ffffff" fgColor="#0f172a" level="M" />
                 </div>
                 <p className="text-white/25 text-[8px] font-medium text-center tracking-wide">
-                  ckmendoza.com.ar/profesionales/{profesional.slug}
+                  {BASE_URL.replace(/^https?:\/\//, "")}/profesionales/{profesional.slug}
                 </p>
               </div>
 

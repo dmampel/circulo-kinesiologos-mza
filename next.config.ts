@@ -6,6 +6,11 @@ const nextConfig: NextConfig = {
       bodySizeLimit: '50mb',
     },
   },
+  images: {
+    remotePatterns: [
+      { protocol: 'https', hostname: '**' },
+    ],
+  },
 };
 
 export default nextConfig;

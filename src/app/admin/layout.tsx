@@ -27,7 +27,7 @@ export default async function AdminLayout({
     <div className="flex min-h-screen bg-slate-50 font-sans">
       <AdminSidebar />
       {/* Main Content Area */}
-      <main className="flex-grow lg:pl-64">
+      <main className="flex-grow lg:ml-64">
         {/* Viewport */}
         <div className="pt-20 p-8">{children}</div>
       </main>

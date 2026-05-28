@@ -144,6 +144,7 @@ export default function ClientObrasSociales({ initialObras }: ClientObrasSociale
                 
                 <div className="h-12 w-12 rounded-xl border border-slate-100 overflow-hidden flex-shrink-0 bg-slate-50 flex items-center justify-center mr-4">
                   {obra.logo_url ? (
+                    // eslint-disable-next-line @next/next/no-img-element
                     <img src={obra.logo_url} alt={obra.nombre} className="h-full w-full object-contain p-1" />
                   ) : (
                     <ImageIcon className="h-5 w-5 text-slate-300" />

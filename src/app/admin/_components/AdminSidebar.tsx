@@ -56,8 +56,11 @@ export default function AdminSidebar() {
 
       {/* Sidebar */}
       <aside className="w-64 bg-slate-900 text-white fixed h-full z-20 hidden lg:flex flex-col">
-        <div className="p-8 border-b border-slate-800">
-          <div>
+        <div className="p-6">
+          <div className="flex items-center gap-3">
+            <div className="h-10 w-10 rounded-xl bg-slate-100 flex items-center justify-center text-slate-400">
+              <ShieldCheck className="h-6 w-6" />
+          </div>
             <p className="font-black tracking-tight text-lg text-white">Panel de Admin</p>
           </div>
         </div>
@@ -105,25 +108,7 @@ export default function AdminSidebar() {
       </aside>
 
       {/* Topbar */}
-      <header className="h-20 bg-white border-b sticky top-0 z-10 flex items-center justify-between px-4 sm:px-8">
-        <div className="flex items-center gap-3">
-          <h2 className="text-sm font-black text-slate-400 uppercase tracking-widest">
-            {SIDEBAR_LINKS.find((l) => l.href === pathname)?.name ||
-              "Administración"}
-          </h2>
-        </div>
-        <div className="flex items-center space-x-4">
-          <div className="text-right hidden sm:block">
-            <p className="text-sm font-black text-slate-900">Admin General</p>
-            <p className="text-[10px] font-bold text-slate-400 uppercase tracking-wider">
-              Círculo Mendoza
-            </p>
-          </div>
-          <div className="h-10 w-10 rounded-xl bg-slate-100 flex items-center justify-center text-slate-400">
-            <ShieldCheck className="h-6 w-6" />
-          </div>
-        </div>
-      </header>
+      
     </>
   );
 }

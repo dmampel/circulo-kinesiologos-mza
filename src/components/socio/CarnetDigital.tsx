@@ -1,5 +1,6 @@
 "use client";
 
+import Image from "next/image";
 import { motion } from "framer-motion";
 import { ShieldCheck } from "lucide-react";
 import CarnetQR from "@/components/socio/CarnetQR";
@@ -62,12 +63,13 @@ export default function CarnetDigital({ profesional, slug }: Props) {
           <div className="flex items-center gap-3 sm:gap-6">
             {/* Foto o Iniciales */}
             <div className="h-20 w-20 sm:h-28 sm:w-28 rounded-[1.5rem] sm:rounded-[2rem] bg-white/10 backdrop-blur-xl border border-white/20 p-1.5 overflow-hidden shadow-xl shrink-0">
-              <div className="h-full w-full rounded-[1.2rem] sm:rounded-[1.6rem] bg-white/5 flex items-center justify-center text-white overflow-hidden">
+              <div className="relative h-full w-full rounded-[1.2rem] sm:rounded-[1.6rem] bg-white/5 flex items-center justify-center text-white overflow-hidden">
                 {profesional.foto_url ? (
-                  <img 
-                    src={profesional.foto_url} 
-                    alt={profesional.nombre} 
-                    className="h-full w-full object-cover"
+                  <Image
+                    src={profesional.foto_url}
+                    alt={profesional.nombre}
+                    fill
+                    className="object-cover"
                   />
                 ) : (
                   <span className="text-4xl font-black opacity-40">

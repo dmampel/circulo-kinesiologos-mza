@@ -45,6 +45,7 @@ export default function ObrasSocialesGrid({ obrasSociales }: { obrasSociales: Ob
             >
               <div className="h-24 w-full rounded-2xl bg-slate-50 flex items-center justify-center mb-6 overflow-hidden border border-slate-100 p-4">
                 {os.logo_url ? (
+                  // eslint-disable-next-line @next/next/no-img-element
                   <img
                     src={os.logo_url}
                     alt={os.nombre}

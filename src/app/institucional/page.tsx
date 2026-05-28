@@ -1,4 +1,5 @@
 import type { Metadata } from "next";
+import Image from "next/image";
 import { FileText, ArrowUpRight } from "lucide-react";
 import { AutoridadRepository } from "@/lib/repositories/AutoridadRepository";
 import { ProfesionalRepository } from "@/lib/repositories/ProfesionalRepository";
@@ -201,12 +202,13 @@ export default async function InstitucionalPage() {
                 Presidencia
               </span>
               <div className="flex flex-col md:flex-row items-start md:items-end gap-8 md:gap-12">
-                <div className="h-24 w-24 md:h-28 md:w-28 2xl:h-32 2xl:w-32 rounded-[2rem] bg-blue-600 flex items-center justify-center text-4xl font-black text-white shrink-0 overflow-hidden">
+                <div className="relative h-24 w-24 md:h-28 md:w-28 2xl:h-32 2xl:w-32 rounded-[2rem] bg-blue-600 flex items-center justify-center text-4xl font-black text-white shrink-0 overflow-hidden">
                   {presidente.profesional.foto_url ? (
-                    <img
+                    <Image
                       src={presidente.profesional.foto_url}
                       alt={presidente.profesional.full_name || ""}
-                      className="h-full w-full object-cover"
+                      fill
+                      className="object-cover"
                     />
                   ) : (
                     getInitials(presidente.profesional.nombre, presidente.profesional.apellido)
@@ -229,13 +231,14 @@ export default async function InstitucionalPage() {
                 }`}
               >
                 <div
-                  className={`h-11 w-11 rounded-xl ${AVATAR_COLORS[i % AVATAR_COLORS.length]} flex items-center justify-center text-sm font-black text-white shrink-0 overflow-hidden`}
+                  className={`relative h-11 w-11 rounded-xl ${AVATAR_COLORS[i % AVATAR_COLORS.length]} flex items-center justify-center text-sm font-black text-white shrink-0 overflow-hidden`}
                 >
                   {miembro.profesional.foto_url ? (
-                    <img 
-                      src={miembro.profesional.foto_url} 
-                      alt={miembro.profesional.full_name || ""} 
-                      className="h-full w-full object-cover"
+                    <Image
+                      src={miembro.profesional.foto_url}
+                      alt={miembro.profesional.full_name || ""}
+                      fill
+                      className="object-cover"
                     />
                   ) : (
                     getInitials(miembro.profesional.nombre, miembro.profesional.apellido)

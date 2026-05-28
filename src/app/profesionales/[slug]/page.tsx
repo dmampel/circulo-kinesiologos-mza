@@ -1,4 +1,5 @@
 import type { Metadata } from "next";
+import Image from "next/image";
 import prisma from "@/lib/prisma";
 import { notFound } from "next/navigation";
 import {
@@ -76,12 +77,13 @@ export default async function PerfilProfesionalPage({ params }: Props) {
 
           <div className="flex flex-col md:flex-row items-center md:items-end gap-10">
             <div className="h-48 w-48 rounded-[3rem] bg-white p-2 shadow-2xl shadow-blue-500/20 relative z-20 shrink-0 group">
-              <div className="h-full w-full rounded-[2.5rem] bg-blue-50 flex items-center justify-center text-blue-600 overflow-hidden border border-slate-100">
+              <div className="relative h-full w-full rounded-[2.5rem] bg-blue-50 flex items-center justify-center text-blue-600 overflow-hidden border border-slate-100">
                 {profesional.foto_url ? (
-                  <img
+                  <Image
                     src={profesional.foto_url}
                     alt={profesional.full_name || ""}
-                    className="h-full w-full object-cover group-hover:scale-110 transition-transform duration-700"
+                    fill
+                    className="object-cover group-hover:scale-110 transition-transform duration-700"
                   />
                 ) : (
                   <span className="text-5xl font-black">

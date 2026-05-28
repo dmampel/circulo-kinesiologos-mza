@@ -1,3 +1,4 @@
+import Image from "next/image";
 import prisma from "@/lib/prisma";
 import {
   Plus,
@@ -104,12 +105,13 @@ export default async function NoticiasAdminPage({
                   <tr key={n.id} className="hover:bg-slate-50/50 transition-colors group">
                     <td className="px-8 py-6">
                       <div className="flex items-center space-x-4">
-                        <div className="h-14 w-20 rounded-xl bg-slate-100 overflow-hidden shrink-0 border border-slate-200">
+                        <div className="relative h-14 w-20 rounded-xl bg-slate-100 overflow-hidden shrink-0 border border-slate-200">
                           {n.imagen_url ? (
-                            <img
+                            <Image
                               src={n.imagen_url}
                               alt=""
-                              className="h-full w-full object-cover"
+                              fill
+                              className="object-cover"
                             />
                           ) : (
                             <div className="h-full w-full flex items-center justify-center text-slate-300">

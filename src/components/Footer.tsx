@@ -50,16 +50,15 @@ export default function Footer() {
           <div>
             <h3 className="text-white font-black text-xs uppercase tracking-widest mb-5">Institucional</h3>
             <ul className="space-y-3 text-sm">
-              {[
-                { label: "Sobre Nosotros", href: "/nosotros" },
-                { label: "Autoridades", href: "/autoridades" },
-                { label: "Estatutos", href: "/estatuto" },
-                { label: "Contacto", href: "/contacto" },
-              ].map(({ label, href }) => (
-                <li key={label}>
-                  <Link href={href} className="hover:text-white transition-colors">{label}</Link>
-                </li>
-              ))}
+              <li>
+                <Link href="/institucional" className="hover:text-white transition-colors">Sobre Nosotros</Link>
+              </li>
+              <li>
+                <Link href="/institucional" className="hover:text-white transition-colors">Autoridades</Link>
+              </li>
+              <li>
+                <a href="/estatuto.pdf" target="_blank" rel="noopener noreferrer" className="hover:text-white transition-colors">Estatutos</a>
+              </li>
             </ul>
           </div>
 
@@ -70,7 +69,7 @@ export default function Footer() {
                 { label: "Padrón de Profesionales", href: "/profesionales" },
                 { label: "Obras Sociales", href: "/obras-sociales" },
                 { label: "KineClub", href: "/kineclub" },
-                { label: "Capacitaciones", href: "/capacitaciones" },
+                { label: "Noticias", href: "/noticias" },
               ].map(({ label, href }) => (
                 <li key={label}>
                   <Link href={href} className="hover:text-white transition-colors">{label}</Link>
@@ -120,7 +119,7 @@ export default function Footer() {
 
         {/* Bottom */}
         <div className="py-6 flex flex-col md:flex-row justify-between items-center gap-4 text-xs text-slate-600 uppercase tracking-widest">
-          <p>© {currentYear} Círculo de Kinesiólogos de Mendoza</p>
+          <p>© {currentYear} Círculo de Kinesiólogos y Fisioterapeutas de Mendoza</p>
           <Link href="/registro" className="flex items-center gap-1 text-slate-500 hover:text-white transition-colors">
             Asociate <ArrowUpRight className="h-3 w-3" />
           </Link>

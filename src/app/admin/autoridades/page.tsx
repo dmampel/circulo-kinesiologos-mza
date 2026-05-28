@@ -1,3 +1,4 @@
+import Image from "next/image";
 import { AutoridadRepository } from "@/lib/repositories/AutoridadRepository";
 import {
   Plus,
@@ -83,12 +84,13 @@ export default async function AutoridadesAdminPage() {
                     </td>
                     <td className="px-8 py-6">
                       <div className="flex items-center space-x-4">
-                        <div className="h-12 w-12 rounded-xl bg-slate-100 overflow-hidden shrink-0 border border-slate-200 flex items-center justify-center text-slate-400">
+                        <div className="relative h-12 w-12 rounded-xl bg-slate-100 overflow-hidden shrink-0 border border-slate-200 flex items-center justify-center text-slate-400">
                           {a.profesional.foto_url ? (
-                            <img
+                            <Image
                               src={a.profesional.foto_url}
                               alt=""
-                              className="h-full w-full object-cover"
+                              fill
+                              className="object-cover"
                             />
                           ) : (
                             <Users className="h-5 w-5" />
