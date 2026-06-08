@@ -1,5 +1,6 @@
 import { login } from "@/app/auth/actions";
 import { ShieldCheck, Mail, Lock, ArrowRight } from "lucide-react";
+import Image from "next/image";
 import Link from "next/link";
 
 export default async function LoginPage({
@@ -12,10 +13,10 @@ export default async function LoginPage({
     <div className="min-h-screen bg-slate-50 flex items-center justify-center p-4">
       <div className="max-w-md w-full">
         {/* Logo / Brand */}
-        <div className="text-center mb-10">
+        <div className="text-center mb-5">
           <Link href="/" className="inline-flex items-center space-x-2 text-slate-900 group">
-            <div className="h-12 w-12 bg-blue-600 rounded-2xl flex items-center justify-center text-white shadow-lg shadow-blue-200 group-hover:scale-110 transition-transform">
-              <span className="font-black text-xl">CK</span>
+            <div className="h-12 w-12 bg-blue-200 rounded-2xl flex items-center justify-center text-white shadow-lg shadow-blue-200">
+              <Image src="/icon.png" alt="Círculo de Kinesiólogos de Mendoza" width={120} height={40} className="w-auto rounded-2xl" />
             </div>
             <div className="text-left">
               <span className="block font-black text-xl tracking-tighter">Círculo Kinesiologos y Fisioterapeutas</span>

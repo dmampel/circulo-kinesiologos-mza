@@ -23,6 +23,7 @@ import { twMerge } from "tailwind-merge";
 import { motion } from "framer-motion";
 import { createClient } from "@/utils/supabase/client";
 import { useRouter } from "next/navigation";
+import Image from "next/image";
 
 function cn(...inputs: any[]) {
   return twMerge(clsx(inputs));
@@ -59,8 +60,8 @@ export default function Sidebar({ unreadCirculares = 0 }: { unreadCirculares?: n
     <aside className="w-80 h-full overflow-hidden bg-white border-r border-slate-100 flex flex-col px-6 py-5 relative">
       {/* Brand */}
       <div className="flex items-center gap-3 px-2 mb-10">
-        <div className="h-10 w-10 bg-blue-600 rounded-xl flex items-center justify-center text-white shadow-lg shadow-blue-500/20">
-          <ShieldCheck className="h-6 w-6" />
+        <div className="h-10 w-10 bg-blue-200 rounded-xl flex items-center justify-center text-white shadow-lg shadow-blue-500/20">
+          <Image src="/icon.png" alt="Círculo de Kinesiólogos de Mendoza" width={120} height={40} className="w-auto rounded-2xl" />
         </div>
         <div>
           <h1 className="font-black text-slate-900 leading-none tracking-tighter">
