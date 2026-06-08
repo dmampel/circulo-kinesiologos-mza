@@ -18,6 +18,8 @@ import {
   Monitor,
 } from "lucide-react";
 import { cn } from "@/lib/utils";
+import { createClient } from "@/utils/supabase/client";
+import { useRouter } from "next/navigation";
 
 const SIDEBAR_LINKS: {
   name: string;
@@ -38,6 +40,13 @@ const SIDEBAR_LINKS: {
 
 export default function AdminSidebar() {
   const pathname = usePathname();
+  const router = useRouter();
+
+  async function handleLogout() {
+    const supabase = createClient();
+    await supabase.auth.signOut();
+    router.push("/login");
+  }
 
   return (
     <>
@@ -101,7 +110,7 @@ export default function AdminSidebar() {
           >
             <Globe className="mr-3 h-5 w-5" /> Volver al Sitio
           </Link>
-          <button className="flex items-center w-full px-4 py-3 text-sm font-bold text-slate-400 hover:text-red-400 transition-colors">
+          <button onClick={handleLogout} className="flex items-center w-full px-4 py-3 text-sm font-bold text-slate-400 hover:text-red-400 transition-colors">
             <LogOut className="mr-3 h-5 w-5" /> Cerrar Sesión
           </button>
         </div>

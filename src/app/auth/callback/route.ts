@@ -1,20 +1,24 @@
 import { createClient } from "@/utils/supabase/server";
+import prisma from "@/lib/prisma";
 import { NextResponse } from "next/server";
 
 export async function GET(request: Request) {
   const { searchParams, origin } = new URL(request.url);
   const code = searchParams.get("code");
-  // Si hay un parámetro 'next', lo usamos, si no vamos al panel
   const next = searchParams.get("next") ?? "/mi-panel";
 
   if (code) {
     const supabase = await createClient();
-    const { error } = await supabase.auth.exchangeCodeForSession(code);
-    if (!error) {
-      return NextResponse.redirect(`${origin}${next}`);
+    const { data, error } = await supabase.auth.exchangeCodeForSession(code);
+    if (!error && data.user) {
+      const profesional = await prisma.profesional.findUnique({
+        where: { userId: data.user.id },
+        select: { role: true },
+      });
+      const destination = profesional?.role === "ADMIN" ? "/admin" : next;
+      return NextResponse.redirect(`${origin}${destination}`);
     }
   }
 
-  // En caso de error o si no hay código, volvemos al login
   return NextResponse.redirect(`${origin}/login?error=Invalid or expired token`);
 }

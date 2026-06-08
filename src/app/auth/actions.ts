@@ -25,12 +25,11 @@ export async function login(formData: FormData) {
 
   revalidatePath("/", "layout");
 
-  if (profesional) {
-    redirect("/mi-panel");
+  if (profesional?.role === "ADMIN") {
+    redirect("/admin");
   }
 
-  // Por defecto, si no es profesional pero tiene acceso, asumo que es admin o un profesional sin perfil
-  redirect("/admin");
+  redirect("/mi-panel");
 }
 
 export async function signup(formData: FormData) {

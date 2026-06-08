@@ -18,7 +18,7 @@ export default async function LoginPage({
               <span className="font-black text-xl">CK</span>
             </div>
             <div className="text-left">
-              <span className="block font-black text-xl tracking-tighter">Círculo Kinesiología</span>
+              <span className="block font-black text-xl tracking-tighter">Círculo Kinesiologos y Fisioterapeutas</span>
               <span className="block text-[10px] font-bold text-slate-400 uppercase tracking-widest">Panel de Acceso</span>
             </div>
           </Link>

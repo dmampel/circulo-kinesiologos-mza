@@ -315,7 +315,7 @@ export default async function InstitucionalPage() {
                 href="mailto:presidencia@kinesiologosmza.com"
                 className="text-base md:text-lg font-bold text-blue-600 hover:underline underline-offset-4 break-all"
               >
-                presidencia@kinesiologosmza.com
+                kinesiologosmza@gmail.com
               </a>
             </div>
             <div className="pt-10 md:pt-0 md:pl-10">

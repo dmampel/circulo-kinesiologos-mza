@@ -18,6 +18,8 @@ import {
   X,
 } from "lucide-react";
 import { cn } from "@/lib/utils";
+import { createClient } from "@/utils/supabase/client";
+import { useRouter } from "next/navigation";
 
 const SIDEBAR_LINKS = [
   { name: "Resumen", href: "/admin", icon: LayoutDashboard },
@@ -38,6 +40,13 @@ interface Props {
 
 export default function AdminMobileSidebar({ open, onClose }: Props) {
   const pathname = usePathname();
+  const router = useRouter();
+
+  async function handleLogout() {
+    const supabase = createClient();
+    await supabase.auth.signOut();
+    router.push("/login");
+  }
 
   useEffect(() => {
     const timer = setTimeout(onClose, 0);
@@ -121,7 +130,7 @@ export default function AdminMobileSidebar({ open, onClose }: Props) {
           >
             <Globe className="mr-3 h-5 w-5" /> Volver al Sitio
           </Link>
-          <button className="flex items-center w-full px-4 py-3 text-sm font-bold text-slate-400 hover:text-red-400 transition-colors rounded-xl">
+          <button onClick={handleLogout} className="flex items-center w-full px-4 py-3 text-sm font-bold text-slate-400 hover:text-red-400 transition-colors rounded-xl">
             <LogOut className="mr-3 h-5 w-5" /> Cerrar Sesión
           </button>
         </div>

@@ -74,8 +74,7 @@ export default function RegistroPage() {
       return formData.matricula && formData.especialidad && formData.direccion && formData.localidadId;
     }
     if (step === 3) {
-      // Validamos que al menos DNI, Título y Matrícula estén cargados
-      return archivos.dni && archivos.titulo && archivos.matricula_file;
+      return archivos.dni && archivos.titulo && archivos.cuit && archivos.seguro && archivos.cv && archivos.matricula_file;
     }
     return true;
   };
