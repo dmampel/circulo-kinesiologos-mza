@@ -37,27 +37,26 @@ export default function Pagination({ totalPages, currentPage }: Props) {
   );
 
   return (
-    <div className="flex items-center justify-center space-x-2 mt-16">
+    <div className="flex items-center justify-center space-x-1 md:space-x-2 mt-8 md:mt-16">
       <button
         onClick={() => handlePageChange(currentPage - 1)}
         disabled={currentPage === 1}
-        className="p-3 rounded-2xl bg-white border border-slate-200 text-slate-600 hover:bg-slate-50 disabled:opacity-30 disabled:hover:bg-white transition-all shadow-sm"
+        className="p-2 md:p-3 rounded-xl md:rounded-2xl bg-white border border-slate-200 text-slate-600 hover:bg-slate-50 disabled:opacity-30 disabled:hover:bg-white transition-all shadow-sm"
       >
-        <ChevronLeft className="h-5 w-5" />
+        <ChevronLeft className="h-4 w-4 md:h-5 md:w-5" />
       </button>
 
-      <div className="flex items-center space-x-2">
-        {pages.map((page, index) => {
-          // Mostrar el separador de "..."
-          const showEllipsis = index > 0 && page - pages[index - 1] > 1;
-          
+      <div className="flex items-center space-x-1 md:space-x-2">
+        {visiblePages.map((page, index) => {
+          const showEllipsis = index > 0 && page - visiblePages[index - 1] > 1;
+
           return (
-            <div key={page} className="flex items-center space-x-2">
-              {showEllipsis && <span className="text-slate-400 font-bold px-2">...</span>}
+            <div key={page} className="flex items-center space-x-1 md:space-x-2">
+              {showEllipsis && <span className="text-slate-400 font-bold px-1 md:px-2 text-xs md:text-sm">...</span>}
               <button
                 onClick={() => handlePageChange(page)}
                 className={cn(
-                  "h-12 w-12 rounded-2xl text-sm font-black transition-all",
+                  "h-9 w-9 md:h-12 md:w-12 rounded-xl md:rounded-2xl text-xs md:text-sm font-black transition-all",
                   currentPage === page
                     ? "bg-blue-600 text-white shadow-lg shadow-blue-200"
                     : "bg-white border border-slate-200 text-slate-600 hover:bg-slate-50 shadow-sm"
@@ -73,9 +72,9 @@ export default function Pagination({ totalPages, currentPage }: Props) {
       <button
         onClick={() => handlePageChange(currentPage + 1)}
         disabled={currentPage === totalPages}
-        className="p-3 rounded-2xl bg-white border border-slate-200 text-slate-600 hover:bg-slate-50 disabled:opacity-30 disabled:hover:bg-white transition-all shadow-sm"
+        className="p-2 md:p-3 rounded-xl md:rounded-2xl bg-white border border-slate-200 text-slate-600 hover:bg-slate-50 disabled:opacity-30 disabled:hover:bg-white transition-all shadow-sm"
       >
-        <ChevronRight className="h-5 w-5" />
+        <ChevronRight className="h-4 w-4 md:h-5 md:w-5" />
       </button>
     </div>
   );

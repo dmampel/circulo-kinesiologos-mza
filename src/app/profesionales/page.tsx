@@ -93,7 +93,7 @@ export default async function ProfesionalesPage({ searchParams }: Props) {
       </div>
 
       {/* Main Content */}
-      <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8 -mt-24 relative z-20">
+      <div className="mx-auto max-w-9xl lg:max-w-9xl px-4 sm:px-6 lg:px-8 -mt-24 relative z-20">
         {/* Controles de Búsqueda Flotantes sobre la Onda */}
         <div className="mb-8 max-w-5xl mx-auto">
           {/* ... SearchInput and filters ... */}
@@ -172,68 +172,79 @@ export default async function ProfesionalesPage({ searchParams }: Props) {
             </div>
           ) : (
             <>
-              <div className="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-2 gap-6">
+              <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-2 md:gap-6">
                 {profesionales.map((p) => (
                   <div
                     key={p.id}
-                    className="bg-white p-7 rounded-[2.5rem] border border-slate-100 shadow-sm hover:shadow-xl hover:shadow-blue-500/5 hover:-translate-y-1 transition-all duration-300 group flex flex-col h-full"
+                    className="bg-white border border-slate-100 shadow-sm hover:shadow-xl hover:shadow-blue-500/5 transition-all duration-300 group
+                               flex flex-row items-center gap-3 p-3 rounded-2xl
+                               md:flex-col md:items-start md:p-7 md:rounded-[2.5rem] md:hover:-translate-y-1 md:h-full"
                   >
-                    <div className="flex items-start gap-6 mb-6">
-                      <div className="relative h-20 w-20 rounded-[1.5rem] bg-blue-50 flex items-center justify-center text-blue-600 overflow-hidden shrink-0 border border-blue-100 group-hover:scale-105 transition-transform duration-500">
-                        {p.foto_url ? (
-                          <Image
-                            src={p.foto_url}
-                            alt={p.full_name || ""}
-                            fill
-                            className="object-cover"
-                          />
+                    {/* Avatar */}
+                    <div className="relative h-11 w-11 rounded-xl bg-blue-50 flex items-center justify-center text-blue-600 overflow-hidden shrink-0 border border-blue-100
+                                    md:h-20 md:w-20 md:rounded-[1.5rem] md:group-hover:scale-105 md:transition-transform md:duration-500">
+                      {p.foto_url ? (
+                        <Image
+                          src={p.foto_url}
+                          alt={p.full_name || ""}
+                          fill
+                          className="object-cover"
+                        />
+                      ) : (
+                        <span className="text-sm font-black md:text-xl">
+                          {p.nombre[0]}
+                          {p.apellido[0]}
+                        </span>
+                      )}
+                    </div>
+
+                    {/* Info */}
+                    <div className="flex-grow min-w-0 md:w-full md:mt-0">
+                      <span className="text-[10px] font-bold text-slate-400 uppercase tracking-widest md:bg-slate-50 md:px-2 md:py-1 md:rounded-lg md:inline-block md:mb-1">
+                        M.P. {p.matricula}
+                      </span>
+                      <h3 className="text-sm font-black text-slate-900 group-hover:text-blue-600 transition-colors capitalize leading-tight line-clamp-1
+                                     md:text-xl md:line-clamp-2 md:mb-2">
+                        {p.apellido}, {p.nombre}
+                      </h3>
+
+                      {/* Localidad — always visible */}
+                      <div className="flex items-center text-xs text-slate-500 font-medium md:text-sm">
+                        <MapPin className="h-3 w-3 mr-1 text-slate-300 shrink-0 md:h-4 md:w-4 md:mr-2" />
+                        <span className="truncate">{p.localidad.nombre}</span>
+                      </div>
+
+                      {/* Especialidades — only on desktop */}
+                      <div className="hidden md:flex flex-wrap gap-1 mt-2">
+                        {p.especialidades.length > 0 ? (
+                          p.especialidades.map((e: { id: string; nombre: string }) => (
+                            <span
+                              key={e.id}
+                              className="flex items-center text-xs text-blue-600 font-bold bg-blue-50/50 px-3 py-1 rounded-full border border-blue-100/50"
+                            >
+                              <Award className="h-3.5 w-3.5 mr-1.5 shrink-0" />
+                              {e.nombre}
+                            </span>
+                          ))
                         ) : (
-                          <span className="text-xl font-black">
-                            {p.nombre[0]}
-                            {p.apellido[0]}
+                          <span className="flex items-center text-xs text-blue-600 font-bold bg-blue-50/50 px-3 py-1 rounded-full border border-blue-100/50">
+                            <Award className="h-3.5 w-3.5 mr-1.5 shrink-0" />
+                            Kinesiología General
                           </span>
                         )}
                       </div>
-                      <div className="flex-grow">
-                        <div className="flex items-center justify-between mb-1">
-                          <span className="text-[10px] font-bold text-slate-400 uppercase tracking-widest bg-slate-50 px-2 py-1 rounded-lg">
-                            M.P. {p.matricula}
-                          </span>
-                        </div>
-                        <h3 className="text-xl font-black text-slate-900 group-hover:text-blue-600 transition-colors capitalize leading-tight mb-2 line-clamp-2">
-                          {p.apellido}, {p.nombre}
-                        </h3>
-
-                        <div className="space-y-2">
-                          <div className="flex items-center text-sm text-slate-500 font-medium">
-                            <MapPin className="h-4 w-4 mr-2 text-slate-300 shrink-0" />
-                            <span className="truncate">
-                              {p.localidad.nombre}
-                            </span>
-                          </div>
-                          <div className="flex flex-wrap gap-1 mt-1">
-                            {p.especialidades.length > 0 ? (
-                              p.especialidades.map((e: { id: string; nombre: string }) => (
-                                <span
-                                  key={e.id}
-                                  className="flex items-center text-xs text-blue-600 font-bold bg-blue-50/50 px-3 py-1 rounded-full border border-blue-100/50"
-                                >
-                                  <Award className="h-3.5 w-3.5 mr-1.5 shrink-0" />
-                                  {e.nombre}
-                                </span>
-                              ))
-                            ) : (
-                              <span className="flex items-center text-xs text-blue-600 font-bold bg-blue-50/50 px-3 py-1 rounded-full border border-blue-100/50">
-                                <Award className="h-3.5 w-3.5 mr-1.5 shrink-0" />
-                                Kinesiología General
-                              </span>
-                            )}
-                          </div>
-                        </div>
-                      </div>
                     </div>
 
-                    <div className="mt-auto pt-6 border-t border-slate-50 flex items-center justify-between">
+                    {/* Mobile CTA: solo flecha */}
+                    <Link
+                      href={`/profesionales/${p.slug}`}
+                      className="shrink-0 p-2 rounded-xl bg-slate-50 text-slate-400 hover:bg-blue-600 hover:text-white transition-all md:hidden"
+                    >
+                      <ChevronRight className="h-4 w-4" />
+                    </Link>
+
+                    {/* Desktop CTA: botones + "Ver Perfil" */}
+                    <div className="hidden md:flex mt-auto pt-6 border-t border-slate-50 w-full items-center justify-between">
                       <div className="flex gap-2">
                         {p.whatsapp && (
                           <a

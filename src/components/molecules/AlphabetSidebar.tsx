@@ -33,24 +33,24 @@ export default function AlphabetSidebar({ selectedChar = "" }: { selectedChar?: 
   };
 
   return (
-    <div className="w-full mb-8 flex items-center gap-2">
+    <div className="w-full mb-4 md:mb-8 flex items-center gap-1 md:gap-2">
       <button
         onClick={() => scroll("left")}
-        className="shrink-0 h-10 w-10 flex items-center justify-center rounded-2xl bg-white border border-slate-100 text-slate-400 hover:text-slate-900 hover:bg-slate-50 shadow-sm transition-all"
+        className="shrink-0 h-8 w-8 md:h-10 md:w-10 flex items-center justify-center rounded-xl md:rounded-2xl bg-white border border-slate-100 text-slate-400 hover:text-slate-900 hover:bg-slate-50 shadow-sm transition-all"
         aria-label="Scroll izquierda"
       >
-        <ChevronLeft className="h-4 w-4" />
+        <ChevronLeft className="h-3.5 w-3.5 md:h-4 md:w-4" />
       </button>
 
       <div
         ref={scrollRef}
         className="flex-1 overflow-x-auto [&::-webkit-scrollbar]:hidden [-ms-overflow-style:none] [scrollbar-width:none]"
       >
-        <div className="flex items-center gap-2 min-w-max p-2">
+        <div className="flex items-center gap-1 md:gap-2 min-w-max p-1 md:p-2">
           <button
             onClick={() => handleLetterClick("")}
             className={cn(
-              "h-10 px-6 rounded-2xl text-[10px] font-black uppercase tracking-widest transition-all",
+              "h-8 md:h-10 px-4 md:px-6 rounded-xl md:rounded-2xl text-[9px] md:text-[10px] font-black uppercase tracking-widest transition-all",
               !selectedChar
                 ? "bg-blue-600 text-white shadow-lg shadow-blue-200"
                 : "bg-white border border-slate-100 text-slate-400 hover:text-slate-900 hover:bg-slate-50 shadow-sm"
@@ -59,7 +59,7 @@ export default function AlphabetSidebar({ selectedChar = "" }: { selectedChar?: 
             Todos
           </button>
 
-          <div className="w-px h-6 bg-slate-200 mx-2" />
+          <div className="w-px h-5 md:h-6 bg-slate-200 mx-1 md:mx-2" />
 
           {ALPHABET.map((letter) => (
             <button
@@ -67,7 +67,7 @@ export default function AlphabetSidebar({ selectedChar = "" }: { selectedChar?: 
               onClick={() => handleLetterClick(letter)}
               disabled={isPending}
               className={cn(
-                "h-10 w-10 shrink-0 rounded-2xl text-xs font-black transition-all",
+                "h-8 w-8 md:h-10 md:w-10 shrink-0 rounded-xl md:rounded-2xl text-[11px] md:text-xs font-black transition-all",
                 selectedChar === letter
                   ? "bg-blue-600 text-white shadow-lg shadow-blue-200"
                   : "bg-white border border-slate-100 text-slate-400 hover:text-slate-900 hover:bg-slate-50 shadow-sm",
@@ -82,10 +82,10 @@ export default function AlphabetSidebar({ selectedChar = "" }: { selectedChar?: 
 
       <button
         onClick={() => scroll("right")}
-        className="shrink-0 h-10 w-10 flex items-center justify-center rounded-2xl bg-white border border-slate-100 text-slate-400 hover:text-slate-900 hover:bg-slate-50 shadow-sm transition-all"
+        className="shrink-0 h-8 w-8 md:h-10 md:w-10 flex items-center justify-center rounded-xl md:rounded-2xl bg-white border border-slate-100 text-slate-400 hover:text-slate-900 hover:bg-slate-50 shadow-sm transition-all"
         aria-label="Scroll derecha"
       >
-        <ChevronRight className="h-4 w-4" />
+        <ChevronRight className="h-3.5 w-3.5 md:h-4 md:w-4" />
       </button>
     </div>
   );
