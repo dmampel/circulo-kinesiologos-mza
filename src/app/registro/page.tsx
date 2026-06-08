@@ -91,7 +91,7 @@ export default function RegistroPage() {
 
   const handleSubmit = async () => {
     if (!validateStep(3)) {
-      alert("Por favor, cargá al menos el DNI, Título y Matrícula.");
+      alert("Por favor, cargá todos los documentos requeridos para procesar tu solicitud.");
       return;
     }
 

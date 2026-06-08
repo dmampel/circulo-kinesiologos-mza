@@ -30,6 +30,8 @@ export async function crearSolicitud(formData: FormData) {
   const email = formData.get("email") as string;
   const matricula = formData.get("matricula") as string;
   const especialidadId = formData.get("especialidad") as string;
+  const cuil = formData.get("dni") as string;
+  const telefono = formData.get("telefono") as string;
 
   const especialidadNombre = especialidadId
     ? (await prisma.especialidad.findUnique({ where: { id: especialidadId }, select: { nombre: true } }))?.nombre ?? especialidadId
@@ -39,6 +41,29 @@ export async function crearSolicitud(formData: FormData) {
   if (!nombre || !apellido || !email || !matricula) {
     return { error: "Faltan campos obligatorios" };
   }
+
+  // Verificar duplicados
+  const [emailExistente, matriculaExistente, cuilExistente, telefonoExistente] = await Promise.all([
+    prisma.solicitud.findFirst({ where: { email } }),
+    prisma.solicitud.findFirst({ where: { matricula } }),
+    cuil ? prisma.solicitud.findFirst({ where: { datos: { path: ["dni"], equals: cuil } } }) : null,
+    telefono ? prisma.solicitud.findFirst({ where: { datos: { path: ["telefono"], equals: telefono } } }) : null,
+  ]);
+
+  if (emailExistente) return { error: "Ya existe una solicitud registrada con ese email." };
+  if (matriculaExistente) return { error: "Ya existe una solicitud registrada con esa matrícula." };
+  if (cuilExistente) return { error: "Ya existe una solicitud registrada con ese CUIL/DNI." };
+  if (telefonoExistente) return { error: "Ya existe una solicitud registrada con ese teléfono." };
+
+  // Validar documentos requeridos
+  const archivosRequeridos = ["dni", "titulo", "cuit", "seguro", "cv", "matricula_file"];
+  for (const key of archivosRequeridos) {
+    const archivo = formData.get(key) as File;
+    if (!archivo || archivo.size === 0) {
+      return { error: `El documento "${key}" es obligatorio.` };
+    }
+  }
+
   // 2. Subir archivos a Supabase Storage en paralelo
   const archivosKeys = ["dni", "titulo", "cuit", "seguro", "cv", "matricula_file", "super_salud", "habilitacion"];
   const archivosUrls: Record<string, string | null> = {};
