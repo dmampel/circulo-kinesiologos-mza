@@ -182,8 +182,10 @@ export default async function AdminDashboard() {
                       className={cn(
                         "px-3 py-1 rounded-full text-[10px] font-black uppercase shrink-0",
                         s.status === "PENDIENTE"
-                          ? "bg-red-100 text-red-600"
-                          : "bg-green-100 text-green-600"
+                          ? "bg-green-100 text-green-600"
+                          : s.status === "APROBADA"
+                          ? "bg-blue-100 text-blue-600"
+                          : "bg-red-100 text-red-600"
                       )}
                     >
                       {s.status}
