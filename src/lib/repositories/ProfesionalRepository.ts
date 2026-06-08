@@ -31,6 +31,7 @@ export class ProfesionalRepository {
 
     const where: Prisma.ProfesionalWhereInput = {
       status: "ACTIVO",
+      role: { not: "ADMIN" },
       AND: [
         query
           ? {
