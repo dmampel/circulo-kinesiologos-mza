@@ -17,6 +17,9 @@ const geistMono = Geist_Mono({
 export const metadata: Metadata = {
   title: "Círculo de Kinesiólogos de Mendoza | Institución Profesional",
   description: "Entidad que agrupa y representa a los profesionales de la kinesiología en la provincia de Mendoza, Argentina.",
+  icons: {
+    icon: "/favicon.png",
+  },
 };
 
 export default function RootLayout({
