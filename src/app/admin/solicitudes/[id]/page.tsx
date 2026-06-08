@@ -35,6 +35,13 @@ export default async function DetalleSolicitudPage({ params }: Props) {
 
   const datos = solicitud.datos as any;
   const archivos = datos?.archivos || {};
+
+  const especialidadRaw = datos?.especialidad as string | undefined;
+  let especialidadNombre = especialidadRaw || "General";
+  if (especialidadRaw && especialidadRaw.length > 20) {
+    const esp = await prisma.especialidad.findUnique({ where: { id: especialidadRaw }, select: { nombre: true } });
+    especialidadNombre = esp?.nombre ?? especialidadRaw;
+  }
   
   const SUPABASE_STORAGE_URL = `${process.env.NEXT_PUBLIC_SUPABASE_URL}/storage/v1/object/public/solicitudes`;
 
@@ -113,7 +120,7 @@ export default async function DetalleSolicitudPage({ params }: Props) {
               <div className="space-y-1">
                 <p className="text-[10px] font-black text-slate-400 uppercase tracking-widest">Especialidad</p>
                 <div className="flex items-center text-slate-900 font-bold">
-                  <ShieldCheck className="h-4 w-4 mr-2 text-slate-400" /> {datos?.especialidad || "General"}
+                  <ShieldCheck className="h-4 w-4 mr-2 text-slate-400" /> {especialidadNombre}
                 </div>
               </div>
               <div className="col-span-full space-y-1">
