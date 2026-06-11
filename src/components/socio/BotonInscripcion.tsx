@@ -5,7 +5,6 @@ import { CheckCircle2, Wallet, MessageCircle, Mail, X, Clock } from "lucide-reac
 import { inscribirseACapacitacion } from "@/app/mi-panel/capacitaciones/actions";
 
 interface BotonInscripcionProps {
-  profesionalId: string;
   capacitacionId: string;
   costo: number | null;
   titulo: string;
@@ -13,7 +12,6 @@ interface BotonInscripcionProps {
 }
 
 export default function BotonInscripcion({
-  profesionalId,
   capacitacionId,
   costo,
   titulo,
@@ -26,7 +24,7 @@ export default function BotonInscripcion({
   const handleInscripcion = async () => {
     setLoading(true);
     try {
-      await inscribirseACapacitacion(profesionalId, capacitacionId);
+      await inscribirseACapacitacion(capacitacionId);
       if (esPago) {
         setShowModal(true);
       }

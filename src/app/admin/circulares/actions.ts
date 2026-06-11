@@ -6,6 +6,7 @@ import { revalidatePath } from "next/cache";
 import { redirect } from "next/navigation";
 import { isRedirectError } from "next/dist/client/components/redirect-error";
 import { supabaseAdmin } from "@/lib/supabase/admin";
+import { requireAdmin } from "@/utils/supabase/require-admin";
 
 // ─── Zod Schema ──────────────────────────────────────────────────────────────
 
@@ -66,6 +67,7 @@ async function deleteStorageFile(url: string): Promise<void> {
 // ─── Server Actions ───────────────────────────────────────────────────────────
 
 export async function createCircular(formData: FormData) {
+  await requireAdmin();
   const titulo = formData.get("titulo") as string;
   const etiqueta = formData.get("etiqueta") as string;
   const contenido = formData.get("contenido") as string | null;
@@ -106,6 +108,7 @@ export async function createCircular(formData: FormData) {
 }
 
 export async function updateCircular(id: string, formData: FormData) {
+  await requireAdmin();
   const titulo = formData.get("titulo") as string;
   const etiqueta = formData.get("etiqueta") as string;
   const contenido = formData.get("contenido") as string | null;
@@ -161,6 +164,7 @@ export async function updateCircular(id: string, formData: FormData) {
 }
 
 export async function togglePublicada(id: string, currentState: boolean) {
+  await requireAdmin();
   await CircularRepository.update(id, {
     publicada: !currentState,
     publicada_en: !currentState ? new Date() : null,
@@ -171,6 +175,7 @@ export async function togglePublicada(id: string, currentState: boolean) {
 }
 
 export async function deleteCircular(id: string) {
+  await requireAdmin();
   try {
     const circular = await CircularRepository.getById(id);
     if (circular?.archivo_url && circular.archivo_url.includes("circulares-adjuntos")) {

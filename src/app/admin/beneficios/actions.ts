@@ -2,11 +2,11 @@
 
 import prisma from "@/lib/prisma";
 import { revalidatePath } from "next/cache";
-import { createClient } from "@/utils/supabase/server";
+import { requireAdmin } from "@/utils/supabase/require-admin";
 
 export async function crearBeneficio(formData: FormData) {
+  await requireAdmin();
   try {
-    const supabase = await createClient();
     
     const empresa = formData.get("empresa") as string;
     const descripcion = formData.get("descripcion") as string;
@@ -39,6 +39,7 @@ export async function crearBeneficio(formData: FormData) {
 
 
 export async function actualizarBeneficio(id: string, formData: FormData) {
+  await requireAdmin();
   try {
     const empresa = formData.get("empresa") as string;
     const descripcion = formData.get("descripcion") as string;
@@ -69,6 +70,7 @@ export async function actualizarBeneficio(id: string, formData: FormData) {
 }
 
 export async function eliminarBeneficio(id: string) {
+  await requireAdmin();
   try {
     await prisma.beneficioKineClub.delete({ where: { id } });
     revalidatePath("/admin/beneficios");

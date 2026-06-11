@@ -2,8 +2,10 @@
 
 import prisma from "@/lib/prisma";
 import { revalidatePath } from "next/cache";
+import { requireAdmin } from "@/utils/supabase/require-admin";
 
 export async function crearCategoria(formData: FormData) {
+  await requireAdmin();
   try {
     const nombre = formData.get("nombre") as string;
     const icono = formData.get("icono") as string || "Tag";
@@ -35,6 +37,7 @@ export async function crearCategoria(formData: FormData) {
 }
 
 export async function actualizarCategoria(id: string, formData: FormData) {
+  await requireAdmin();
   try {
     const nombre = formData.get("nombre") as string;
     const icono = formData.get("icono") as string;
@@ -67,6 +70,7 @@ export async function actualizarCategoria(id: string, formData: FormData) {
 }
 
 export async function eliminarCategoria(id: string) {
+  await requireAdmin();
   try {
     const beneficiosCount = await prisma.beneficioKineClub.count({
       where: { categoriaId: id }

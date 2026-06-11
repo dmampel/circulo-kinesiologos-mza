@@ -2,6 +2,7 @@
 
 import prisma from "@/lib/prisma";
 import { revalidatePath } from "next/cache";
+import { requireAdmin } from "@/utils/supabase/require-admin";
 
 export async function getObrasSociales() {
   return prisma.obraSocial.findMany({
@@ -10,6 +11,7 @@ export async function getObrasSociales() {
 }
 
 export async function toggleActiva(id: string, activa: boolean) {
+  await requireAdmin();
   try {
     await prisma.obraSocial.update({
       where: { id },
@@ -23,6 +25,7 @@ export async function toggleActiva(id: string, activa: boolean) {
 }
 
 export async function deleteObraSocial(id: string) {
+  await requireAdmin();
   try {
     await prisma.obraSocial.delete({
       where: { id },
@@ -35,6 +38,7 @@ export async function deleteObraSocial(id: string) {
 }
 
 export async function saveObraSocial(data: { id?: string; nombre: string; logo_url?: string; convenio_url?: string; activa?: boolean }) {
+  await requireAdmin();
   try {
     if (data.id) {
       await prisma.obraSocial.update({
@@ -72,6 +76,7 @@ export async function saveObraSocial(data: { id?: string; nombre: string; logo_u
 }
 
 export async function updateOrden(items: { id: string; orden: number }[]) {
+  await requireAdmin();
   try {
     // We update all items in a transaction
     await prisma.$transaction(

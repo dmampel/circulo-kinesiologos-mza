@@ -5,17 +5,16 @@ import { cancelarInscripcionSocio } from "@/app/mi-panel/capacitaciones/actions"
 
 interface Props {
   inscripcionId: string;
-  profesionalId: string;
 }
 
-export default function BotonCancelarInscripcion({ inscripcionId, profesionalId }: Props) {
+export default function BotonCancelarInscripcion({ inscripcionId }: Props) {
   const [confirmando, setConfirmando] = useState(false);
   const [loading, setLoading] = useState(false);
 
   const handleCancelar = async () => {
     setLoading(true);
     try {
-      await cancelarInscripcionSocio(inscripcionId, profesionalId);
+      await cancelarInscripcionSocio(inscripcionId);
     } finally {
       setLoading(false);
       setConfirmando(false);

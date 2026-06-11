@@ -3,6 +3,7 @@
 import { Prisma, Status } from "@prisma/client";
 import prisma from "@/lib/prisma";
 import { revalidatePath } from "next/cache";
+import { requireAdmin } from "@/utils/supabase/require-admin";
 
 type ProfesionalInput = {
   id?: string;
@@ -49,6 +50,7 @@ export async function getProfesionales(search?: string, especialidadId?: string,
 }
 
 export async function toggleEstadoProfesional(id: string, nuevoEstado: "ACTIVO" | "INACTIVO") {
+  await requireAdmin();
   try {
     await prisma.profesional.update({
       where: { id },
@@ -62,6 +64,7 @@ export async function toggleEstadoProfesional(id: string, nuevoEstado: "ACTIVO" 
 }
 
 export async function deleteProfesional(id: string) {
+  await requireAdmin();
   try {
     await prisma.profesional.delete({
       where: { id },
@@ -80,6 +83,7 @@ export async function getLocalidadesYEspecialidades() {
 }
 
 export async function saveProfesional(data: ProfesionalInput, especialidadIds: string[]) {
+  await requireAdmin();
   try {
     const baseSlug = `${data.nombre.toLowerCase().replace(/[^a-z0-9]+/g, '-')}-${data.apellido.toLowerCase().replace(/[^a-z0-9]+/g, '-')}`;
 

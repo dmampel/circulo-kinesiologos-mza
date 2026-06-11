@@ -5,11 +5,13 @@ import { CapacitacionSchema, CapacitacionFormState } from "./schema";
 import { CapacitacionRepository } from "@/lib/repositories/CapacitacionRepository";
 import { revalidatePath } from "next/cache";
 import { redirect } from "next/navigation";
+import { requireAdmin } from "@/utils/supabase/require-admin";
 
 export async function createCapacitacion(
   _prevState: CapacitacionFormState,
   formData: FormData
 ): Promise<CapacitacionFormState> {
+  await requireAdmin();
   const fechaFinRaw = formData.get("fechaFin") as string;
 
   const parsed = CapacitacionSchema.safeParse({
@@ -39,6 +41,7 @@ export async function updateCapacitacion(
   _prevState: CapacitacionFormState,
   formData: FormData
 ): Promise<CapacitacionFormState> {
+  await requireAdmin();
   const fechaFinRaw = formData.get("fechaFin") as string;
 
   const parsed = CapacitacionSchema.partial().safeParse({
@@ -67,6 +70,7 @@ export async function cambiarEstadoInscripcion(
   id: string,
   nuevoEstado: "PENDIENTE" | "CONFIRMADA" | "CANCELADA"
 ) {
+  await requireAdmin();
   await CapacitacionRepository.actualizarEstadoInscripcion(id, nuevoEstado);
   revalidatePath("/admin/capacitaciones/[id]", "page");
 }

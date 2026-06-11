@@ -35,15 +35,18 @@ export async function updateSession(request: NextRequest) {
     data: { user },
   } = await supabase.auth.getUser();
 
-  // Protegemos la ruta /admin y /mi-panel
-  const isProtectedRoute = 
-    request.nextUrl.pathname.startsWith("/admin") || 
-    request.nextUrl.pathname.startsWith("/mi-panel");
+  const isAdminRoute = request.nextUrl.pathname.startsWith("/admin");
+  const isMiPanelRoute = request.nextUrl.pathname.startsWith("/mi-panel");
 
-  if (!user && isProtectedRoute && !request.nextUrl.pathname.startsWith("/login")) {
-    // No user, potentially respond by redirecting the user to the login page
+  if (!user && (isAdminRoute || isMiPanelRoute)) {
     const url = request.nextUrl.clone();
     url.pathname = "/login";
+    return NextResponse.redirect(url);
+  }
+
+  if (user && isAdminRoute && user.app_metadata?.role !== "admin") {
+    const url = request.nextUrl.clone();
+    url.pathname = "/mi-panel";
     return NextResponse.redirect(url);
   }
 

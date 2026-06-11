@@ -2,12 +2,12 @@
 
 import prisma from "@/lib/prisma";
 import { revalidatePath } from "next/cache";
-import { createClient } from "@/utils/supabase/server";
 import { NoticiaRepository } from "@/lib/repositories/NoticiaRepository";
+import { requireAdmin } from "@/utils/supabase/require-admin";
 
 export async function crearNoticia(formData: FormData) {
+  await requireAdmin();
   try {
-    const supabase = await createClient();
     
     const titulo = formData.get("titulo") as string;
     const resumen = formData.get("resumen") as string;
@@ -50,6 +50,7 @@ export async function crearNoticia(formData: FormData) {
 }
 
 export async function actualizarNoticia(id: string, formData: FormData) {
+  await requireAdmin();
   try {
     const titulo = formData.get("titulo") as string;
     const resumen = formData.get("resumen") as string;
@@ -92,6 +93,7 @@ export async function actualizarNoticia(id: string, formData: FormData) {
 }
 
 export async function eliminarNoticia(id: string) {
+  await requireAdmin();
   try {
     await prisma.noticia.delete({ where: { id } });
     revalidatePath("/admin/noticias");

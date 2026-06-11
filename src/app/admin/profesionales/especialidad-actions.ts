@@ -2,8 +2,10 @@
 
 import { EspecialidadRepository } from "@/lib/repositories/EspecialidadRepository";
 import { revalidatePath } from "next/cache";
+import { requireAdmin } from "@/utils/supabase/require-admin";
 
 export async function crearEspecialidad(formData: FormData) {
+  await requireAdmin();
   try {
     const nombre = (formData.get("nombre") as string).trim();
     if (!nombre) throw new Error("El nombre es obligatorio.");
@@ -17,6 +19,7 @@ export async function crearEspecialidad(formData: FormData) {
 }
 
 export async function actualizarEspecialidad(id: string, formData: FormData) {
+  await requireAdmin();
   try {
     const nombre = (formData.get("nombre") as string).trim();
     if (!nombre) throw new Error("El nombre es obligatorio.");
@@ -30,6 +33,7 @@ export async function actualizarEspecialidad(id: string, formData: FormData) {
 }
 
 export async function eliminarEspecialidad(id: string) {
+  await requireAdmin();
   try {
     const count = await EspecialidadRepository.countProfesionales(id);
     if (count > 0) {

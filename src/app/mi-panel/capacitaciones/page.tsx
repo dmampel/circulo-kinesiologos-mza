@@ -35,7 +35,7 @@ function InscripcionCard({ insc, profesionalId }: { insc: Inscripcion; profesion
             </span>
           )}
           {insc.estado !== "CANCELADA" && (
-            <BotonCancelarInscripcion inscripcionId={insc.id} profesionalId={profesionalId} />
+            <BotonCancelarInscripcion inscripcionId={insc.id} />
           )}
         </div>
       </div>
@@ -157,7 +157,6 @@ export default async function CapacitacionesSocioPage() {
                         </div>
                       ) : (
                         <BotonInscripcion
-                          profesionalId={profesional.id}
                           capacitacionId={c.id}
                           costo={c.costo ? Number(c.costo) : null}
                           titulo={c.titulo}

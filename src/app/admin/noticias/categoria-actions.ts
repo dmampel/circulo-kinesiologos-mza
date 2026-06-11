@@ -2,8 +2,10 @@
 
 import { revalidatePath } from "next/cache";
 import { CategoriaNoticiaRepository } from "@/lib/repositories/CategoriaNoticiaRepository";
+import { requireAdmin } from "@/utils/supabase/require-admin";
 
 export async function crearCategoria(formData: FormData) {
+  await requireAdmin();
   try {
     const nombre = formData.get("nombre") as string;
     const icono = (formData.get("icono") as string) || "Tag";
@@ -20,6 +22,7 @@ export async function crearCategoria(formData: FormData) {
 }
 
 export async function actualizarCategoria(id: string, formData: FormData) {
+  await requireAdmin();
   try {
     const nombre = formData.get("nombre") as string;
     const icono = formData.get("icono") as string;
@@ -36,6 +39,7 @@ export async function actualizarCategoria(id: string, formData: FormData) {
 }
 
 export async function eliminarCategoria(id: string) {
+  await requireAdmin();
   try {
     await CategoriaNoticiaRepository.delete(id);
 

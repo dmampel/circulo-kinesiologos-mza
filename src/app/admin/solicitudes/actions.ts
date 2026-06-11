@@ -5,8 +5,10 @@ import { supabaseAdmin } from "@/lib/supabase/admin";
 import { revalidatePath } from "next/cache";
 import { ProfesionalRepository } from "@/lib/repositories/ProfesionalRepository";
 import { getResend, canSendEmails, FROM_EMAIL } from "@/lib/resend";
+import { requireAdmin } from "@/utils/supabase/require-admin";
 
 export async function gestionarSolicitud(id: string, accion: "APROBAR" | "RECHAZAR") {
+  await requireAdmin();
   try {
     if (accion === "RECHAZAR") {
       const solicitud = await prisma.solicitud.findUnique({ where: { id } });

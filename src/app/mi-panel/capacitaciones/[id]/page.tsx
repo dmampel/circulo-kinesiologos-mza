@@ -185,7 +185,6 @@ export default async function CapacitacionDetalleSocioPage({
               </div>
             ) : (
               <BotonInscripcion
-                profesionalId={profesional.id}
                 capacitacionId={capacitacion.id}
                 costo={capacitacion.costo ? Number(capacitacion.costo) : null}
                 titulo={capacitacion.titulo}
@@ -240,7 +239,6 @@ export default async function CapacitacionDetalleSocioPage({
               <div className="pt-4 border-t border-slate-50 text-center">
                 <BotonCancelarInscripcion
                   inscripcionId={inscripcion.id}
-                  profesionalId={profesional.id}
                 />
               </div>
             )}

@@ -3,8 +3,10 @@
 import { AutoridadRepository } from "@/lib/repositories/AutoridadRepository";
 import { revalidatePath, refresh } from "next/cache";
 import { redirect } from "next/navigation";
+import { requireAdmin } from "@/utils/supabase/require-admin";
 
 export async function crearAutoridad(formData: FormData) {
+  await requireAdmin();
   try {
     const profesionalId = formData.get("profesionalId") as string;
     const cargo = formData.get("cargo") as string;
@@ -22,6 +24,7 @@ export async function crearAutoridad(formData: FormData) {
 }
 
 export async function actualizarAutoridad(id: string, formData: FormData) {
+  await requireAdmin();
   try {
     const cargo = formData.get("cargo") as string;
     const orden = parseInt(formData.get("orden") as string) || 0;
@@ -43,6 +46,7 @@ export async function actualizarAutoridad(id: string, formData: FormData) {
 }
 
 export async function eliminarAutoridad(id: string) {
+  await requireAdmin();
   try {
     await AutoridadRepository.delete(id);
     revalidatePath("/admin/autoridades");
@@ -58,6 +62,7 @@ export async function eliminarAutoridadAction(id: string): Promise<void> {
 }
 
 export async function buscarProfesionales(query: string) {
+  await requireAdmin();
   try {
     const { ProfesionalRepository } = await import("@/lib/repositories/ProfesionalRepository");
     const result = await ProfesionalRepository.findPaginated(1, 10, { query });
