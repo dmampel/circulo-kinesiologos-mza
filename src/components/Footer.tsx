@@ -94,7 +94,7 @@ export default function Footer() {
             </ul>
           </div>
 
-          <div className="col-span-full">
+          <div className="col-span-full md:col-span-1">
             <h3 className="text-white font-black text-xs uppercase tracking-widest mb-5">Contacto</h3>
             <ul className="space-y-4 text-sm">
               <li className="flex items-start gap-3">
