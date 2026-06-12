@@ -223,20 +223,20 @@ export default async function Home() {
 
           {/* Mobile: copy + marquee */}
           <div className="lg:hidden">
-            <div className="px-4 sm:px-6 mb-10">
-              <TextReveal className="text-4xl font-black text-slate-900 tracking-tighter leading-tight mb-6">
+            <div className=" sm:px-6 mb-10">
+              <TextReveal className="px-4 text-4xl font-black text-slate-900 tracking-tighter leading-tight mb-6">
                 {obrasSociales.length}+ obras sociales{" "}
                 <span className="text-slate-400">con convenio activo</span>
               </TextReveal>
               {obrasSociales.length > 0 && (
                 <ObrasSocialesMarquee items={obrasSociales} />
               )}
-              <p className="text-slate-500 leading-relaxed mb-8">
+              <p className="px-4 text-slate-500 leading-relaxed mb-8">
                 Gestionamos aranceles y facturación centralizada con las principales prestadoras de salud de la provincia, para que te concentres en atender a tus pacientes.
               </p>
               <Link
                 href="/obras-sociales"
-                className="inline-flex items-center gap-1 text-slate-800 font-black hover:text-blue-600 transition-colors"
+                className="px-4 inline-flex items-center gap-1 text-slate-800 font-black hover:text-blue-600 transition-colors"
               >
                 Ver todos los convenios <ChevronRight className="ml-2 h-4 w-4" />
               </Link>
