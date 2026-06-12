@@ -15,6 +15,7 @@ import {
   CalendarDays,
   UserCircle,
 } from "lucide-react";
+import ObrasSocialesMarquee from "@/components/ObrasSocialesMarquee";
 import WaveTransition from "@/components/WaveTransition";
 import FloatingStatPills from "@/components/FloatingStatPills";
 import CtaPills from "@/components/CtaPills";
@@ -169,7 +170,7 @@ export default async function Home() {
               { title: "Formación continua", desc: "Acceso a cursos, talleres y congresos para mantenerte actualizado.", icon: Award },
               { title: "Beneficios exclusivos", desc: "Descuentos en comercios, turismo y servicios para vos y tu familia.", icon: CheckCircle },
             ].map(({ title, desc, icon: Icon }) => (
-              <StaggerItem key={title} className="flex flex-col gap-4 px-8 py-6 first:pl-0 last:pr-0 group">
+              <StaggerItem key={title} className="flex flex-col gap-4 px-4 py-6 lg:px-8 lg:first:pl-0 lg:last:pr-0 group">
                 <Icon className="h-5 w-5 text-blue-500" />
                 <div>
                   <h3 className="font-black text-slate-900 mb-1">{title}</h3>
@@ -183,11 +184,11 @@ export default async function Home() {
       </section>
 
       {/* ── OBRAS SOCIALES ────────────────────────────────────── */}
-      <section className="min-h-screen flex items-center py-16 bg-white">
-        <div className="w-full mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
-          <div className="grid grid-cols-1 lg:grid-cols-2 gap-16 items-center">
+      <section className="py-16 lg:min-h-screen lg:flex lg:items-center bg-white overflow-hidden">
+        <div className="w-full mx-auto max-w-7xl">
 
-            {/* Left: Copy */}
+          {/* Desktop: 2-column grid (copy left, pills right) */}
+          <div className="hidden lg:grid grid-cols-2 gap-16 items-center px-4 sm:px-6 lg:px-8">
             <ScrollReveal>
               <span className="text-xs font-black uppercase tracking-widest text-blue-600 mb-4 block">
                 Convenios
@@ -206,8 +207,6 @@ export default async function Home() {
                 Ver todos los convenios <ChevronRight className="ml-2 h-4 w-4" />
               </Link>
             </ScrollReveal>
-
-            {/* Right: Names */}
             {obrasSociales.length > 0 && (
               <ScrollReveal variant="staggerContainer" className="flex flex-wrap gap-2">
                 {obrasSociales.map((os) => (
@@ -220,8 +219,31 @@ export default async function Home() {
                 ))}
               </ScrollReveal>
             )}
-
           </div>
+
+          {/* Mobile: copy + marquee */}
+          <div className="lg:hidden">
+            <div className="px-4 sm:px-6 mb-10">
+              <TextReveal className="text-4xl font-black text-slate-900 tracking-tighter leading-tight mb-6">
+                {obrasSociales.length}+ obras sociales{" "}
+                <span className="text-slate-400">con convenio activo</span>
+              </TextReveal>
+              {obrasSociales.length > 0 && (
+                <ObrasSocialesMarquee items={obrasSociales} />
+              )}
+              <p className="text-slate-500 leading-relaxed mb-8">
+                Gestionamos aranceles y facturación centralizada con las principales prestadoras de salud de la provincia, para que te concentres en atender a tus pacientes.
+              </p>
+              <Link
+                href="/obras-sociales"
+                className="inline-flex items-center gap-1 text-slate-800 font-black hover:text-blue-600 transition-colors"
+              >
+                Ver todos los convenios <ChevronRight className="ml-2 h-4 w-4" />
+              </Link>
+            </div>
+            
+          </div>
+
         </div>
       </section>
 
@@ -245,7 +267,7 @@ export default async function Home() {
               </div>
               <Link
                 href="/kineclub"
-                className="inline-flex items-center px-6 py-3 rounded-full bg-white text-blue-900 font-black shadow-md hover:bg-blue-50 transition-all shrink-0"
+                className="inline-flex items-center self-start px-6 py-3 rounded-full bg-white text-blue-900 font-black shadow-md hover:bg-blue-50 transition-all shrink-0"
               >
                 Explorar beneficios <ChevronRight className="ml-1 h-4 w-4" />
               </Link>
