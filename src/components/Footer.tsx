@@ -46,7 +46,7 @@ export default function Footer() {
         </div>
 
         {/* Mid: Links grid */}
-        <div className="py-12 grid grid-cols-2 md:grid-cols-4 gap-10 border-b border-slate-800">
+        <div className="py-12 grid grid-cols-3 md:grid-cols-4 gap-10 border-b border-slate-800">
           <div>
             <h3 className="text-white font-black text-xs uppercase tracking-widest mb-5">Institucional</h3>
             <ul className="space-y-3 text-sm">
@@ -94,7 +94,7 @@ export default function Footer() {
             </ul>
           </div>
 
-          <div>
+          <div className="col-span-full">
             <h3 className="text-white font-black text-xs uppercase tracking-widest mb-5">Contacto</h3>
             <ul className="space-y-4 text-sm">
               <li className="flex items-start gap-3">
@@ -118,8 +118,8 @@ export default function Footer() {
         </div>
 
         {/* Bottom */}
-        <div className="py-6 flex flex-col md:flex-row justify-between items-center gap-4 text-xs text-slate-600 uppercase tracking-widest">
-          <p>© {currentYear} Círculo de Kinesiólogos y Fisioterapeutas de Mendoza</p>
+        <div className="py-6 flex flex-col md:flex-row justify-between items-end gap-4 text-xs text-slate-600 uppercase tracking-widest">
+          <p className="text-center md:text-left">© {currentYear} Círculo de Kinesiólogos y Fisioterapeutas de Mendoza</p>
           <Link href="/registro" className="flex items-center gap-1 text-slate-500 hover:text-white transition-colors">
             Asociate <ArrowUpRight className="h-3 w-3" />
           </Link>
