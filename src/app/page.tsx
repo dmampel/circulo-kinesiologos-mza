@@ -16,6 +16,7 @@ import {
   UserCircle,
 } from "lucide-react";
 import ObrasSocialesMarquee from "@/components/ObrasSocialesMarquee";
+import HeroCard from "@/components/HeroCard";
 import WaveTransition from "@/components/WaveTransition";
 import FloatingStatPills from "@/components/FloatingStatPills";
 import CtaPills from "@/components/CtaPills";
@@ -78,7 +79,7 @@ export default async function Home() {
 
       {/* ── HERO ─────────────────────────────────────────────── */}
       <section className="min-h-screen bg-slate-50 flex flex-col">
-      <div className="bg-slate-900 pt-40 pb-80 relative overflow-hidden">
+      <HeroCard>
 
         {/* Grid pattern */}
         <div className="absolute inset-0 bg-[linear-gradient(rgba(255,255,255,0.03)_1px,transparent_1px),linear-gradient(90deg,rgba(255,255,255,0.03)_1px,transparent_1px)] bg-[size:60px_60px] pointer-events-none" />
@@ -131,32 +132,36 @@ export default async function Home() {
           </div>
         </div>
 
-        <WaveTransition color="text-slate-50" position="bottom" />
-      </div>
+        {/* Glow azul en el borde inferior */}
+        <div className="absolute bottom-0 left-1/2 -translate-x-1/2 w-[60%] h-48 bg-blue-600/20 blur-[80px] rounded-full pointer-events-none" />
+
+      </HeroCard>
       </section>
 
       {/* ── POR QUÉ ASOCIARTE ────────────────────────────────── */}
-      <section className="min-h-screen flex items-center py-16 bg-slate-50">
+      <section className="py-24 lg:py-32 bg-slate-50">
         <div className="w-full mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
 
-          {/* Top: Editorial header */}
+          {/* Top: Editorial header — Opción A: border-left como ancla tipográfica */}
           <ScrollReveal className="mb-16">
-            <span className="text-xs font-black uppercase tracking-widest text-blue-600 mb-4 block">
-              Ser parte del Círculo
-            </span>
-            <TextReveal className="text-4xl lg:text-5xl font-black text-slate-900 tracking-tighter leading-tight mb-6">
-              Más que una matrícula.{" "}
-              <span className="text-slate-400">Una comunidad.</span>
-            </TextReveal>
-            <p className="text-slate-500 leading-relaxed mb-4 max-w-xl">
-              El Círculo de Kinesiólogos de Mendoza es la institución que te respalda en cada etapa de tu carrera — desde los primeros pasos hasta el desarrollo profesional continuo. No estás solo.
-            </p>
-            <Link
-              href="/institucional"
-              className="inline-flex items-center text-sm font-black text-slate-800 hover:text-blue-600 transition-colors"
-            >
-              Conocé nuestra institución <ChevronRight className="ml-1 h-4 w-4" />
-            </Link>
+            <div className="border-l-4 border-blue-500 pl-6">
+              <span className="text-xs font-black uppercase tracking-widest text-blue-600 mb-4 block">
+                Ser parte del Círculo
+              </span>
+              <TextReveal className="text-4xl lg:text-5xl font-black text-slate-900 tracking-tighter leading-tight mb-6">
+                Más que una matrícula.{" "}
+                <span className="text-slate-400">Una comunidad.</span>
+              </TextReveal>
+              <p className="text-slate-500 leading-relaxed mb-4 max-w-xl">
+                El Círculo de Kinesiólogos de Mendoza es la institución que te respalda en cada etapa de tu carrera — desde los primeros pasos hasta el desarrollo profesional continuo. No estás solo.
+              </p>
+              <Link
+                href="/institucional"
+                className="inline-flex items-center text-sm font-black text-slate-800 hover:text-blue-600 transition-colors"
+              >
+                Conocé nuestra institución <ChevronRight className="ml-1 h-4 w-4" />
+              </Link>
+            </div>
           </ScrollReveal>
 
           {/* Bottom: Pillars horizontal */}
