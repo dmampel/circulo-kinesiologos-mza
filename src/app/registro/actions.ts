@@ -58,7 +58,8 @@ export async function crearSolicitud(formData: FormData) {
   // Validar documentos requeridos
   const archivosRequeridos = ["dni", "titulo", "cuit", "seguro", "cv", "matricula_file"];
   for (const key of archivosRequeridos) {
-    const archivo = formData.get(key) as File;
+    const allValues = formData.getAll(key);
+    const archivo = (allValues.find(v => v instanceof File) ?? null) as File | null;
     if (!archivo || archivo.size === 0) {
       return { error: `El documento "${key}" es obligatorio.` };
     }
@@ -70,7 +71,8 @@ export async function crearSolicitud(formData: FormData) {
 
   try {
     await Promise.all(archivosKeys.map(async (key) => {
-      const archivo = formData.get(key) as File;
+      const allValues = formData.getAll(key);
+      const archivo = (allValues.find(v => v instanceof File) ?? null) as File | null;
       if (archivo && archivo.size > 0) {
         const fileExt = archivo.name.split('.').pop();
         const fileName = `${matricula}-${key}-${Date.now()}.${fileExt}`;
