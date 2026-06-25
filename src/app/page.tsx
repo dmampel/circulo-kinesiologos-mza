@@ -214,7 +214,7 @@ export default async function Home() {
                 {obrasSociales.map((os) => (
                   <StaggerItem
                     key={os.id}
-                    className="px-4 py-2 rounded-xl border border-slate-400 bg-slate-50 text-slate-600 text-sm font-medium hover:bg-slate-100 hover:text-slate-900 transition-colors"
+                    className="px-4 py-2 rounded-xl border border-slate-300 bg-slate-50 text-slate-600 text-sm font-medium hover:bg-slate-100 hover:text-slate-900 transition-colors"
                   >
                     {os.nombre}
                   </StaggerItem>
