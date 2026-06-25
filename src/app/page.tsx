@@ -91,9 +91,6 @@ export default async function Home() {
 
             {/* LEFT: Copy */}
             <div>
-              <div className="inline-flex items-center px-4 py-2 rounded-full bg-blue-600 text-white text-xs font-black tracking-widest uppercase mb-8">
-                Institución Centenaria · Mendoza
-              </div>
               <TextReveal as="h1" variant="words" className="text-5xl lg:text-6xl xl:text-7xl font-black text-white tracking-tighter leading-[1.05] mb-6">
                 Somos{" "}
                 <span className="text-blue-500 underline decoration-blue-500/30 underline-offset-8">

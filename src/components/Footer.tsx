@@ -1,12 +1,13 @@
 import Link from "next/link";
 import Image from "next/image";
 import { Mail, MapPin, Phone, ArrowUpRight } from "lucide-react";
+import FooterCard from "@/components/FooterCard";
 
 export default function Footer() {
   const currentYear = new Date().getFullYear();
 
   return (
-    <footer className="bg-slate-900 text-slate-400 relative overflow-hidden">
+    <FooterCard>
       <div className="" />
 
       <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8 relative z-10">
@@ -126,6 +127,6 @@ export default function Footer() {
         </div>
 
       </div>
-    </footer>
+    </FooterCard>
   );
 }
