@@ -3,6 +3,7 @@
 import { useRef, useEffect, useState } from "react";
 import { motion, useInView, animate, useReducedMotion } from "framer-motion";
 import { Users, ShieldCheck, Award } from "lucide-react";
+import Link from "next/link";
 
 interface Props {
   profesionales: number;
@@ -77,6 +78,7 @@ export default function FloatingStatPills({
       icon: Users,
       display: profDisplay,
       desc: "Profesionales",
+      href: "/profesionales",
       pos: "top-0 right-0",
       anim: "float-1",
       delayOffset: 0,
@@ -85,6 +87,7 @@ export default function FloatingStatPills({
       icon: ShieldCheck,
       display: osDisplay,
       desc: "Obras sociales",
+      href: "/obras-sociales",
       pos: "top-[calc(50%-22px)] left-8",
       anim: "float-2",
       delayOffset: 0.3,
@@ -93,6 +96,7 @@ export default function FloatingStatPills({
       icon: Award,
       display: benDisplay,
       desc: "Beneficios",
+      href: "/kineclub",
       pos: "bottom-0 right-12",
       anim: "float-3",
       delayOffset: 0.6,
@@ -111,7 +115,7 @@ export default function FloatingStatPills({
         .float-3 { animation: float 4.8s ease-in-out infinite 2s; }
       `}</style>
 
-      {pills.map(({ icon: Icon, display, desc, pos, anim, delayOffset }) => (
+      {pills.map(({ icon: Icon, display, desc, href, pos, anim, delayOffset }) => (
         <motion.div
           key={desc}
           initial={{ opacity: 0, scale: 0.9, y: 10 }}
@@ -124,8 +128,8 @@ export default function FloatingStatPills({
           className={`absolute ${pos}`}
         >
           <div className={`${anim}`}>
-            <div className="inline-flex items-center gap-3 bg-slate-800/60 backdrop-blur-md border border-white/10 rounded-full px-5 py-3 shadow-lg hover:bg-slate-800/80 transition-colors cursor-default group">
-              <div className="h-8 w-8 bg-blue-600/20 rounded-full flex items-center justify-center shrink-0 group-hover:bg-blue-600/30 transition-colors">
+            <Link href={href} className="inline-flex items-center gap-3 bg-slate-800/60 backdrop-blur-md border border-white/10 rounded-full px-5 py-3 shadow-lg hover:bg-slate-700/80 hover:border-white/20 transition-all group">
+              <div className="h-8 w-8 bg-blue-600/20 rounded-full flex items-center justify-center shrink-0 group-hover:bg-blue-600/40 transition-colors">
                 <Icon className="h-4 w-4 text-blue-400" />
               </div>
               <div>
@@ -134,7 +138,7 @@ export default function FloatingStatPills({
                 </span>
                 <span className="text-slate-400 text-sm ml-2">{desc}</span>
               </div>
-            </div>
+            </Link>
           </div>
         </motion.div>
       ))}
