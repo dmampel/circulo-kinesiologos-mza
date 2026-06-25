@@ -70,8 +70,8 @@ export default async function Home() {
 
   const stats = [
     { label: "Profesionales registrados", value: `+${totalProfesionales}`, icon: Users },
-    { label: "Obras sociales activas", value: `+${obrasSociales.length}`, icon: ShieldCheck },
-    { label: "Beneficios KineClub", value: `+${activeBeneficios.length}`, icon: Award },
+    { label: "Obras sociales activas", value: `+30`, icon: ShieldCheck },
+    { label: "Beneficios KineClub", value: `+15`, icon: Award },
   ];
 
   return (
@@ -121,8 +121,8 @@ export default async function Home() {
             <div>
               <FloatingStatPills
                 profesionales={totalProfesionales}
-                obrasSociales={obrasSociales.length}
-                beneficios={activeBeneficios.length}
+                obrasSociales={30}
+                beneficios={15}
               />
             </div>
 
@@ -196,7 +196,7 @@ export default async function Home() {
                 Convenios
               </span>
               <TextReveal className="text-4xl lg:text-5xl font-black text-slate-900 tracking-tighter leading-tight mb-6">
-                {obrasSociales.length}+ obras sociales{" "}
+                30+ obras sociales{" "}
                 <span className="text-slate-400">con convenio activo</span>
               </TextReveal>
               <p className="text-slate-500 leading-relaxed mb-10">
@@ -227,7 +227,7 @@ export default async function Home() {
           <div className="lg:hidden">
             <div className=" sm:px-6 mb-10">
               <TextReveal className="px-4 text-4xl font-black text-slate-900 tracking-tighter leading-tight mb-6">
-                {obrasSociales.length}+ obras sociales{" "}
+                30+ obras sociales{" "}
                 <span className="text-slate-400">con convenio activo</span>
               </TextReveal>
               {obrasSociales.length > 0 && (
@@ -264,7 +264,7 @@ export default async function Home() {
                   Beneficios exclusivos para socios
                 </TextReveal>
                 <p className="text-blue-300 mt-2 text-sm">
-                  {activeBeneficios.length} beneficios en comercios, turismo y servicios.
+                  +15 beneficios en comercios, turismo y servicios.
                 </p>
               </div>
               <Link
