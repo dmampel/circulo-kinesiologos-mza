@@ -92,14 +92,14 @@ export default async function Home() {
             {/* LEFT: Copy */}
             <div>
               <TextReveal as="h1" variant="words" className="text-5xl lg:text-6xl xl:text-7xl font-black text-white tracking-tighter leading-[1.05] mb-6">
-                Somos{" "}
+                {" "}
                 <span className="text-blue-500 underline decoration-blue-500/30 underline-offset-8">
-                  El Círculo
+                  Círculo
                 </span>{" "}
-                de Kinesiólogos y Fisioterapeutas 
+                de Kinesiólogos y Fisioterapeutas  de Mendoza
               </TextReveal>
               <p className="text-slate-400 text-lg leading-relaxed mb-10 max-w-lg">
-                Representamos y acompañamos a los profesionales de la salud kinésica, garantizando la calidad prestacional y el desarrollo continuo de la disciplina.
+                Somos una entidad sin fines de lucro que representa y acompaña a los profesionales de la salud kinésica, que garantiza la calidad prestacional y el desarrollo continuo de la disciplina.
               </p>
               <div className="flex flex-col sm:flex-row gap-4">
                 <Link
@@ -146,11 +146,11 @@ export default async function Home() {
                 Ser parte del Círculo
               </span>
               <TextReveal className="text-4xl lg:text-5xl font-black text-slate-900 tracking-tighter leading-tight mb-6">
-                Más que una matrícula.{" "}
+                Más que una profesión.{" "}
                 <span className="text-slate-400">Una comunidad.</span>
               </TextReveal>
               <p className="text-slate-500 leading-relaxed mb-4 max-w-xl">
-                El Círculo de Kinesiólogos de Mendoza es la institución que te respalda en cada etapa de tu carrera — desde los primeros pasos hasta el desarrollo profesional continuo. No estás solo.
+                El Círculo de Kinesiólogos de Mendoza es la institución que te respalda en cada etapa de tu carrera, desde los primeros pasos hasta el desarrollo profesional continuo. 
               </p>
               <Link
                 href="/institucional"
@@ -167,7 +167,7 @@ export default async function Home() {
             className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 divide-y sm:divide-y-0 lg:divide-x divide-slate-200"
           >
             {[
-              { title: "Respaldo gremial", desc: "Negociamos aranceles y convenios dignos para que tu trabajo sea reconocido.", icon: ShieldCheck },
+              { title: "Respaldo gremial", desc: "Negociamos aranceles y convenios para que tu trabajo sea reconocido.", icon: ShieldCheck },
               { title: "Red de pacientes", desc: "Tu perfil en el padrón público para que nuevos pacientes te encuentren.", icon: Users },
               { title: "Formación continua", desc: "Acceso a cursos, talleres y congresos para mantenerte actualizado.", icon: Award },
               { title: "Beneficios exclusivos", desc: "Descuentos en comercios, turismo y servicios para vos y tu familia.", icon: CheckCircle },
@@ -197,10 +197,10 @@ export default async function Home() {
               </span>
               <TextReveal className="text-4xl lg:text-5xl font-black text-slate-900 tracking-tighter leading-tight mb-6">
                 30+ obras sociales{" "}
-                <span className="text-slate-400">con convenio activo</span>
+                <span className="text-slate-400">con convenio activo.</span>
               </TextReveal>
               <p className="text-slate-500 leading-relaxed mb-10">
-                Gestionamos aranceles y facturación centralizada con las principales prestadoras de salud de la provincia, para que te concentres en atender a tus pacientes.
+                Negociamos aranceles con las principales prestadoras de salud de la provincia y del país, para que vos solo te concentres en atender a tus pacientes.
               </p>
               <Link
                 href="/obras-sociales"
@@ -214,7 +214,7 @@ export default async function Home() {
                 {obrasSociales.map((os) => (
                   <StaggerItem
                     key={os.id}
-                    className="px-4 py-2 rounded-xl border border-slate-200 bg-slate-50 text-slate-600 text-sm font-medium hover:bg-slate-100 hover:text-slate-900 transition-colors"
+                    className="px-4 py-2 rounded-xl border border-slate-400 bg-slate-50 text-slate-600 text-sm font-medium hover:bg-slate-100 hover:text-slate-900 transition-colors"
                   >
                     {os.nombre}
                   </StaggerItem>
@@ -436,7 +436,7 @@ export default async function Home() {
             </p>
             <TextReveal className="text-5xl lg:text-7xl font-black text-slate-900 tracking-tighter leading-[0.95] mb-10 max-w-4xl">
               Todo lo que necesitás,{" "}
-              <span className="text-slate-400">en un sólo lugar.</span>
+              <span className="text-slate-400">en un solo lugar.</span>
             </TextReveal>
 
             <CtaPills />

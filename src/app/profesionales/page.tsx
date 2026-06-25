@@ -71,7 +71,7 @@ export default async function ProfesionalesPage({ searchParams }: Props) {
           </div>
 
           <h1 className="text-4xl lg:text-6xl font-black text-white mb-6 tracking-tighter">
-            Encontrá tu <br />{" "}
+            Encontrá a tu <br />{" "}
             <span className="text-blue-500 underline decoration-blue-500/30 underline-offset-8">
               Kinesiólogo
             </span>
@@ -79,7 +79,7 @@ export default async function ProfesionalesPage({ searchParams }: Props) {
 
           <p className="text-slate-400 text-base max-w-2xl mx-auto leading-relaxed mb-8">
             Accedé al listado completo de profesionales matriculados y
-            habilitados por el Círculo de Kinesiólogos de la provincia.
+            habilitados por el Círculo de Kinesiólogos y Fisioterapeutas de la provincia.
           </p>
         </div>
 

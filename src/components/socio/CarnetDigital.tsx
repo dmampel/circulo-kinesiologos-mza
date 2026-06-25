@@ -40,11 +40,8 @@ export default function CarnetDigital({ profesional, slug }: Props) {
             </div>
             <div>
               <h2 className="text-white font-black text-lg tracking-tighter leading-none">
-                Círculo de <br /> Kinesiólogos
+                CKFM <br />
               </h2>
-              <p className="text-blue-300 text-[10px] font-bold uppercase tracking-widest mt-1">
-                Mendoza, Argentina
-              </p>
             </div>
           </div>
           <div className="flex flex-col items-end">

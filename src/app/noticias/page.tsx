@@ -69,12 +69,12 @@ export default async function NoticiasPage({ searchParams }: Props) {
           <div className="inline-flex items-center gap-2 px-3 py-1.5 rounded-full bg-blue-600/20 border border-blue-500/30 mb-6">
             <Newspaper className="h-3.5 w-3.5 text-blue-400" />
             <span className="text-[10px] font-black uppercase tracking-widest text-blue-400">
-              Actualidad Kinésica · CKM Mendoza
+              Actualidad Kinésica · CKFM Mendoza
             </span>
           </div>
           <h1 className="text-4xl lg:text-6xl font-black text-white tracking-tight leading-[1.05] mb-4">
             Noticias{" "}
-            <span className="text-blue-400 italic">del Círculo</span>
+            <span className="text-blue-400">del Círculo.</span>
           </h1>
           <p className="text-slate-400 text-base leading-relaxed max-w-lg">
             Las últimas novedades, convenios y eventos de la comunidad kinesiológica mendocina.

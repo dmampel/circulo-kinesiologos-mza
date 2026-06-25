@@ -16,10 +16,10 @@ export default function Footer() {
         <div className="pt-16 pb-12 border-b border-slate-800 flex flex-col lg:flex-row lg:items-end justify-between gap-8">
           <div>
             <div className="mb-4">
-              <Image src="/logo.png" alt="Círculo de Kinesiólogos de Mendoza" width={120} height={40} className="h-10 w-auto" />
+              <Image src="/logo.png" alt="Círculo de Kinesiólogos de Mendoza" width={150} height={80} className="h-10 w-auto" />
             </div>
-            <p className="text-slate-500 text-sm leading-relaxed max-w-sm">
-              Representando y acompañando a los profesionales de la kinesiología en Mendoza desde hace décadas.
+            <p className="text-slate-100 text-xl leading-relaxed max-w-sm">
+              El Círculo nos une.
             </p>
           </div>
           <div className="flex gap-3">
@@ -52,7 +52,7 @@ export default function Footer() {
             <h3 className="text-white font-black text-xs uppercase tracking-widest mb-5">Institucional</h3>
             <ul className="space-y-3 text-sm">
               <li>
-                <Link href="/institucional" className="hover:text-white transition-colors">Sobre Nosotros</Link>
+                <Link href="/institucional" className="hover:text-white transition-colors">Sobre nosotros</Link>
               </li>
               <li>
                 <Link href="/institucional" className="hover:text-white transition-colors">Autoridades</Link>
@@ -67,7 +67,7 @@ export default function Footer() {
             <h3 className="text-white font-black text-xs uppercase tracking-widest mb-5">Servicios</h3>
             <ul className="space-y-3 text-sm">
               {[
-                { label: "Padrón de Profesionales", href: "/profesionales" },
+                { label: "Padrón de profesionales", href: "/profesionales" },
                 { label: "Obras Sociales", href: "/obras-sociales" },
                 { label: "KineClub", href: "/kineclub" },
                 { label: "Noticias", href: "/noticias" },
@@ -83,8 +83,8 @@ export default function Footer() {
             <h3 className="text-white font-black text-xs uppercase tracking-widest mb-5">Portal Socio</h3>
             <ul className="space-y-3 text-sm">
               {[
-                { label: "Mi Panel", href: "/mi-panel" },
-                { label: "Carnet Digital", href: "/mi-panel/carnet" },
+                { label: "Mi panel", href: "/mi-panel" },
+                { label: "Carnet digital", href: "/mi-panel/carnet" },
                 { label: "Circulares", href: "/mi-panel/circulares" },
                 { label: "Capacitaciones", href: "/mi-panel/capacitaciones" },
               ].map(({ label, href }) => (

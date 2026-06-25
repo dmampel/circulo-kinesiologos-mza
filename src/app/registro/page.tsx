@@ -117,9 +117,9 @@ export default function RegistroPage() {
 
         {/* Header de Registro */}
         <div className="text-center mb-12">
-          <h1 className="text-4xl font-black text-slate-900 mb-4 tracking-tight">Solicitud de <span className="text-blue-600">Asociación</span></h1>
+          <h1 className="text-4xl font-black text-slate-900 mb-4 tracking-tight">Solicitud para <span className="text-blue-600">Asociarte</span></h1>
           <p className="text-slate-500 max-w-xl mx-auto leading-relaxed">
-            Completá los datos para iniciar tu trámite de ingreso al Círculo de Kinesiólogos de Mendoza.
+            Completá los datos para iniciar tu trámite de ingreso al Círculo de Kinesiólogos y Fisioterapeutas de Mendoza.
           </p>
         </div>
 

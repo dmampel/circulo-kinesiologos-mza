@@ -193,7 +193,7 @@ export default async function DashboardPage() {
             Panel Profesional • CKFM
           </p>
           <h1 className="text-4xl lg:text-5xl font-black text-slate-900 tracking-tighter leading-none uppercase">
-            Que bueno verte,{" "}
+            Qué bueno verte,{" "}
             <span className="text-blue-600 italic"> {profesional.nombre}</span>
           </h1>
           <p className="text-slate-500 text-md max-w-lg leading-relaxed pt-2">

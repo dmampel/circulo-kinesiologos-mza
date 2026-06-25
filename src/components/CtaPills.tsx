@@ -45,7 +45,7 @@ export default function CtaPills() {
             className={`flex items-center gap-2 px-4 py-2.5 rounded-full border text-sm font-semibold transition-all ${
               active === index
                 ? "bg-blue-600 border-blue-600 text-white"
-                : "bg-slate-50 border-slate-200 text-slate-700 hover:border-blue-400 hover:text-blue-600"
+                : "bg-slate-50 border-slate-300 text-slate-700 hover:border-blue-400 hover:text-blue-600"
             }`}
           >
             <Icon className={`h-4 w-4 shrink-0 ${active === index ? "text-white" : "text-blue-500"}`} />

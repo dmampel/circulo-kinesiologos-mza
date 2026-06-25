@@ -94,7 +94,7 @@ export default async function InstitucionalPage() {
         <div className="absolute bottom-16 md:bottom-20 left-0 right-0">
           <div className="mx-auto max-w-5xl px-6">
             <p className="text-6xl md:text-7xl xl:text-8xl 2xl:text-9xl font-black text-white tracking-tighter leading-none">
-              El Círculo
+              CKFM
             </p>
           </div>
         </div>
@@ -110,11 +110,11 @@ export default async function InstitucionalPage() {
             de los kinesiólogos<br />
             mendocinos.
           </h1>
-          <p className="text-base md:text-lg xl:text-xl 2xl:text-2xl text-slate-500 leading-relaxed font-light max-w-3xl border-l-4 border-blue-600 pl-8">
+          <p className="text-base md:text-lg xl:text-xl 2xl:text-2xl text-slate-600 leading-relaxed font-light max-w-3xl border-l-4 border-blue-600 pl-8">
             Negociamos convenios colectivos con obras sociales, mutuales y prepagas,
             representando a nuestros socios para asegurar aranceles justos. Generamos
             un espacio de pertenencia y colaboración, promoviendo la solidaridad, la
-            formación continua y la difusión de la kinesiología en la sociedad.
+            formación continua y la difusión de la kinesiología y la fisioterapia en la sociedad.
           </p>
         </div>
       </section>
@@ -140,17 +140,17 @@ export default async function InstitucionalPage() {
             Misión
           </span>
           <p className="text-base md:text-lg xl:text-xl 2xl:text-2xl text-white/65 leading-[1.7] font-light">
-            Negociamos convenios colectivos con obras sociales, mutuales y prepagas
+            Negociar convenios colectivos con obras sociales, mutuales y prepagas
             en representación de nuestros socios, buscando siempre mejorar los aranceles.
-            Fomentamos un crecimiento conjunto basado en la solidaridad y la formación continua,
-            y trabajamos en la concientización sobre el intrusismo profesional.
+            Fomentar un crecimiento conjunto basado en la solidaridad y la formación permanente
+            y trabajar en la concientización sobre el intrusismo profesional.
           </p>
         </div>
         <div className="bg-blue-600 py-14 md:py-20 xl:py-24 2xl:py-36 px-8 md:px-14 xl:px-16 2xl:px-24">
           <span className="text-xs font-black text-blue-200 uppercase tracking-[0.3em] block mb-7 xl:mb-10">
             Visión
           </span>
-          <p className="text-base md:text-lg xl:text-xl 2xl:text-2xl text-white/85 leading-[1.7] font-light">
+          <p className="text-base md:text-lg xl:text-xl 2xl:text-2xl text-white leading-[1.7] font-light">
             Prestar servicios modernos y procedimientos sistematizados para atender de manera
             eficiente las necesidades de nuestros socios, adaptándonos a las demandas del sector
             con políticas de gestión de calidad.
