@@ -1,3 +1,4 @@
+import Image from "next/image";
 import { createClient } from "@/utils/supabase/server";
 import { ProfesionalRepository } from "@/lib/repositories/ProfesionalRepository";
 import { BeneficioRepository } from "@/lib/repositories/BeneficioRepository";
@@ -283,23 +284,25 @@ export default async function DashboardPage() {
                   matricula={profesional.matricula}
                 />
 
-                <Link
-                  href="/mi-panel/capacitaciones"
-                  className="flex items-center gap-4 p-4 sm:p-5 bg-white border border-slate-100 rounded-2xl hover:border-blue-200 hover:shadow-md transition-all group w-full"
+                <a
+                  href="https://octus.com.ar/login"
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className="flex items-center gap-4 p-4 sm:p-5 bg-white border border-slate-100 rounded-2xl hover:border-red-200 hover:shadow-md transition-all group w-full"
                 >
-                  <div className="h-12 w-12 rounded-xl bg-slate-50 flex items-center justify-center text-slate-400 group-hover:bg-blue-600 group-hover:text-white transition-all shrink-0">
-                    <BookOpen className="h-6 w-6" />
+                  <div className="h-12 w-12 rounded-xl bg-slate-50 flex items-center justify-center overflow-hidden shrink-0">
+                    <Image src="/octuslogo.png" alt="Octus" width={24} height={24} className="object-contain" />
                   </div>
                   <div>
                     <p className="text-sm font-bold text-slate-800 group-hover:text-slate-900">
-                      Cursos y Capacitaciones
+                      Ir a Octus
                     </p>
                     <p className="text-[11px] text-slate-400 font-medium">
-                      Formación continua para profesionales
+                      Plataforma de gestión y archivo digital.
                     </p>
                   </div>
-                  <ArrowUpRight className="h-4 w-4 ml-auto text-slate-300 group-hover:text-blue-600 transition-colors" />
-                </Link>
+                  <ArrowUpRight className="h-4 w-4 ml-auto text-slate-300 group-hover:text-red-600 transition-colors" />
+                </a>
               </div>
             </div>
           </div>
