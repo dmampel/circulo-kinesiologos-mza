@@ -56,8 +56,8 @@ function formatHora(fecha: Date) {
 
 const MODALIDAD_COLORS: Record<string, { bar: string; bg: string; icon: string }> = {
   PRESENCIAL: { bar: "border-l-blue-500", bg: "bg-blue-50/40", icon: "text-blue-500" },
-  VIRTUAL:    { bar: "border-l-emerald-500", bg: "bg-emerald-50/40", icon: "text-emerald-500" },
-  HIBRIDO:    { bar: "border-l-violet-500", bg: "bg-violet-50/40", icon: "text-violet-500" },
+  VIRTUAL: { bar: "border-l-emerald-500", bg: "bg-emerald-50/40", icon: "text-emerald-500" },
+  HIBRIDO: { bar: "border-l-violet-500", bg: "bg-violet-50/40", icon: "text-violet-500" },
 };
 
 // ─── Page ─────────────────────────────────────────────────────────────────────
@@ -221,11 +221,10 @@ export default async function DashboardPage() {
                 {profesional.especialidades.map((e) => e.nombre).join(", ")}
               </p>
             </div>
-            <div className={`ml-2 px-3 py-1 rounded-lg text-[9px] font-black uppercase tracking-widest border ${
-              profesional.status === "ACTIVO"
+            <div className={`ml-2 px-3 py-1 rounded-lg text-[9px] font-black uppercase tracking-widest border ${profesional.status === "ACTIVO"
                 ? "bg-green-50 text-green-600 border-green-100"
                 : "bg-slate-100 text-slate-400 border-slate-200"
-            }`}>
+              }`}>
               {profesional.status === "ACTIVO" ? "Activo" : "Inactivo"}
             </div>
           </div>
@@ -302,6 +301,26 @@ export default async function DashboardPage() {
                     </p>
                   </div>
                   <ArrowUpRight className="h-4 w-4 ml-auto text-slate-300 group-hover:text-red-600 transition-colors" />
+                </a>
+
+                <a
+                  href="https://ajrpt.com/revista/"
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className="flex items-center gap-4 p-4 sm:p-5 bg-white border border-slate-100 rounded-2xl hover:border-green-200 hover:shadow-md transition-all group w-full"
+                >
+                  <div className="h-12 w-12 rounded-xl bg-slate-50 flex items-center justify-center overflow-hidden shrink-0">
+                    <Image src="/logoAJRPT.png" alt="Revista AJRPT" width={24} height={24} className="object-contain" />
+                  </div>
+                  <div>
+                    <p className="text-sm font-bold text-slate-800 group-hover:text-slate-900">
+                      Revista AJRPT
+                    </p>
+                    <p className="text-[11px] text-slate-400 font-medium">
+                      Accedé a la última edición de la Revista Argentina de Fisioterapia y Kinesiología.
+                    </p>
+                  </div>
+                  <ArrowUpRight className="h-4 w-4 ml-auto text-slate-300 group-hover:text[#469588] transition-colors" />
                 </a>
               </div>
             </div>
@@ -456,32 +475,33 @@ export default async function DashboardPage() {
             ) : circulares.map((circular) => {
               const isRead = (circular as any).lecturas?.length > 0;
               return (
-              <div key={circular.id} className="group relative pl-8 sm:pl-10 py-6 first:pt-0">
-                <div className={`absolute left-0 top-[38px] h-[22px] w-[22px] rounded-full border-4 border-white z-10 transition-colors ${isRead ? "bg-slate-200" : "bg-blue-600 animate-pulse"}`} />
-                <div className="space-y-1.5">
-                  <div className="flex items-center gap-3">
-                    <span className="text-[10px] font-bold text-slate-400 uppercase tracking-widest">
-                      {new Intl.DateTimeFormat("es-AR", { day: "2-digit", month: "long", year: "numeric" }).format(circular.publicada_en || circular.createdAt)}
-                    </span>
-                    <span className="h-1 w-1 rounded-full bg-slate-200" />
-                    <span className={`text-[10px] font-black uppercase tracking-widest ${isRead ? "text-slate-400" : "text-blue-600"}`}>
-                      {circular.etiqueta}
-                    </span>
+                <div key={circular.id} className="group relative pl-8 sm:pl-10 py-6 first:pt-0">
+                  <div className={`absolute left-0 top-[38px] h-[22px] w-[22px] rounded-full border-4 border-white z-10 transition-colors ${isRead ? "bg-slate-200" : "bg-blue-600 animate-pulse"}`} />
+                  <div className="space-y-1.5">
+                    <div className="flex items-center gap-3">
+                      <span className="text-[10px] font-bold text-slate-400 uppercase tracking-widest">
+                        {new Intl.DateTimeFormat("es-AR", { day: "2-digit", month: "long", year: "numeric" }).format(circular.publicada_en || circular.createdAt)}
+                      </span>
+                      <span className="h-1 w-1 rounded-full bg-slate-200" />
+                      <span className={`text-[10px] font-black uppercase tracking-widest ${isRead ? "text-slate-400" : "text-blue-600"}`}>
+                        {circular.etiqueta}
+                      </span>
+                    </div>
+                    <Link href={`/mi-panel/circulares/${circular.id}`} className="block">
+                      <h3 className={`text-lg font-bold leading-tight transition-colors ${isRead ? "text-slate-400" : "text-slate-900 group-hover:text-blue-700"}`}>
+                        {circular.titulo}
+                      </h3>
+                    </Link>
+                    <Link
+                      href={`/mi-panel/circulares/${circular.id}`}
+                      className="inline-flex items-center text-[10px] font-bold text-slate-400 uppercase tracking-widest group-hover:text-slate-900 transition-colors pt-1"
+                    >
+                      Ver más <ArrowUpRight className="ml-1 h-3 w-3" />
+                    </Link>
                   </div>
-                  <Link href={`/mi-panel/circulares/${circular.id}`} className="block">
-                    <h3 className={`text-lg font-bold leading-tight transition-colors ${isRead ? "text-slate-400" : "text-slate-900 group-hover:text-blue-700"}`}>
-                      {circular.titulo}
-                    </h3>
-                  </Link>
-                  <Link
-                    href={`/mi-panel/circulares/${circular.id}`}
-                    className="inline-flex items-center text-[10px] font-bold text-slate-400 uppercase tracking-widest group-hover:text-slate-900 transition-colors pt-1"
-                  >
-                    Ver más <ArrowUpRight className="ml-1 h-3 w-3" />
-                  </Link>
                 </div>
-              </div>
-            );})}
+              );
+            })}
           </div>
         </div>
 

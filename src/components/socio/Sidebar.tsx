@@ -17,6 +17,7 @@ import {
   Home,
   CalendarDays,
   Users,
+  Gift,
 } from "lucide-react";
 import { clsx } from "clsx";
 import { twMerge } from "tailwind-merge";
@@ -34,6 +35,7 @@ const navItems = [
   { title: "Mi Carnet", href: "/mi-panel/carnet", icon: CreditCard },
   { title: "Mi Perfil", href: "/mi-panel/perfil", icon: UserCircle },
   { title: "Capacitaciones", href: "/mi-panel/capacitaciones", icon: BookOpen },
+  { title: "Sorteos", href: "/mi-panel/sorteos", icon: Gift },
   { title: "Circulares", href: "/mi-panel/circulares", icon: Megaphone },
   { title: "Turnos", href: "/mi-panel/turnos", icon: CalendarDays },
   { title: "Pacientes", href: "/mi-panel/turnos/pacientes", icon: Users },

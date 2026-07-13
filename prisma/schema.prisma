@@ -54,6 +54,8 @@ model Profesional {
   autoridades               Autoridad[]
   pacientes                 Paciente[]
   turnos                    Turno[]
+  inscripcionesSorteo       InscripcionSorteo[]
+  sorteoGanado              Sorteo?            @relation("SorteoGanador")
 
   // Auth y Sistema
   userId String?  @unique // ID de Supabase Auth
@@ -278,4 +280,39 @@ model Autoridad {
 
   createdAt     DateTime    @default(now())
   updatedAt     DateTime    @updatedAt
+}
+
+enum EstadoSorteo {
+  BORRADOR
+  ACTIVO
+  REALIZADO
+}
+
+model Sorteo {
+  id               String              @id @default(cuid())
+  titulo           String
+  descripcion      String              @db.Text
+  imagen_url       String?
+  fechaInicio      DateTime
+  fechaCierre      DateTime?
+  maxParticipantes Int?
+  estado           EstadoSorteo        @default(BORRADOR)
+
+  inscripciones    InscripcionSorteo[]
+  ganadorId        String?             @unique
+  ganador          Profesional?        @relation("SorteoGanador", fields: [ganadorId], references: [id])
+
+  createdAt        DateTime            @default(now())
+  updatedAt        DateTime            @updatedAt
+}
+
+model InscripcionSorteo {
+  id            String      @id @default(cuid())
+  sorteoId      String
+  profesionalId String
+  sorteo        Sorteo      @relation(fields: [sorteoId], references: [id], onDelete: Cascade)
+  profesional   Profesional @relation(fields: [profesionalId], references: [id], onDelete: Cascade)
+  createdAt     DateTime    @default(now())
+
+  @@unique([sorteoId, profesionalId])
 }

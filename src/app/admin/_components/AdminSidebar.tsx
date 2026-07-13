@@ -16,6 +16,7 @@ import {
   BookOpen,
   Megaphone,
   Monitor,
+  Gift,
 } from "lucide-react";
 import { cn } from "@/lib/utils";
 import { createClient } from "@/utils/supabase/client";
@@ -36,6 +37,7 @@ const SIDEBAR_LINKS: {
   { name: "Autoridades", href: "/admin/autoridades", icon: ShieldCheck },
   { name: "Circulares", href: "/admin/circulares", icon: Megaphone },
   { name: "Capacitaciones", href: "/admin/capacitaciones", icon: BookOpen },
+  { name: "Sorteos", href: "/admin/sorteos", icon: Gift },
 ];
 
 export default function AdminSidebar() {
