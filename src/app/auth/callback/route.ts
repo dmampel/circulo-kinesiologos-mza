@@ -5,7 +5,8 @@ import { NextResponse } from "next/server";
 export async function GET(request: Request) {
   const { searchParams, origin } = new URL(request.url);
   const code = searchParams.get("code");
-  const next = searchParams.get("next") ?? "/mi-panel";
+  const explicitNext = searchParams.get("next");
+  const next = explicitNext ?? "/mi-panel";
 
   if (code) {
     const supabase = await createClient();
@@ -15,7 +16,7 @@ export async function GET(request: Request) {
         where: { userId: data.user.id },
         select: { role: true },
       });
-      const destination = profesional?.role === "ADMIN" ? "/admin" : next;
+      const destination = (!explicitNext && profesional?.role === "ADMIN") ? "/admin" : next;
       return NextResponse.redirect(`${origin}${destination}`);
     }
   }
