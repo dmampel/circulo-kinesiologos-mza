@@ -92,11 +92,7 @@ export default async function Home() {
               {/* LEFT: Copy */}
               <div>
                 <TextReveal as="h1" variant="words" className="text-5xl lg:text-6xl xl:text-7xl font-black text-white tracking-tighter leading-[1.05] mb-6">
-                  {" "}
-                  <span className="text-blue-500 underline decoration-blue-500/30 underline-offset-8">
-                    Círculo
-                  </span>{" "}
-                  de Kinesiólogos y Fisioterapeutas  de Mendoza
+                  Círculo de <span className="text-blue-500 underline decoration-white underline-offset-8">Kinesiólogos</span> y <span className="text-blue-500 underline decoration-white underline-offset-8">Fisioterapeutas</span> de Mendoza
                 </TextReveal>
                 <p className="text-slate-400 text-lg leading-relaxed mb-10 max-w-lg">
                   Somos una entidad sin fines de lucro que representa y acompaña a los profesionales de la salud kinésica, que garantiza la calidad prestacional y el desarrollo continuo de la disciplina.
