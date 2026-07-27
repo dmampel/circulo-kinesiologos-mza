@@ -23,7 +23,7 @@ function getInitials(nombre: string, apellido: string): string {
 
 const HITOS: Array<{ año: string; titulo: string; desc: string }> = [
   {
-    año: "1960",
+    año: "1980",
     titulo: "Fundación",
     desc: "Se fundó el Círculo de Kinesiólogos y Fisioterapeutas de Mendoza como organización gremial provincial.",
   },
@@ -105,7 +105,7 @@ export default async function InstitucionalPage() {
       <section className="bg-white py-16 md:py-20 xl:py-28 2xl:py-40">
         <div className="mx-auto max-w-5xl px-6">
           <h1 className="text-4xl md:text-5xl xl:text-6xl 2xl:text-8xl font-black text-slate-900 tracking-tighter leading-[0.88] mb-10 md:mb-14 2xl:mb-24">
-            Desde 1960,<br />
+            Desde 1980,<br />
             <span className="text-blue-600">la voz</span><br />
             de los kinesiólogos<br />
             mendocinos.
