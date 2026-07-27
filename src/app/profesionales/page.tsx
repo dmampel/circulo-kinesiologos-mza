@@ -143,7 +143,7 @@ export default async function ProfesionalesPage({ searchParams }: Props) {
           </div>
         </div>
 
-        <div className="bg-white/60 backdrop-blur-xl rounded-[3rem] p-8 lg:p-12 border border-white shadow-xl shadow-slate-200/50">
+        <div className="p-8 lg:p-12 ">
           {/* Alphabet Navigation Horizontal */}
           <AlphabetSidebar selectedChar={char} />
 
