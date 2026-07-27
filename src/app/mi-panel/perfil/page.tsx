@@ -43,7 +43,7 @@ export default async function PerfilPage() {
     <div className="max-w-3xl mx-auto space-y-10 pb-10 animate-in fade-in duration-500">
       {/* Header */}
       <div className="space-y-1">
-        <p className="text-[10px] font-black text-blue-600 uppercase tracking-[0.3em]">Panel Profesional · CKM</p>
+        <p className="text-[10px] font-black text-blue-600 uppercase tracking-[0.3em]">Panel Profesional · CKFM</p>
         <h1 className="text-3xl font-black text-slate-900 tracking-tight leading-none">Mi Perfil</h1>
         <p className="text-sm text-slate-500 font-medium pt-1">
           Actualizá tus datos de contacto y foto. Los cambios se reflejan automáticamente en el Padrón Público.

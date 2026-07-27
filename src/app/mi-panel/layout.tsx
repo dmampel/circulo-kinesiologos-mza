@@ -3,6 +3,8 @@ import MobileSidebarShell from "@/components/socio/MobileSidebarShell";
 import { createClient } from "@/utils/supabase/server";
 import { ProfesionalRepository } from "@/lib/repositories/ProfesionalRepository";
 import { CircularRepository } from "@/lib/repositories/CircularRepository";
+import { SorteoRepository } from "@/lib/repositories/SorteoRepository";
+import { CapacitacionRepository } from "@/lib/repositories/CapacitacionRepository";
 import { redirect } from "next/navigation";
 
 export default async function PortalLayout({
@@ -26,10 +28,20 @@ export default async function PortalLayout({
     unreadCount = await CircularRepository.countUnread(profesional.id);
   }
 
+  const latestSorteo = await SorteoRepository.getLatestActive();
+  const latestSorteoTime = latestSorteo ? latestSorteo.createdAt.toISOString() : null;
+
+  const latestCapacitacion = await CapacitacionRepository.getLatestPublicada();
+  const latestCapacitacionTime = latestCapacitacion ? latestCapacitacion.createdAt.toISOString() : null;
+
   return (
     <div className="min-h-screen bg-slate-50 lg:flex lg:h-screen lg:overflow-hidden">
       <MobileSidebarShell>
-        <Sidebar unreadCirculares={unreadCount} />
+        <Sidebar 
+          unreadCirculares={unreadCount} 
+          latestSorteoTime={latestSorteoTime} 
+          latestCapacitacionTime={latestCapacitacionTime} 
+        />
       </MobileSidebarShell>
       <main className="flex-1 lg:overflow-y-auto">
         <div className="mx-auto max-w-6xl py-5 px-4 sm:px-6 lg:px-5 pt-16 lg:pt-5">

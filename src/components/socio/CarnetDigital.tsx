@@ -35,9 +35,9 @@ export default function CarnetDigital({ profesional, slug }: Props) {
         {/* Header del Carnet */}
         <div className="flex items-start justify-between">
           <div className="flex items-center gap-3">
-            <div className="h-12 w-12 bg-white rounded-2xl flex items-center justify-center shadow-lg">
-              <span className="text-blue-700 font-black text-xl">CK</span>
-            </div>
+          
+            <Image src="/icon.png" alt="Círculo de Kinesiólogos de Mendoza" width={150} height={80} className="h-10 w-auto rounded-xl" />
+            
             <div>
               <h2 className="text-white font-black text-lg tracking-tighter leading-none">
                 CKFM <br />

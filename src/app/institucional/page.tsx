@@ -74,7 +74,7 @@ export default async function InstitucionalPage() {
   const STATS = [
     { num: "65+", label: "Años de trayectoria" },
     { num: `${sociosCount}+`, label: "Socios activos" },
-    { num: `${obrasSocialesCount}+`, label: "Obras sociales convenidas" },
+    { num: `30+`, label: "Obras sociales convenidas" },
   ];
   
   const presidente = autoridades.find(a => a.cargo.toLowerCase() === 'presidente');
@@ -202,17 +202,8 @@ export default async function InstitucionalPage() {
                 Presidencia
               </span>
               <div className="flex flex-col md:flex-row items-start md:items-end gap-8 md:gap-12">
-                <div className="relative h-24 w-24 md:h-28 md:w-28 2xl:h-32 2xl:w-32 rounded-[2rem] bg-blue-600 flex items-center justify-center text-4xl font-black text-white shrink-0 overflow-hidden">
-                  {presidente.profesional.foto_url ? (
-                    <Image
-                      src={presidente.profesional.foto_url}
-                      alt={presidente.profesional.full_name || ""}
-                      fill
-                      className="object-cover"
-                    />
-                  ) : (
-                    getInitials(presidente.profesional.nombre, presidente.profesional.apellido)
-                  )}
+                <div className="h-24 w-24 md:h-28 md:w-28 2xl:h-32 2xl:w-32 rounded-[2rem] bg-blue-600 flex items-center justify-center text-4xl font-black text-white shrink-0">
+                  {getInitials(presidente.profesional.nombre, presidente.profesional.apellido)}
                 </div>
                 <p className="text-3xl md:text-4xl xl:text-5xl 2xl:text-7xl font-black text-white tracking-tighter leading-none">
                   {presidente.profesional.full_name || `${presidente.profesional.nombre} ${presidente.profesional.apellido}`}
@@ -231,18 +222,9 @@ export default async function InstitucionalPage() {
                 }`}
               >
                 <div
-                  className={`relative h-11 w-11 rounded-xl ${AVATAR_COLORS[i % AVATAR_COLORS.length]} flex items-center justify-center text-sm font-black text-white shrink-0 overflow-hidden`}
+                  className={`h-11 w-11 rounded-xl ${AVATAR_COLORS[i % AVATAR_COLORS.length]} flex items-center justify-center text-sm font-black text-white shrink-0`}
                 >
-                  {miembro.profesional.foto_url ? (
-                    <Image
-                      src={miembro.profesional.foto_url}
-                      alt={miembro.profesional.full_name || ""}
-                      fill
-                      className="object-cover"
-                    />
-                  ) : (
-                    getInitials(miembro.profesional.nombre, miembro.profesional.apellido)
-                  )}
+                  {getInitials(miembro.profesional.nombre, miembro.profesional.apellido)}
                 </div>
                 <div className="flex-1 min-w-0">
                   <span className="text-xs font-black text-slate-500 uppercase tracking-widest block mb-1">

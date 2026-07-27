@@ -57,4 +57,12 @@ export class SorteoRepository {
       },
     });
   }
+
+  static async getLatestActive() {
+    return prisma.sorteo.findFirst({
+      where: { estado: "ACTIVO" },
+      orderBy: { createdAt: "desc" },
+      select: { createdAt: true },
+    });
+  }
 }

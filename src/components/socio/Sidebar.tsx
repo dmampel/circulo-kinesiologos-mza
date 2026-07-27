@@ -1,5 +1,6 @@
 "use client";
 
+import { useState, useEffect } from "react";
 import Link from "next/link";
 import { usePathname } from "next/navigation";
 import {
@@ -47,10 +48,52 @@ const toolItems = [
   { title: "KineClub", href: "/kineclub", icon: Star },
 ];
 
-export default function Sidebar({ unreadCirculares = 0 }: { unreadCirculares?: number }) {
+export default function Sidebar({
+  unreadCirculares = 0,
+  latestSorteoTime = null,
+  latestCapacitacionTime = null,
+}: {
+  unreadCirculares?: number;
+  latestSorteoTime?: string | null;
+  latestCapacitacionTime?: string | null;
+}) {
   const pathname = usePathname();
   const router = useRouter();
   const supabase = createClient();
+  const [hasNewSorteo, setHasNewSorteo] = useState(false);
+  const [hasNewCapacitacion, setHasNewCapacitacion] = useState(false);
+
+  useEffect(() => {
+    if (pathname === "/mi-panel/sorteos") {
+      localStorage.setItem("lastSeenSorteoTime", String(Date.now()));
+      setHasNewSorteo(false);
+    } else if (latestSorteoTime) {
+      const lastSeen = localStorage.getItem("lastSeenSorteoTime");
+      if (!lastSeen || new Date(latestSorteoTime).getTime() > Number(lastSeen)) {
+        setHasNewSorteo(true);
+      } else {
+        setHasNewSorteo(false);
+      }
+    } else {
+      setHasNewSorteo(false);
+    }
+  }, [latestSorteoTime, pathname]);
+
+  useEffect(() => {
+    if (pathname === "/mi-panel/capacitaciones") {
+      localStorage.setItem("lastSeenCapacitacionTime", String(Date.now()));
+      setHasNewCapacitacion(false);
+    } else if (latestCapacitacionTime) {
+      const lastSeen = localStorage.getItem("lastSeenCapacitacionTime");
+      if (!lastSeen || new Date(latestCapacitacionTime).getTime() > Number(lastSeen)) {
+        setHasNewCapacitacion(true);
+      } else {
+        setHasNewCapacitacion(false);
+      }
+    } else {
+      setHasNewCapacitacion(false);
+    }
+  }, [latestCapacitacionTime, pathname]);
 
   const handleLogout = async () => {
     await supabase.auth.signOut();
@@ -108,21 +151,29 @@ export default function Sidebar({ unreadCirculares = 0 }: { unreadCirculares?: n
                 <span className="font-bold text-sm tracking-tight">{item.title}</span>
                 
                 {hasUnread && !isActive && (
-                  <span className="flex h-5 w-5 items-center justify-center rounded-full bg-red-500 text-[10px] font-black text-white shadow-sm shadow-red-200">
-                    {unreadCirculares}
+                  <span className="px-2 py-0.5 bg-blue-50 text-blue-600 text-[9px] font-black uppercase tracking-widest rounded-md">
+                    Nuevo
+                  </span>
+                )}
+
+                {item.href === "/mi-panel/sorteos" && hasNewSorteo && !isActive && (
+                  <span className="px-2 py-0.5 bg-blue-50 text-blue-600 text-[9px] font-black uppercase tracking-widest rounded-md">
+                    Nuevo
+                  </span>
+                )}
+
+                {item.href === "/mi-panel/capacitaciones" && hasNewCapacitacion && !isActive && (
+                  <span className="px-2 py-0.5 bg-blue-50 text-blue-600 text-[9px] font-black uppercase tracking-widest rounded-md">
+                    Nuevo
                   </span>
                 )}
               </div>
               
-              {isActive ? (
+              {isActive && (
                 <motion.div
                   layoutId="active-indicator"
                   className="h-1.5 w-1.5 bg-blue-600 rounded-full"
                 />
-              ) : (
-                hasUnread && isActive && (
-                   <div className="h-1.5 w-1.5 bg-red-500 rounded-full" />
-                )
               )}
             </Link>
           );

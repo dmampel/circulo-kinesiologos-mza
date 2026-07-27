@@ -79,60 +79,60 @@ export default async function Home() {
 
       {/* ── HERO ─────────────────────────────────────────────── */}
       <section className="min-h-screen bg-slate-50 flex flex-col">
-      <HeroCard>
+        <HeroCard>
 
-        {/* Grid pattern */}
-        <div className="absolute inset-0 bg-[linear-gradient(rgba(255,255,255,0.03)_1px,transparent_1px),linear-gradient(90deg,rgba(255,255,255,0.03)_1px,transparent_1px)] bg-[size:60px_60px] pointer-events-none" />
+          {/* Grid pattern */}
+          <div className="absolute inset-0 bg-[linear-gradient(rgba(255,255,255,0.03)_1px,transparent_1px),linear-gradient(90deg,rgba(255,255,255,0.03)_1px,transparent_1px)] bg-[size:60px_60px] pointer-events-none" />
 
-        <HeroGlows />
+          <HeroGlows />
 
-        <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8 relative z-10">
-          <div className="grid grid-cols-1 lg:grid-cols-2 gap-16 items-center">
+          <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8 relative z-10">
+            <div className="grid grid-cols-1 lg:grid-cols-2 gap-16 items-center">
 
-            {/* LEFT: Copy */}
-            <div>
-              <TextReveal as="h1" variant="words" className="text-5xl lg:text-6xl xl:text-7xl font-black text-white tracking-tighter leading-[1.05] mb-6">
-                {" "}
-                <span className="text-blue-500 underline decoration-blue-500/30 underline-offset-8">
-                  Círculo
-                </span>{" "}
-                de Kinesiólogos y Fisioterapeutas  de Mendoza
-              </TextReveal>
-              <p className="text-slate-400 text-lg leading-relaxed mb-10 max-w-lg">
-                Somos una entidad sin fines de lucro que representa y acompaña a los profesionales de la salud kinésica, que garantiza la calidad prestacional y el desarrollo continuo de la disciplina.
-              </p>
-              <div className="flex flex-col sm:flex-row gap-4">
-                <Link
-                  href="/profesionales"
-                  className="inline-flex items-center justify-center px-8 py-4 rounded-full bg-blue-600 text-white font-black shadow-lg shadow-blue-500/30 hover:bg-blue-500 hover:shadow-blue-500/50 transition-all"
-                >
-                  Buscar Profesional <Search className="ml-2 h-4 w-4" />
-                </Link>
-                <Link
-                  href="/registro"
-                  className="inline-flex items-center justify-center px-8 py-4 rounded-full border border-white/30 text-white font-black hover:bg-white hover:text-slate-900 transition-all"
-                >
-                  Asociate <ArrowRight className="ml-2 h-4 w-4" />
-                </Link>
+              {/* LEFT: Copy */}
+              <div>
+                <TextReveal as="h1" variant="words" className="text-5xl lg:text-6xl xl:text-7xl font-black text-white tracking-tighter leading-[1.05] mb-6">
+                  {" "}
+                  <span className="text-blue-500 underline decoration-blue-500/30 underline-offset-8">
+                    Círculo
+                  </span>{" "}
+                  de Kinesiólogos y Fisioterapeutas  de Mendoza
+                </TextReveal>
+                <p className="text-slate-400 text-lg leading-relaxed mb-10 max-w-lg">
+                  Somos una entidad sin fines de lucro que representa y acompaña a los profesionales de la salud kinésica, que garantiza la calidad prestacional y el desarrollo continuo de la disciplina.
+                </p>
+                <div className="flex flex-col sm:flex-row gap-4">
+                  <Link
+                    href="/profesionales"
+                    className="inline-flex items-center justify-center px-8 py-4 rounded-full bg-blue-600 text-white font-black shadow-lg shadow-blue-500/30 hover:bg-blue-500 hover:shadow-blue-500/50 transition-all"
+                  >
+                    Buscar Profesional <Search className="ml-2 h-4 w-4" />
+                  </Link>
+                  <Link
+                    href="/registro"
+                    className="inline-flex items-center justify-center px-8 py-4 rounded-full border border-white/30 text-white font-black hover:bg-white hover:text-slate-900 transition-all"
+                  >
+                    Asociate <ArrowRight className="ml-2 h-4 w-4" />
+                  </Link>
+                </div>
               </div>
-            </div>
 
-            {/* RIGHT: Floating stat pills */}
-            <div>
-              <FloatingStatPills
-                profesionales={totalProfesionales}
-                obrasSociales={30}
-                beneficios={15}
-              />
-            </div>
+              {/* RIGHT: Floating stat pills */}
+              <div>
+                <FloatingStatPills
+                  profesionales={totalProfesionales}
+                  obrasSociales={30}
+                  beneficios={15}
+                />
+              </div>
 
+            </div>
           </div>
-        </div>
 
-        {/* Glow azul en el borde inferior */}
-        <div className="absolute bottom-0 left-1/2 -translate-x-1/2 w-[60%] h-48 bg-blue-600/20 blur-[80px] rounded-full pointer-events-none" />
+          {/* Glow azul en el borde inferior */}
+          <div className="absolute bottom-0 left-1/2 -translate-x-1/2 w-[60%] h-48 bg-blue-600/20 blur-[80px] rounded-full pointer-events-none" />
 
-      </HeroCard>
+        </HeroCard>
       </section>
 
       {/* ── POR QUÉ ASOCIARTE ────────────────────────────────── */}
@@ -150,7 +150,7 @@ export default async function Home() {
                 <span className="text-slate-400">Una comunidad.</span>
               </TextReveal>
               <p className="text-slate-500 leading-relaxed mb-4 max-w-xl">
-                El Círculo de Kinesiólogos de Mendoza es la institución que te respalda en cada etapa de tu carrera, desde los primeros pasos hasta el desarrollo profesional continuo. 
+                El Círculo de Kinesiólogos de Mendoza es la institución que te respalda en cada etapa de tu carrera, desde los primeros pasos hasta el desarrollo profesional continuo.
               </p>
               <Link
                 href="/institucional"
@@ -210,13 +210,15 @@ export default async function Home() {
               </Link>
             </ScrollReveal>
             {obrasSociales.length > 0 && (
-              <ScrollReveal variant="staggerContainer" className="flex flex-wrap gap-2">
-                {obrasSociales.map((os) => (
-                  <StaggerItem
-                    key={os.id}
-                    className="px-4 py-2 rounded-xl border border-slate-300 bg-slate-50 text-slate-600 text-sm font-medium hover:bg-slate-100 hover:text-slate-900 transition-colors"
-                  >
-                    {os.nombre}
+              <ScrollReveal variant="staggerContainer" className="flex flex-wrap justify-center gap-2">
+                {[...obrasSociales].sort((a, b) => a.nombre.localeCompare(b.nombre)).map((os) => (
+                  <StaggerItem key={os.id}>
+                    <Link
+                      href="/obras-sociales"
+                      className="block px-4 py-2 rounded-xl border border-slate-300 bg-slate-50 text-slate-600 text-sm font-medium hover:bg-slate-100 hover:text-blue-600 hover:border-blue-300 transition-colors"
+                    >
+                      {os.nombre}
+                    </Link>
                   </StaggerItem>
                 ))}
               </ScrollReveal>
@@ -243,7 +245,7 @@ export default async function Home() {
                 Ver todos los convenios <ChevronRight className="ml-2 h-4 w-4" />
               </Link>
             </div>
-            
+
           </div>
 
         </div>
@@ -324,42 +326,92 @@ export default async function Home() {
               {/* Noticias */}
               {ultimasNoticias.length > 0 && (
                 <div>
-                  <ScrollReveal className="flex items-center justify-between mb-10">
+                  <ScrollReveal className="flex items-end justify-between mb-10">
                     <div>
-                      <span className="text-xs font-black uppercase tracking-widest text-blue-600 mb-1 block">Novedades</span>
-                      <h2 className="text-2xl font-black text-slate-900 tracking-tight">Últimas noticias</h2>
+                      <span className="text-xs font-black uppercase tracking-widest text-blue-600 mb-2 block">Novedades</span>
+                      <h2 className="text-4xl lg:text-5xl font-black text-slate-900 tracking-tighter leading-none">Últimas noticias.</h2>
                     </div>
-                    <Link href="/noticias" className="inline-flex items-center text-sm font-bold text-slate-400 hover:text-blue-600 transition-colors">
+                    <Link href="/noticias" className="inline-flex items-center text-sm font-bold text-slate-400 hover:text-blue-600 transition-colors mb-1">
                       Ver todas <ChevronRight className="ml-1 h-4 w-4" />
                     </Link>
                   </ScrollReveal>
-                  <ScrollReveal variant="staggerContainer" className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
-                    {ultimasNoticias.map((noticia) => (
-                      <StaggerItem key={noticia.id}>
+
+                  <div className="grid grid-cols-1 lg:grid-cols-[1fr_380px] gap-6 items-stretch">
+
+                    {/* Noticia destacada */}
+                    {ultimasNoticias[0] && (
+                      <ScrollReveal>
                         <Link
-                          href={`/noticias?noticia=${noticia.slug}`}
-                          className="group block rounded-2xl overflow-hidden border border-slate-100 hover:shadow-md hover:-translate-y-0.5 transition-all bg-white"
+                          href={`/noticias?noticia=${ultimasNoticias[0].slug}`}
+                          className="group relative flex flex-col justify-end h-full min-h-[480px] rounded-3xl overflow-hidden bg-slate-900"
                         >
-                          <div className="relative h-44 overflow-hidden bg-gradient-to-br from-blue-50 to-indigo-100">
-                            {noticia.imagen_url
-                              ? <Image src={noticia.imagen_url} alt={noticia.titulo} fill className="object-cover group-hover:scale-105 transition-transform duration-500" />
-                              : <div className="h-full w-full flex items-center justify-center"><Newspaper className="h-8 w-8 text-blue-200" /></div>
-                            }
-                          </div>
-                          <div className="p-5">
-                            {noticia.publicada_en && (
-                              <p className="text-xs text-slate-400 mb-2">
-                                {new Date(noticia.publicada_en).toLocaleDateString("es-AR", { day: "numeric", month: "short" })}
+                          {ultimasNoticias[0].imagen_url ? (
+                            <Image
+                              src={ultimasNoticias[0].imagen_url}
+                              alt={ultimasNoticias[0].titulo}
+                              fill
+                              className="object-cover group-hover:scale-105 transition-transform duration-700"
+                            />
+                          ) : (
+                            <div className="absolute inset-0 bg-gradient-to-br from-slate-800 to-blue-950" />
+                          )}
+                          {/* Gradient overlay */}
+                          <div className="absolute inset-0 bg-gradient-to-t from-slate-950 via-slate-950/40 to-transparent" />
+                          {/* Content */}
+                          <div className="relative z-10 p-8">
+                            <span className="inline-block text-xs font-black uppercase tracking-widest text-blue-400 mb-4">Destacada</span>
+                            <h3 className="text-2xl lg:text-3xl font-black text-white tracking-tighter leading-tight line-clamp-3 group-hover:text-blue-200 transition-colors mb-4">
+                              {ultimasNoticias[0].titulo}
+                            </h3>
+                            {ultimasNoticias[0].publicada_en && (
+                              <p className="text-slate-400 text-sm">
+                                {new Date(ultimasNoticias[0].publicada_en).toLocaleDateString("es-AR", { day: "numeric", month: "long", year: "numeric" })}
                               </p>
                             )}
-                            <h3 className="font-black text-slate-900 text-sm leading-snug line-clamp-3 group-hover:text-blue-600 transition-colors">
-                              {noticia.titulo}
-                            </h3>
                           </div>
                         </Link>
-                      </StaggerItem>
-                    ))}
-                  </ScrollReveal>
+                      </ScrollReveal>
+                    )}
+
+                    {/* Resto de noticias — lista compacta */}
+                    {ultimasNoticias.length > 1 && (
+                      <ScrollReveal variant="staggerContainer" className="flex flex-col divide-y divide-slate-100">
+                        {ultimasNoticias.slice(1).map((noticia, i) => (
+                          <StaggerItem key={noticia.id}>
+                            <Link
+                              href={`/noticias?noticia=${noticia.slug}`}
+                              className="group flex gap-5 items-start py-7 first:pt-0"
+                            >
+                              {/* Número index */}
+                              <span className="text-4xl font-black text-slate-100 group-hover:text-blue-100 transition-colors leading-none shrink-0 w-8 mt-1 select-none">
+                                0{i + 2}
+                              </span>
+                              <div className="flex-1 min-w-0">
+                                {noticia.publicada_en && (
+                                  <p className="text-xs text-slate-400 uppercase tracking-widest font-bold mb-2">
+                                    {new Date(noticia.publicada_en).toLocaleDateString("es-AR", { day: "numeric", month: "short" })}
+                                  </p>
+                                )}
+                                <h3 className="font-black text-slate-900 text-base leading-snug line-clamp-3 group-hover:text-blue-600 transition-colors tracking-tight">
+                                  {noticia.titulo}
+                                </h3>
+                              </div>
+                              {/* Thumbnail */}
+                              <div className="relative h-20 w-20 rounded-xl overflow-hidden bg-slate-100 shrink-0">
+                                {noticia.imagen_url ? (
+                                  <Image src={noticia.imagen_url} alt={noticia.titulo} fill className="object-cover group-hover:scale-110 transition-transform duration-500" />
+                                ) : (
+                                  <div className="h-full w-full flex items-center justify-center">
+                                    <Newspaper className="h-6 w-6 text-slate-300" />
+                                  </div>
+                                )}
+                              </div>
+                            </Link>
+                          </StaggerItem>
+                        ))}
+                      </ScrollReveal>
+                    )}
+                  </div>
                 </div>
               )}
 

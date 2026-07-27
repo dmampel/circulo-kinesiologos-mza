@@ -1,5 +1,7 @@
 "use client";
 
+import Link from "next/link";
+
 type ObraSocial = { id: string; nombre: string };
 
 export default function ObrasSocialesMarquee({ items }: { items: ObraSocial[] }) {
@@ -8,9 +10,12 @@ export default function ObrasSocialesMarquee({ items }: { items: ObraSocial[] })
   const row2 = items.slice(mid);
 
   const Pill = ({ nombre }: { nombre: string }) => (
-    <span className="shrink-0 px-4 py-2 rounded-xl border border-slate-200 bg-slate-50 text-slate-600 text-sm font-medium mx-1.5">
+    <Link
+      href="/obras-sociales"
+      className="shrink-0 px-4 py-2 rounded-xl border border-slate-200 bg-slate-50 text-slate-600 text-sm font-medium mx-1.5 hover:bg-slate-100 hover:text-slate-900 transition-colors cursor-pointer"
+    >
       {nombre}
-    </span>
+    </Link>
   );
 
   return (

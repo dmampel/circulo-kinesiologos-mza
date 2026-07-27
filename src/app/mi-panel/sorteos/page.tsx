@@ -6,6 +6,7 @@ import { redirect } from "next/navigation";
 import { Gift, Trophy, Calendar, Users, CheckCircle2 } from "lucide-react";
 import { cn } from "@/lib/utils";
 import { inscribirmeAlSorteo, desinscribirmeDelSorteo } from "./actions";
+import { SorteosClientTracker, SorteoBadge } from "./SorteosClient";
 
 export const dynamic = "force-dynamic";
 
@@ -29,8 +30,9 @@ export default async function SorteosSocioPage() {
 
   return (
     <div className="space-y-10 pb-10 animate-in fade-in duration-500">
+      <SorteosClientTracker />
       <div className="space-y-1">
-        <p className="text-[10px] font-black text-blue-600 uppercase tracking-[0.3em]">Panel Profesional · CKM</p>
+        <p className="text-[10px] font-black text-blue-600 uppercase tracking-[0.3em]">Panel Profesional · CKFM</p>
         <h1 className="text-3xl font-black text-slate-900 tracking-tight leading-none">Sorteos</h1>
         <p className="text-sm text-slate-500 font-medium pt-1">Participá en los sorteos exclusivos para socios del Círculo.</p>
       </div>
@@ -142,8 +144,11 @@ function SorteoCard({
 
       <div className="flex-1 space-y-4">
         <div>
-          <h3 className="text-lg font-black text-slate-900">{sorteo.titulo}</h3>
-          <p className="text-sm text-slate-500 font-medium mt-1 line-clamp-2">{sorteo.descripcion}</p>
+          <div className="flex items-center gap-2 flex-wrap mb-1">
+            <h3 className="text-lg font-black text-slate-900 leading-tight">{sorteo.titulo}</h3>
+            <SorteoBadge createdAt={sorteo.createdAt.toISOString()} />
+          </div>
+          <p className="text-sm text-slate-500 font-medium line-clamp-2">{sorteo.descripcion}</p>
         </div>
 
         <div className="flex flex-wrap items-center gap-4 text-xs font-bold text-slate-400">

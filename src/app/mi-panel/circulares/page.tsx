@@ -30,7 +30,7 @@ export default async function CircularesHistorialPage() {
       {/* Header */}
       <div className="space-y-1">
         <p className="text-[10px] font-black text-blue-600 uppercase tracking-[0.3em]">
-          Panel Profesional · CKM
+          Panel Profesional · CKFM
         </p>
         <h1 className="text-3xl font-black text-slate-900 tracking-tight leading-none">
           Circulares Institucionales

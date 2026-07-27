@@ -44,6 +44,14 @@ export class CapacitacionRepository {
   }
 
   // socio
+  static async getLatestPublicada() {
+    return prisma.capacitacion.findFirst({
+      where: { publicada: true },
+      orderBy: { createdAt: "desc" },
+      select: { createdAt: true },
+    });
+  }
+
   static async findPublicadas() {
     return prisma.capacitacion.findMany({
       where: { publicada: true },

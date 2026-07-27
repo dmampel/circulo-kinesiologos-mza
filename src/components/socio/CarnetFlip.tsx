@@ -95,7 +95,7 @@ export default function CarnetFlip({ profesional }: Props) {
             <div className="absolute top-[-20%] right-[-10%] w-[60%] h-[60%] bg-blue-500 rounded-full blur-[80px] opacity-40" />
             <div className="absolute bottom-[-10%] left-[-10%] w-[40%] h-[40%] bg-indigo-600 rounded-full blur-[60px] opacity-30" />
             <div className="absolute inset-0 opacity-[0.03] pointer-events-none flex items-center justify-center overflow-hidden">
-              <span className="text-[20rem] font-black tracking-tighter rotate-12">CKM</span>
+              <span className="text-[20rem] font-black tracking-tighter rotate-12">CKFM</span>
             </div>
 
             {/* Holographic */}
@@ -110,9 +110,7 @@ export default function CarnetFlip({ profesional }: Props) {
             <div className="absolute inset-0 p-5 sm:p-8 flex flex-col justify-between z-10">
               <div className="flex items-start justify-between">
                 <div className="flex items-center gap-3">
-                  <div className="h-12 w-12 bg-white rounded-2xl flex items-center justify-center shadow-lg shrink-0">
-                    <span className="text-blue-700 font-black text-xl">CK</span>
-                  </div>
+                 <Image src="/icon.png" alt="Círculo de Kinesiólogos de Mendoza" width={150} height={80} className="h-16 w-auto rounded-2xl" />
                   <div>
                     <h2 className="text-white font-black text-lg tracking-tighter leading-none">
                       Círculo de <br /> Kinesiólogos

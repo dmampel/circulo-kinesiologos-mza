@@ -14,9 +14,9 @@ export default function Footer() {
 
         {/* Top: Brand + tagline */}
         <div className="pt-16 pb-12 border-b border-slate-800 flex flex-col lg:flex-row lg:items-end justify-between gap-8">
-          <div>
+          <div className="self-center">
             <div className="mb-4">
-              <Image src="/logo.png" alt="Círculo de Kinesiólogos de Mendoza" width={150} height={80} className="h-10 w-auto" />
+              <Image src="/logo-invert.png" alt="Círculo de Kinesiólogos de Mendoza" width={150} height={80} className="h-20 w-auto" />
             </div>
             <p className="text-slate-100 text-xl leading-relaxed max-w-sm">
               El Círculo nos une.
