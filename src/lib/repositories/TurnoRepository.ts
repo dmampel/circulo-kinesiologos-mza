@@ -81,6 +81,13 @@ export class TurnoRepository {
     return prisma.turno.update({ where: { id }, data: { estado } });
   }
 
+  static async findByPaciente(pacienteId: string, profesionalId: string) {
+    return prisma.turno.findMany({
+      where: { pacienteId, profesionalId },
+      orderBy: { fecha: "desc" },
+    });
+  }
+
   static async delete(id: string, profesionalId: string) {
     const existing = await prisma.turno.findFirst({ where: { id, profesionalId } });
     if (!existing) return null;

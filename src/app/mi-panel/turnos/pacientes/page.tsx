@@ -67,15 +67,17 @@ export default async function PacientesPage() {
                   <div className="h-10 w-10 rounded-2xl bg-blue-50 flex items-center justify-center text-blue-600 font-black text-sm shrink-0">
                     {p.apellido.charAt(0).toUpperCase()}
                   </div>
-                  <div className="">
-                    <p className="font-black text-slate-900 text-sm">
+                  <Link
+                    href={`/mi-panel/turnos/pacientes/${p.id}`}
+                    className="hover:text-blue-600 transition-colors"
+                  >
+                    <p className="font-black text-slate-900 text-sm hover:text-blue-600 transition-colors">
                       {p.apellido}, {p.nombre}
                     </p>
                     <p className="text-[11px] text-slate-400 font-medium">
                       {[p.telefono, p.email, p.obraSocial].filter(Boolean).join(" · ") || "Sin datos adicionales"}
                     </p>
-                    
-                  </div>
+                  </Link>
                 </div>
 
                 <div className="flex items-center gap-1">

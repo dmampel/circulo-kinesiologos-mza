@@ -242,18 +242,31 @@ enum EstadoTurno {
 }
 
 model Paciente {
-  id            String      @id @default(cuid())
-  nombre        String
-  apellido      String
-  telefono      String?
-  email         String?
-  obraSocial    String?
-  notas         String?     @db.Text
-  profesionalId String
-  profesional   Profesional @relation(fields: [profesionalId], references: [id], onDelete: Cascade)
-  turnos        Turno[]
-  createdAt     DateTime    @default(now())
-  updatedAt     DateTime    @updatedAt
+  id              String                   @id @default(cuid())
+  nombre          String
+  apellido        String
+  telefono        String?
+  email           String?
+  obraSocial      String?
+  notas           String?                  @db.Text
+  profesionalId   String
+  profesional     Profesional              @relation(fields: [profesionalId], references: [id], onDelete: Cascade)
+  turnos          Turno[]
+  historiaClinica EntradaHistoriaClinica[]
+  createdAt       DateTime                 @default(now())
+  updatedAt       DateTime                 @updatedAt
+}
+
+model EntradaHistoriaClinica {
+  id          String   @id @default(cuid())
+  fecha       DateTime @default(now())
+  motivo      String?
+  evolucion   String   @db.Text
+  pacienteId  String
+  paciente    Paciente @relation(fields: [pacienteId], references: [id], onDelete: Cascade)
+
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
 }
 
 model Turno {

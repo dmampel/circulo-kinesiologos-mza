@@ -104,9 +104,9 @@ describe('TurnoRepository.autoCompletarPasados', () => {
     await TurnoRepository.autoCompletarPasados('prof-1');
     expect(mockUpdateMany).toHaveBeenCalledOnce();
     const call = mockUpdateMany.mock.calls[0][0];
-    expect(call.where.profesionalId).toBe('prof-1');
-    expect(call.where.estado).toEqual({ in: [EstadoTurno.PENDIENTE, EstadoTurno.CONFIRMADO] });
-    expect(call.where.fecha).toHaveProperty('lt');
+    expect(call.where!.profesionalId).toBe('prof-1');
+    expect(call.where!.estado).toEqual({ in: [EstadoTurno.PENDIENTE, EstadoTurno.CONFIRMADO] });
+    expect(call.where!.fecha).toHaveProperty('lt');
     expect(call.data).toEqual({ estado: EstadoTurno.COMPLETADO });
   });
 });
