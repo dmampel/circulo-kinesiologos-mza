@@ -1,21 +1,15 @@
 "use client";
 
-import { Edit2, Ban, CheckCircle2, Trash2 } from "lucide-react";
+import { Edit2, Ban, CheckCircle2 } from "lucide-react";
 import Link from "next/link";
-import { toggleEstadoProfesional, deleteProfesional } from "./actions";
+import { toggleEstadoProfesional } from "./actions";
 
 export default function BotonesProfesional({ id, status }: { id: string, status: "ACTIVO" | "INACTIVO" | "PENDIENTE" }) {
-  
+
   const handleToggleEstado = async () => {
     const nuevoEstado = status === "ACTIVO" ? "INACTIVO" : "ACTIVO";
     if (confirm(`¿Estás seguro de que querés ${nuevoEstado === "ACTIVO" ? "activar" : "suspender"} a este profesional?`)) {
       await toggleEstadoProfesional(id, nuevoEstado);
-    }
-  };
-
-  const handleDelete = async () => {
-    if (confirm("¿Estás 100% seguro de eliminar este profesional? Esta acción no se puede deshacer.")) {
-      await deleteProfesional(id);
     }
   };
 
@@ -39,14 +33,6 @@ export default function BotonesProfesional({ id, status }: { id: string, status:
         title={status === "ACTIVO" ? "Suspender" : "Activar"}
       >
         {status === "ACTIVO" ? <Ban className="h-4 w-4" /> : <CheckCircle2 className="h-4 w-4" />}
-      </button>
-
-      <button 
-        onClick={handleDelete}
-        className="p-2 text-slate-400 hover:text-red-600 hover:bg-red-50 rounded-lg transition-all"
-        title="Eliminar"
-      >
-        <Trash2 className="h-4 w-4" />
       </button>
     </div>
   );

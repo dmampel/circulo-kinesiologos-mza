@@ -1,5 +1,4 @@
 import { createClient } from "@/utils/supabase/server";
-import prisma from "@/lib/prisma";
 import { NextResponse } from "next/server";
 
 export async function GET(request: Request) {
@@ -12,11 +11,8 @@ export async function GET(request: Request) {
     const supabase = await createClient();
     const { data, error } = await supabase.auth.exchangeCodeForSession(code);
     if (!error && data.user) {
-      const profesional = await prisma.profesional.findUnique({
-        where: { userId: data.user.id },
-        select: { role: true },
-      });
-      const destination = (!explicitNext && profesional?.role === "ADMIN") ? "/admin" : next;
+      const isAdmin = data.user.app_metadata?.role === "admin";
+      const destination = (!explicitNext && isAdmin) ? "/admin" : next;
       return NextResponse.redirect(`${origin}${destination}`);
     }
   }

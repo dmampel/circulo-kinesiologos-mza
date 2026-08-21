@@ -1,6 +1,5 @@
 import { redirect } from "next/navigation";
 import { createClient } from "@/utils/supabase/server";
-import { ProfesionalRepository } from "@/lib/repositories/ProfesionalRepository";
 import AdminSidebar from "./_components/AdminSidebar";
 
 export default async function AdminLayout({
@@ -17,9 +16,7 @@ export default async function AdminLayout({
     redirect("/login");
   }
 
-  const profesional = await ProfesionalRepository.findByUserId(user.id);
-
-  if (!profesional || profesional.role !== "ADMIN") {
+  if (user.app_metadata?.role !== "admin") {
     redirect("/mi-panel");
   }
 

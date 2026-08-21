@@ -63,19 +63,6 @@ export async function toggleEstadoProfesional(id: string, nuevoEstado: "ACTIVO" 
   }
 }
 
-export async function deleteProfesional(id: string) {
-  await requireAdmin();
-  try {
-    await prisma.profesional.delete({
-      where: { id },
-    });
-    revalidatePath("/admin/profesionales");
-    return { success: true };
-  } catch {
-    return { success: false, error: "No se pudo eliminar al profesional" };
-  }
-}
-
 export async function getLocalidadesYEspecialidades() {
   const localidades = await prisma.localidad.findMany({ orderBy: { nombre: "asc" } });
   const especialidades = await prisma.especialidad.findMany({ orderBy: { nombre: "asc" } });

@@ -19,13 +19,9 @@ export async function login(formData: FormData) {
     redirect("/login?error=Could not authenticate user");
   }
 
-  // Verificar si es un profesional vinculado
-  const { ProfesionalRepository } = await import("@/lib/repositories/ProfesionalRepository");
-  const profesional = await ProfesionalRepository.findByUserId(user.id);
-
   revalidatePath("/", "layout");
 
-  if (profesional?.role === "ADMIN") {
+  if (user.app_metadata?.role === "admin") {
     redirect("/admin");
   }
 

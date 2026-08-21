@@ -55,26 +55,26 @@ export async function gestionarSolicitud(id: string, accion: "APROBAR" | "RECHAZ
 
       if (!solicitud) throw new Error("Solicitud no encontrada");
 
-      // 2. Validar duplicados antes de cualquier acción externa
+      // 2. Validar duplicados y estado de cuenta
       const emailNormalizado = solicitud.email.toLowerCase();
       const [existeEmail, existeMatricula] = await Promise.all([
         ProfesionalRepository.findByEmail(emailNormalizado),
         ProfesionalRepository.findByMatricula(solicitud.matricula)
       ]);
 
-      if (existeEmail) {
-        return { success: false, error: `Ya existe un profesional registrado con el email ${solicitud.email}` };
+      if (existeMatricula && existeMatricula.userId) {
+        return { success: false, error: `El profesional con matrícula ${solicitud.matricula} ya tiene una cuenta activa vinculada al portal.` };
       }
 
-      if (existeMatricula) {
-        return { success: false, error: `Ya existe un profesional registrado con la matrícula ${solicitud.matricula}` };
+      if (existeEmail && existeEmail.id !== existeMatricula?.id) {
+        return { success: false, error: `El email ${solicitud.email} ya está siendo usado por otro profesional en el sistema.` };
       }
 
       // 3. Extraer datos del JSON
       const datos = solicitud.datos as any;
 
-      if (!datos.localidadId) {
-        throw new Error("La solicitud no contiene una Localidad seleccionada.");
+      if (!existeMatricula && !datos.localidadId) {
+        throw new Error("La solicitud para un nuevo profesional no contiene una Localidad seleccionada.");
       }
 
       // 4. Invitar al usuario a Supabase Auth
@@ -94,29 +94,57 @@ export async function gestionarSolicitud(id: string, accion: "APROBAR" | "RECHAZ
 
       const authUserId = authData.user.id;
 
-      // 5. Crear el Profesional vinculado al Auth ID
-      await prisma.profesional.create({
-        data: {
-          nombre: solicitud.nombre,
-          apellido: solicitud.apellido,
-          full_name: `${solicitud.nombre} ${solicitud.apellido}`,
-          email: emailNormalizado,
-          matricula: solicitud.matricula,
-          dni: datos.dni,
-          telefono: datos.telefono,
-          direccion: datos.direccion,
-          slug: `${solicitud.apellido}-${solicitud.nombre}-${solicitud.matricula}`.toLowerCase().replace(/ /g, "-"),
-          localidadId: datos.localidadId,
-          status: "ACTIVO",
-          userId: authUserId,
-          especialidades: {
-            connectOrCreate: {
-              where: { nombre: datos.especialidad },
-              create: { nombre: datos.especialidad }
-            }
-          }
-        },
-      });
+      // 5. Vincular profesional existente o crear uno nuevo
+      try {
+        if (existeMatricula) {
+          await prisma.profesional.update({
+            where: { id: existeMatricula.id },
+            data: {
+              userId: authUserId,
+              email: emailNormalizado,
+              telefono: datos.telefono || existeMatricula.telefono,
+              direccion: datos.direccion || existeMatricula.direccion,
+              dni: datos.dni || existeMatricula.dni,
+              localidadId: datos.localidadId || existeMatricula.localidadId,
+              especialidades: datos.especialidad ? {
+                connectOrCreate: {
+                  where: { nombre: datos.especialidad },
+                  create: { nombre: datos.especialidad }
+                }
+              } : undefined,
+            },
+          });
+        } else {
+          await prisma.profesional.create({
+            data: {
+              nombre: solicitud.nombre,
+              apellido: solicitud.apellido,
+              full_name: `${solicitud.nombre} ${solicitud.apellido}`,
+              email: emailNormalizado,
+              matricula: solicitud.matricula,
+              dni: datos.dni,
+              telefono: datos.telefono,
+              direccion: datos.direccion,
+              slug: `${solicitud.apellido}-${solicitud.nombre}-${solicitud.matricula}`.toLowerCase().replace(/ /g, "-"),
+              localidadId: datos.localidadId,
+              status: "ACTIVO",
+              userId: authUserId,
+              especialidades: {
+                connectOrCreate: {
+                  where: { nombre: datos.especialidad },
+                  create: { nombre: datos.especialidad }
+                }
+              }
+            },
+          });
+        }
+      } catch (dbError: unknown) {
+        // La identidad en Supabase Auth ya se creó (paso 4): si no la revertimos acá,
+        // queda huérfana y un reintento de "Aprobar" fallará en inviteUserByEmail.
+        await supabaseAdmin.auth.admin.deleteUser(authUserId).catch(() => {});
+        const message = dbError instanceof Error ? dbError.message : "error desconocido";
+        throw new Error(`No se pudo vincular el profesional en la base de datos: ${message}`);
+      }
 
       // 6. Marcar solicitud como aprobada
       await prisma.solicitud.update({

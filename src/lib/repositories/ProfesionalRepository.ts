@@ -118,13 +118,13 @@ export class ProfesionalRepository {
 
   static async findAllSlugsForSitemap() {
     return prisma.profesional.findMany({
-      where: { status: "ACTIVO" },
+      where: { status: "ACTIVO", role: { not: "ADMIN" } },
       select: { slug: true, updatedAt: true },
     });
   }
 
   static async countActive() {
-    return prisma.profesional.count({ where: { status: "ACTIVO" } });
+    return prisma.profesional.count({ where: { status: "ACTIVO", role: { not: "ADMIN" } } });
   }
 
   static async update(userId: string, data: UpdateProfesionalData) {
