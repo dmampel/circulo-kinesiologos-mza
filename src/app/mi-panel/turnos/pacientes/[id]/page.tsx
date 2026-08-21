@@ -81,16 +81,16 @@ export default async function DetallePacientePage({
 
       {/* Header paciente */}
       <div className="bg-white rounded-3xl border border-slate-100 shadow-sm p-6">
-        <div className="flex items-start justify-between gap-4">
-          <div className="flex items-center gap-4">
+        <div className="flex flex-col sm:flex-row sm:items-start justify-between gap-4">
+          <div className="flex items-center gap-4 min-w-0">
             <div className="h-14 w-14 rounded-2xl bg-blue-50 flex items-center justify-center text-blue-600 font-black text-xl shrink-0">
               {paciente.apellido.charAt(0).toUpperCase()}
             </div>
-            <div>
+            <div className="min-w-0">
               <p className="text-[10px] font-black text-blue-600 uppercase tracking-[0.3em]">
                 Paciente
               </p>
-              <h1 className="text-2xl font-black text-slate-900 tracking-tighter">
+              <h1 className="text-2xl font-black text-slate-900 tracking-tighter break-words">
                 {paciente.apellido}, {paciente.nombre}
               </h1>
               <div className="flex flex-wrap items-center gap-3 mt-1.5">
@@ -119,7 +119,7 @@ export default async function DetallePacientePage({
           </div>
           <Link
             href={`/mi-panel/turnos/pacientes/${id}/editar`}
-            className="flex items-center gap-1.5 px-4 py-2 text-sm font-black text-slate-500 hover:text-blue-600 hover:bg-blue-50 rounded-2xl transition-all shrink-0"
+            className="flex items-center gap-1.5 px-4 py-2 text-sm font-black text-slate-500 hover:text-blue-600 hover:bg-blue-50 rounded-2xl transition-all shrink-0 self-start"
           >
             <Pencil className="h-3.5 w-3.5" /> Editar
           </Link>

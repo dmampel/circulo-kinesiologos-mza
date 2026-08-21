@@ -20,7 +20,7 @@ export default async function PacientesPage() {
 
   return (
     <div className="max-w-4xl mx-auto space-y-8 pb-8">
-      <div className="flex items-center justify-between">
+      <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
         <div className="space-y-0.5">
           <p className="text-[10px] font-black text-blue-600 uppercase tracking-[0.3em]">
             Turnos · Gestión
@@ -31,7 +31,7 @@ export default async function PacientesPage() {
         </div>
         <Link
           href="/mi-panel/turnos/pacientes/nuevo"
-          className="flex items-center gap-2 px-5 py-3 bg-blue-600 text-white text-sm font-black rounded-2xl hover:bg-blue-700 transition-all shadow-lg shadow-blue-200"
+          className="flex items-center justify-center gap-2 px-5 py-3 bg-blue-600 text-white text-sm font-black rounded-2xl hover:bg-blue-700 transition-all shadow-lg shadow-blue-200 whitespace-nowrap shrink-0"
         >
           <UserPlus className="h-4 w-4" />
           Nuevo Paciente
@@ -61,26 +61,26 @@ export default async function PacientesPage() {
             {pacientes.map((p) => (
               <div
                 key={p.id}
-                className="flex items-center justify-between px-6 py-4 hover:bg-slate-50/50 transition-colors"
+                className="flex items-start sm:items-center justify-between gap-3 px-6 py-4 hover:bg-slate-50/50 transition-colors"
               >
-                <div className="flex items-center gap-4">
+                <div className="flex items-center gap-4 min-w-0">
                   <div className="h-10 w-10 rounded-2xl bg-blue-50 flex items-center justify-center text-blue-600 font-black text-sm shrink-0">
                     {p.apellido.charAt(0).toUpperCase()}
                   </div>
                   <Link
                     href={`/mi-panel/turnos/pacientes/${p.id}`}
-                    className="hover:text-blue-600 transition-colors"
+                    className="min-w-0 hover:text-blue-600 transition-colors"
                   >
                     <p className="font-black text-slate-900 text-sm hover:text-blue-600 transition-colors">
                       {p.apellido}, {p.nombre}
                     </p>
-                    <p className="text-[11px] text-slate-400 font-medium">
+                    <p className="text-[11px] text-slate-400 font-medium break-words">
                       {[p.telefono, p.email, p.obraSocial].filter(Boolean).join(" · ") || "Sin datos adicionales"}
                     </p>
                   </Link>
                 </div>
 
-                <div className="flex items-center gap-1">
+                <div className="flex items-center gap-1 shrink-0">
                   <Link
                     href={`/mi-panel/turnos/pacientes/${p.id}/editar`}
                     className="p-2 rounded-xl text-slate-300 hover:text-blue-600 hover:bg-blue-50 transition-all"
