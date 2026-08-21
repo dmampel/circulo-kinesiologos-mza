@@ -56,8 +56,8 @@ export default function CarnetDigital({ profesional, slug }: Props) {
         </div>
 
         {/* Info del Profesional */}
-        <div className="flex items-end justify-between">
-          <div className="flex items-center gap-3 sm:gap-6">
+        <div className="flex items-end justify-between gap-3">
+          <div className="flex items-center gap-3 sm:gap-6 min-w-0">
             {/* Foto o Iniciales */}
             <div className="h-20 w-20 sm:h-28 sm:w-28 rounded-[1.5rem] sm:rounded-[2rem] bg-white/10 backdrop-blur-xl border border-white/20 p-1.5 overflow-hidden shadow-xl shrink-0">
               <div className="relative h-full w-full rounded-[1.2rem] sm:rounded-[1.6rem] bg-white/5 flex items-center justify-center text-white overflow-hidden">
@@ -76,16 +76,16 @@ export default function CarnetDigital({ profesional, slug }: Props) {
               </div>
             </div>
 
-            <div className="space-y-1">
+            <div className="space-y-1 min-w-0">
               <p className="text-blue-400 text-[10px] font-black uppercase tracking-widest">
                 Profesional Colegiado
               </p>
               <h3 className="text-xl sm:text-2xl lg:text-3xl font-black text-white tracking-tighter leading-none uppercase">
-                {profesional.apellido} <br />
-                <span className="text-white/80">{profesional.nombre}</span>
+                <span className="block truncate">{profesional.apellido}</span>
+                <span className="block truncate text-white/80">{profesional.nombre}</span>
               </h3>
               <div className="flex items-center gap-2 mt-2">
-                <div className="px-2 py-0.5 bg-blue-500 rounded text-[10px] font-black text-white">
+                <div className="px-2 py-0.5 bg-blue-500 rounded text-[10px] font-black text-white shrink-0">
                   M.P. {profesional.matricula}
                 </div>
                 {profesional.especialidades?.[0] && (
@@ -98,7 +98,7 @@ export default function CarnetDigital({ profesional, slug }: Props) {
           </div>
 
           {/* QR Code (real — apunta al perfil público) */}
-          <div className="h-16 w-16 bg-white rounded-2xl p-2 shadow-xl group-hover:scale-105 transition-transform duration-500">
+          <div className="h-16 w-16 bg-white rounded-2xl p-2 shadow-xl shrink-0 group-hover:scale-105 transition-transform duration-500">
             <div className="h-full w-full rounded-lg flex items-center justify-center bg-slate-800">
               <CarnetQR slug={slug} />
             </div>
