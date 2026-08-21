@@ -89,6 +89,19 @@ export default function NuevoSorteoPage() {
               <p className="text-xs font-medium text-red-500">{state.errors.imagen_url[0]}</p>
             )}
           </div>
+
+          <div className="space-y-2">
+            <label className="text-xs font-bold text-slate-900 uppercase tracking-widest">URL del Sorteo en Instagram (Opcional)</label>
+            <input
+              type="url"
+              name="instagramUrl"
+              className="w-full px-4 py-3 bg-slate-50 border border-slate-200 rounded-xl focus:ring-2 focus:ring-blue-500 focus:border-transparent outline-none transition-all"
+              placeholder="https://www.instagram.com/p/..."
+            />
+            {state?.errors?.instagramUrl?.[0] && (
+              <p className="text-xs font-medium text-red-500">{state.errors.instagramUrl[0]}</p>
+            )}
+          </div>
         </div>
 
         <div className="space-y-2">

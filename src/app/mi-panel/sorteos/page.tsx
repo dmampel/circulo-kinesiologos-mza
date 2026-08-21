@@ -5,7 +5,7 @@ import { InscripcionSorteoRepository } from "@/lib/repositories/InscripcionSorte
 import { redirect } from "next/navigation";
 import { Gift, Trophy, Calendar, Users, CheckCircle2 } from "lucide-react";
 import { cn } from "@/lib/utils";
-import { inscribirmeAlSorteo, desinscribirmeDelSorteo } from "./actions";
+import { desinscribirmeDelSorteo } from "./actions";
 import { SorteosClientTracker, SorteoBadge } from "./SorteosClient";
 
 export const dynamic = "force-dynamic";
@@ -186,15 +186,19 @@ function SorteoCard({
               </button>
             </form>
           </div>
+        ) : sorteo.instagramUrl ? (
+          <a
+            href={sorteo.instagramUrl}
+            target="_blank"
+            rel="noopener noreferrer"
+            className="block w-full text-center px-6 py-3 rounded-2xl bg-blue-600 text-white font-bold text-sm hover:bg-blue-700 transition-all shadow-lg shadow-blue-100"
+          >
+            Ir al sorteo
+          </a>
         ) : (
-          <form action={inscribirmeAlSorteo.bind(null, sorteo.id)}>
-            <button
-              type="submit"
-              className="w-full px-6 py-3 rounded-2xl bg-blue-600 text-white font-bold text-sm hover:bg-blue-700 transition-all shadow-lg shadow-blue-100"
-            >
-              Participar
-            </button>
-          </form>
+          <p className="text-xs font-medium text-slate-400 text-center">
+            Link del sorteo próximamente
+          </p>
         )}
       </div>
     </div>

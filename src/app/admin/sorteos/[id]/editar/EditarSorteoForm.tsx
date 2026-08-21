@@ -97,6 +97,20 @@ export default function EditarSorteoForm({ sorteo }: { sorteo: Sorteo }) {
                 placeholder="https://..."
               />
             </div>
+
+            <div className="space-y-2">
+              <label className="text-xs font-bold text-slate-900 uppercase tracking-widest">URL del Sorteo en Instagram (Opcional)</label>
+              <input
+                type="url"
+                name="instagramUrl"
+                defaultValue={sorteo.instagramUrl ?? ""}
+                className="w-full px-4 py-3 bg-slate-50 border border-slate-200 rounded-xl focus:ring-2 focus:ring-blue-500 focus:border-transparent outline-none transition-all disabled:cursor-not-allowed"
+                placeholder="https://www.instagram.com/p/..."
+              />
+              {state?.errors?.instagramUrl?.[0] && (
+                <p className="text-xs font-medium text-red-500">{state.errors.instagramUrl[0]}</p>
+              )}
+            </div>
           </div>
 
           <div className="space-y-2">

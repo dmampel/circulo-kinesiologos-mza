@@ -306,6 +306,7 @@ model Sorteo {
   titulo           String
   descripcion      String              @db.Text
   imagen_url       String?
+  instagramUrl     String?
   fechaInicio      DateTime
   fechaCierre      DateTime?
   maxParticipantes Int?

@@ -1,7 +1,7 @@
 ## ADDED Requirements
 
 ### Requirement: Admin puede crear un sorteo
-El sistema SHALL permitir al admin crear un sorteo con título, descripción, fecha de inicio, fecha de cierre opcional, cupo máximo opcional e imagen opcional. El sorteo se crea en estado `BORRADOR`.
+El sistema SHALL permitir al admin crear un sorteo con título, descripción, fecha de inicio, fecha de cierre opcional, cupo máximo opcional, imagen opcional e URL de la publicación de Instagram opcional. El sorteo se crea en estado `BORRADOR`.
 
 #### Scenario: Creación exitosa
 - **WHEN** el admin completa el formulario con título y fecha de inicio y guarda
@@ -57,7 +57,7 @@ El sistema SHALL permitir al admin ejecutar el sorteo seleccionando aleatoriamen
 ---
 
 ### Requirement: Admin puede editar un sorteo no realizado
-El sistema SHALL permitir editar los datos de un sorteo en estado `BORRADOR` o `ACTIVO`. No se puede editar un sorteo en estado `REALIZADO`.
+El sistema SHALL permitir editar los datos de un sorteo en estado `BORRADOR` o `ACTIVO`, incluyendo la URL de la publicación de Instagram opcional. No se puede editar un sorteo en estado `REALIZADO`.
 
 #### Scenario: Edición de sorteo editable
 - **WHEN** el admin edita un sorteo en estado `BORRADOR` o `ACTIVO` y guarda

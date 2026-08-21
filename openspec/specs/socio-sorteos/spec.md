@@ -13,16 +13,20 @@ El sistema SHALL mostrar en el panel del socio la lista de sorteos en estado `AC
 
 ---
 
-### Requirement: Socio puede inscribirse en un sorteo
-El sistema SHALL permitir al socio inscribirse en cualquier sorteo en estado `ACTIVO`. Cada socio puede inscribirse solo una vez por sorteo.
+### Requirement: Socio puede acceder a la publicación del sorteo
+El sistema SHALL mostrar un botón "Ir al sorteo" que dirige al socio a la publicación de Instagram del sorteo en estado `ACTIVO`. Si no hay URL disponible, muestra un texto de fallback. Para socios ya inscriptos en sorteos anteriores, se conserva la opción de cancelar su inscripción.
 
-#### Scenario: Inscripción exitosa
-- **WHEN** el socio hace clic en "Inscribirme" en un sorteo activo
-- **THEN** el sistema registra su inscripción y actualiza la UI para reflejar que está inscripto
+#### Scenario: Sorteo con URL de Instagram disponible
+- **WHEN** el socio ve un sorteo activo que tiene URL de Instagram configurada
+- **THEN** el sistema muestra un botón "Ir al sorteo" que abre la publicación en una pestaña nueva
 
-#### Scenario: Intento de doble inscripción
-- **WHEN** el socio intenta inscribirse en un sorteo en el que ya está inscripto
-- **THEN** el sistema rechaza la acción (constraint único `@@unique([sorteoId, profesionalId])`)
+#### Scenario: Sorteo sin URL de Instagram
+- **WHEN** el socio ve un sorteo activo sin URL configurada
+- **THEN** el sistema muestra el texto "Link del sorteo próximamente" en lugar del botón
+
+#### Scenario: Socio ya inscripto en sorteos anteriores
+- **WHEN** el socio está inscripto en un sorteo en estado `ACTIVO`
+- **THEN** el sistema muestra "Ya participás" y el botón para cancelar su inscripción
 
 ---
 

@@ -15,6 +15,7 @@ export async function createSorteo(
   await requireAdmin();
 
   const imagenRaw = formData.get("imagen_url") as string;
+  const instagramRaw = formData.get("instagramUrl") as string;
   const fechaCierreRaw = formData.get("fechaCierre") as string;
   const maxRaw = formData.get("maxParticipantes") as string;
 
@@ -22,6 +23,7 @@ export async function createSorteo(
     titulo: formData.get("titulo"),
     descripcion: formData.get("descripcion"),
     imagen_url: imagenRaw || undefined,
+    instagramUrl: instagramRaw || undefined,
     fechaInicio: formData.get("fechaInicio"),
     fechaCierre: fechaCierreRaw || undefined,
     maxParticipantes: maxRaw || undefined,
@@ -31,8 +33,12 @@ export async function createSorteo(
     return { success: false, errors: z.flattenError(parsed.error).fieldErrors };
   }
 
-  const { imagen_url, ...rest } = parsed.data;
-  await SorteoRepository.create({ ...rest, ...(imagen_url ? { imagen_url } : {}) });
+  const { imagen_url, instagramUrl, ...rest } = parsed.data;
+  await SorteoRepository.create({
+    ...rest,
+    ...(imagen_url ? { imagen_url } : {}),
+    ...(instagramUrl ? { instagramUrl } : {}),
+  });
 
   revalidatePath("/admin/sorteos");
   redirect("/admin/sorteos");
@@ -46,6 +52,7 @@ export async function updateSorteo(
   await requireAdmin();
 
   const imagenRaw = formData.get("imagen_url") as string;
+  const instagramRaw = formData.get("instagramUrl") as string;
   const fechaCierreRaw = formData.get("fechaCierre") as string;
   const maxRaw = formData.get("maxParticipantes") as string;
 
@@ -53,6 +60,7 @@ export async function updateSorteo(
     titulo: formData.get("titulo"),
     descripcion: formData.get("descripcion"),
     imagen_url: imagenRaw || undefined,
+    instagramUrl: instagramRaw || undefined,
     fechaInicio: formData.get("fechaInicio"),
     fechaCierre: fechaCierreRaw || undefined,
     maxParticipantes: maxRaw || undefined,
