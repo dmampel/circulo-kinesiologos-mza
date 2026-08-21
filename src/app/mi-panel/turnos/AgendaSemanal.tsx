@@ -48,6 +48,16 @@ function formatRango(a: Date, b: Date) {
   return `${fmt.format(new Date(a))} — ${fmt.format(new Date(b))}`;
 }
 
+function formatDiaLargo(d: Date) {
+  const fmt = new Intl.DateTimeFormat("es-AR", {
+    weekday: "short",
+    day: "2-digit",
+    month: "short",
+    timeZone: "America/Argentina/Mendoza",
+  });
+  return fmt.format(new Date(d)).toUpperCase();
+}
+
 function titleCase(str: string) {
   return str
     .toLowerCase()
@@ -63,6 +73,87 @@ function isSameDayAR(a: Date, b: Date) {
       timeZone: "America/Argentina/Mendoza",
     }).format(new Date(d));
   return fmtDate(a) === fmtDate(b);
+}
+
+function indexHoy(dias: Date[], hoy: Date) {
+  const idx = dias.findIndex((d) => isSameDayAR(d, hoy));
+  return idx >= 0 ? idx : 0;
+}
+
+// ─── Sub-components ────────────────────────────────────────────────────────────
+function HoraLabels() {
+  return (
+    <div
+      className="w-14 shrink-0 relative border-r border-slate-100"
+      style={{ height: TOTAL_HEIGHT }}
+    >
+      {HOURS.map((h) => (
+        <div
+          key={h}
+          className="absolute right-2 text-[10px] font-bold text-slate-300 tabular-nums"
+          style={{ top: (h - START_HOUR) * HOUR_HEIGHT + (h === START_HOUR ? 4 : -8) }}
+        >
+          {String(h).padStart(2, "0")}:00
+        </div>
+      ))}
+    </div>
+  );
+}
+
+function DiaColumn({
+  turnosDia,
+  onSelect,
+}: {
+  turnosDia: TurnoConPaciente[];
+  onSelect: (t: TurnoConPaciente) => void;
+}) {
+  return (
+    <div className="flex-1 min-w-0 relative border-r border-slate-100 last:border-r-0" style={{ height: TOTAL_HEIGHT }}>
+      {/* Hour grid lines */}
+      {HOURS.map((h) => (
+        <div
+          key={h}
+          className="absolute left-0 right-0 border-t border-slate-100"
+          style={{ top: (h - START_HOUR) * HOUR_HEIGHT }}
+        />
+      ))}
+      {/* Half-hour lines */}
+      {HOURS.map((h) => (
+        <div
+          key={`${h}h`}
+          className="absolute left-0 right-0 border-t border-dashed border-slate-50"
+          style={{ top: (h - START_HOUR) * HOUR_HEIGHT + HOUR_HEIGHT / 2 }}
+        />
+      ))}
+
+      {/* Turnos */}
+      {turnosDia.map((t) => {
+        const { hours, minutes } = getARTime(new Date(t.fecha));
+        const startMin = (hours - START_HOUR) * 60 + minutes;
+        const top = startMin * PX_PER_MIN;
+        const height = Math.max(t.duracion * PX_PER_MIN, 48);
+        const style = ESTADO_STYLES[t.estado] ?? ESTADO_STYLES.PENDIENTE;
+        return (
+          <button
+            key={t.id}
+            onClick={() => onSelect(t)}
+            className={`absolute inset-x-1 rounded-xl border px-2 py-1.5 overflow-hidden hover:shadow-md transition-shadow text-left w-[calc(100%-8px)] ${style.card}`}
+            style={{ top, height }}
+          >
+            <div className="flex items-center gap-1.5">
+              <div className={`h-1.5 w-1.5 rounded-full shrink-0 ${style.dot}`} />
+              <p className="text-[11px] font-bold leading-tight truncate">
+                {titleCase(t.paciente.nombre)} {titleCase(t.paciente.apellido)}
+              </p>
+            </div>
+            {t.motivo && (
+              <p className="text-[10px] opacity-60 truncate mt-0.5">{t.motivo}</p>
+            )}
+          </button>
+        );
+      })}
+    </div>
+  );
 }
 
 // ─── Component ────────────────────────────────────────────────────────────────
@@ -94,10 +185,27 @@ export default function AgendaSemanal({ turnos, weekStartISO, pacientes }: Agend
 
   const hoy = new Date();
 
+  const [diaIndex, setDiaIndex] = useState(() => indexHoy(diasSemana, hoy));
+  const [prevWeekStartISO, setPrevWeekStartISO] = useState(weekStartISO);
+  if (weekStartISO !== prevWeekStartISO) {
+    setPrevWeekStartISO(weekStartISO);
+    setDiaIndex(indexHoy(diasSemana, hoy));
+  }
+
   function navegar(offset: number) {
     const d = new Date(weekStart);
     d.setUTCDate(d.getUTCDate() + offset * 7);
     router.push(`/mi-panel/turnos?semana=${d.toISOString().split("T")[0]}`);
+  }
+
+  function diaAnterior() {
+    if (diaIndex === 0) navegar(-1);
+    else setDiaIndex((i) => i - 1);
+  }
+
+  function diaSiguiente() {
+    if (diaIndex === 6) navegar(1);
+    else setDiaIndex((i) => i + 1);
   }
 
   function handleEstadoChange(id: string, nuevoEstado: TurnoConPaciente["estado"]) {
@@ -108,6 +216,14 @@ export default function AgendaSemanal({ turnos, weekStartISO, pacientes }: Agend
       prev?.id === id ? { ...prev, estado: nuevoEstado } : prev
     );
   }
+
+  function turnosDe(dia: Date) {
+    return localTurnos
+      .filter((t) => isSameDayAR(new Date(t.fecha), dia))
+      .sort((a, b) => new Date(a.fecha).getTime() - new Date(b.fecha).getTime());
+  }
+
+  const diaSeleccionado = diasSemana[diaIndex];
 
   return (
     <div className="space-y-4">
@@ -139,18 +255,17 @@ export default function AgendaSemanal({ turnos, weekStartISO, pacientes }: Agend
         </Link>
       </div>
 
-      {/* ── Calendar grid ── */}
-      <div className="bg-white rounded-xl overflow-hidden">
-       <div className="overflow-x-auto">
+      {/* ── Calendar: Desktop/tablet — semana completa ── */}
+      <div className="hidden sm:block bg-white rounded-xl overflow-hidden">
         {/* Day headers */}
         <div className="flex border-b border-slate-100">
-          <div className="w-14 shrink-0 border-r border-slate-100 sticky left-0 z-10 bg-white" />
+          <div className="w-14 shrink-0 border-r border-slate-100" />
           {diasSemana.map((dia, i) => {
             const esHoy = isSameDayAR(dia, hoy);
             return (
               <div
                 key={i}
-                className={`w-28 shrink-0 sm:w-auto sm:flex-1 flex flex-col items-center py-3 border-r border-slate-100 last:border-r-0 ${
+                className={`flex-1 min-w-0 flex flex-col items-center py-3 border-r border-slate-100 last:border-r-0 ${
                   esHoy ? "bg-blue-600" : ""
                 }`}
               >
@@ -179,83 +294,45 @@ export default function AgendaSemanal({ turnos, weekStartISO, pacientes }: Agend
           style={{ height: "calc(100vh - 240px)", scrollbarWidth: "none" }}
         >
           <div className="flex">
-            {/* Time labels */}
-            <div
-              className="w-14 shrink-0 relative border-r border-slate-100 sticky left-0 z-10 bg-white"
-              style={{ height: TOTAL_HEIGHT }}
-            >
-              {HOURS.map((h) => (
-                <div
-                  key={h}
-                  className="absolute right-2 text-[10px] font-bold text-slate-300 tabular-nums"
-                  style={{ top: (h - START_HOUR) * HOUR_HEIGHT + (h === START_HOUR ? 4 : -8) }}
-                >
-                  {String(h).padStart(2, "0")}:00
-                </div>
-              ))}
-            </div>
-
-            {/* Day columns */}
-            {diasSemana.map((dia, i) => {
-              const turnosDia = localTurnos
-                .filter((t) => isSameDayAR(new Date(t.fecha), dia))
-                .sort((a, b) => new Date(a.fecha).getTime() - new Date(b.fecha).getTime());
-
-              return (
-                <div
-                  key={i}
-                  className="w-28 shrink-0 sm:w-auto sm:flex-1 relative border-r border-slate-100 last:border-r-0"
-                  style={{ height: TOTAL_HEIGHT }}
-                >
-                  {/* Hour grid lines */}
-                  {HOURS.map((h) => (
-                    <div
-                      key={h}
-                      className="absolute left-0 right-0 border-t border-slate-100"
-                      style={{ top: (h - START_HOUR) * HOUR_HEIGHT }}
-                    />
-                  ))}
-                  {/* Half-hour lines */}
-                  {HOURS.map((h) => (
-                    <div
-                      key={`${h}h`}
-                      className="absolute left-0 right-0 border-t border-dashed border-slate-50"
-                      style={{ top: (h - START_HOUR) * HOUR_HEIGHT + HOUR_HEIGHT / 2 }}
-                    />
-                  ))}
-
-                  {/* Turnos */}
-                  {turnosDia.map((t) => {
-                    const { hours, minutes } = getARTime(new Date(t.fecha));
-                    const startMin = (hours - START_HOUR) * 60 + minutes;
-                    const top = startMin * PX_PER_MIN;
-                    const height = Math.max(t.duracion * PX_PER_MIN, 48);
-                    const style = ESTADO_STYLES[t.estado] ?? ESTADO_STYLES.PENDIENTE;
-                    return (
-                      <button
-                        key={t.id}
-                        onClick={() => setSelectedTurno(t)}
-                        className={`absolute inset-x-1 rounded-xl border px-2 py-1.5 overflow-hidden hover:shadow-md transition-shadow text-left w-[calc(100%-8px)] ${style.card}`}
-                        style={{ top, height }}
-                      >
-                        <div className="flex items-center gap-1.5">
-                          <div className={`h-1.5 w-1.5 rounded-full shrink-0 ${style.dot}`} />
-                          <p className="text-[11px] font-bold leading-tight truncate">
-                            {titleCase(t.paciente.nombre)} {titleCase(t.paciente.apellido)}
-                          </p>
-                        </div>
-                        {t.motivo && (
-                          <p className="text-[10px] opacity-60 truncate mt-0.5">{t.motivo}</p>
-                        )}
-                      </button>
-                    );
-                  })}
-                </div>
-              );
-            })}
+            <HoraLabels />
+            {diasSemana.map((dia, i) => (
+              <DiaColumn key={i} turnosDia={turnosDe(dia)} onSelect={setSelectedTurno} />
+            ))}
           </div>
         </div>
-       </div>
+      </div>
+
+      {/* ── Calendar: Mobile — un día a la vez ── */}
+      <div className="sm:hidden bg-white rounded-xl overflow-hidden">
+        {/* Day switcher */}
+        <div className="flex items-center justify-between px-4 py-3 border-b border-slate-100">
+          <button
+            onClick={diaAnterior}
+            className="p-2 rounded-xl bg-slate-50 hover:bg-slate-100 transition-colors text-slate-600"
+          >
+            <ChevronLeft className="h-4 w-4" />
+          </button>
+          <span className={`text-sm font-black ${isSameDayAR(diaSeleccionado, hoy) ? "text-blue-600" : "text-slate-900"}`}>
+            {formatDiaLargo(diaSeleccionado)}
+          </span>
+          <button
+            onClick={diaSiguiente}
+            className="p-2 rounded-xl bg-slate-50 hover:bg-slate-100 transition-colors text-slate-600"
+          >
+            <ChevronRight className="h-4 w-4" />
+          </button>
+        </div>
+
+        {/* Scrollable time body */}
+        <div
+          className="overflow-y-auto [&::-webkit-scrollbar]:hidden"
+          style={{ height: "calc(100vh - 280px)", scrollbarWidth: "none" }}
+        >
+          <div className="flex">
+            <HoraLabels />
+            <DiaColumn turnosDia={turnosDe(diaSeleccionado)} onSelect={setSelectedTurno} />
+          </div>
+        </div>
       </div>
 
       {/* ── Turno detail modal ── */}
