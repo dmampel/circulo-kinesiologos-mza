@@ -83,7 +83,7 @@ export default async function NoticiasPage({ searchParams }: Props) {
       </div>
 
       {/* ── BARRA TÍTULO + BÚSQUEDA ── */}
-      <div className="px-6 lg:px-14 py-4 border-b border-slate-100 flex items-end justify-end gap-4 bg-slate-50/80">
+      <div className="px-6 lg:px-14 py-4 border-b border-slate-100 flex flex-col sm:flex-row items-stretch sm:items-end justify-end gap-4 bg-slate-50/80">
         <Suspense fallback={null}>
           <SearchBar />
         </Suspense>
@@ -106,7 +106,7 @@ export default async function NoticiasPage({ searchParams }: Props) {
             </div>
           </div>
         ) : (
-          <div className="flex gap-8 items-start">
+          <div className="flex flex-col lg:flex-row gap-8 items-start">
 
             {/* ── CONTENIDO PRINCIPAL ── */}
             <div className="flex-1 min-w-0 space-y-6">
@@ -187,7 +187,7 @@ export default async function NoticiasPage({ searchParams }: Props) {
             </div>
 
             {/* ── SIDEBAR ── */}
-            <aside className="w-64 shrink-0 sticky top-6 flex flex-col gap-6">
+            <aside className="w-full lg:w-64 lg:shrink-0 lg:sticky lg:top-6 flex flex-col gap-6">
 
               {/* Categorías con conteo */}
               <div className="bg-white rounded-xl border border-slate-100 overflow-hidden">

@@ -97,11 +97,28 @@ export default function KineClubClient({ beneficios, currentCat, categorias }: P
       </div>
 
       <div className="mx-auto max-w-7xl px-4 -mt-16 relative z-20">
-        <div className="bg-white p-4 rounded-[2.5rem] shadow-xl border border-slate-100 flex flex-wrap justify-center gap-2 mb-12">
+        <div className="md:hidden bg-white p-2 rounded-2xl shadow-xl border border-slate-100 mb-12">
+          <div className="relative">
+            <select
+              value={currentCat}
+              onChange={(e) => handleCatChange(e.target.value)}
+              className="w-full appearance-none rounded-xl bg-slate-50 px-4 py-3 pr-10 text-sm font-bold text-slate-900"
+            >
+              {categorias.map((cat) => (
+                <option key={cat.id} value={cat.id}>
+                  {cat.name}
+                </option>
+              ))}
+            </select>
+            <ChevronRight className="pointer-events-none absolute right-4 top-1/2 h-4 w-4 -translate-y-1/2 rotate-90 text-slate-400" />
+          </div>
+        </div>
+
+        <div className="hidden md:flex bg-white p-4 rounded-[2.5rem] shadow-xl border border-slate-100 flex-wrap justify-center gap-2 mb-12">
           {categorias.map((cat) => {
             const Icon = ICON_MAP[cat.iconName] || Tag;
             return (
-              <button 
+              <button
                 key={cat.id}
                 onClick={() => handleCatChange(cat.id)}
                 className={cn(
