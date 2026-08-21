@@ -141,15 +141,16 @@ export default function AgendaSemanal({ turnos, weekStartISO, pacientes }: Agend
 
       {/* ── Calendar grid ── */}
       <div className="bg-white rounded-xl overflow-hidden">
+       <div className="overflow-x-auto">
         {/* Day headers */}
         <div className="flex border-b border-slate-100">
-          <div className="w-14 shrink-0 border-r border-slate-100" />
+          <div className="w-14 shrink-0 border-r border-slate-100 sticky left-0 z-10 bg-white" />
           {diasSemana.map((dia, i) => {
             const esHoy = isSameDayAR(dia, hoy);
             return (
               <div
                 key={i}
-                className={`flex-1 flex flex-col items-center py-3 border-r border-slate-100 last:border-r-0 ${
+                className={`w-28 shrink-0 sm:w-auto sm:flex-1 flex flex-col items-center py-3 border-r border-slate-100 last:border-r-0 ${
                   esHoy ? "bg-blue-600" : ""
                 }`}
               >
@@ -180,7 +181,7 @@ export default function AgendaSemanal({ turnos, weekStartISO, pacientes }: Agend
           <div className="flex">
             {/* Time labels */}
             <div
-              className="w-14 shrink-0 relative border-r border-slate-100"
+              className="w-14 shrink-0 relative border-r border-slate-100 sticky left-0 z-10 bg-white"
               style={{ height: TOTAL_HEIGHT }}
             >
               {HOURS.map((h) => (
@@ -203,7 +204,7 @@ export default function AgendaSemanal({ turnos, weekStartISO, pacientes }: Agend
               return (
                 <div
                   key={i}
-                  className="flex-1 relative border-r border-slate-100 last:border-r-0"
+                  className="w-28 shrink-0 sm:w-auto sm:flex-1 relative border-r border-slate-100 last:border-r-0"
                   style={{ height: TOTAL_HEIGHT }}
                 >
                   {/* Hour grid lines */}
@@ -254,6 +255,7 @@ export default function AgendaSemanal({ turnos, weekStartISO, pacientes }: Agend
             })}
           </div>
         </div>
+       </div>
       </div>
 
       {/* ── Turno detail modal ── */}
