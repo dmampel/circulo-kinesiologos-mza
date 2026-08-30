@@ -38,7 +38,7 @@
 - [x] 3.5 En `src/app/mi-panel/page.tsx`: agrupar en `Promise.all` los `await` que no dependen entre sí, respetando las dependencias reales sobre `profesional.id`
 - [x] 3.6 Confirmar que el JSX de ambos archivos quedó **intacto**: si el diff toca markup, `className` o componentes, se salió de alcance (`design.md — D7`)
 - [ ] 3.7 Probar el caso del usuario autenticado **sin** perfil profesional vinculado: el dashboard debe seguir mostrando la pantalla "Usuario no vinculado" y no romper con un `profesional` indefinido
-- [ ] 3.8 Probar el aislamiento entre socios: dos profesionales distintos, dos sesiones, cada uno ve únicamente sus propios datos, circulares y turnos
+- [x] 3.8 Probar el aislamiento entre socios: dos profesionales distintos, dos sesiones, cada uno ve únicamente sus propios datos, circulares y turnos — **VERIFICADO por la usuaria el 2026-08-30**: dos socios en sesiones distintas, cada uno vio únicamente sus propios datos. Sin cruce.
 - [ ] 3.9 Probar que un dato modificado se refleja de inmediato: editar el perfil desde `/mi-panel/perfil`, recargar, y confirmar que el cambio aparece —la memoización no debe sobrevivir a la request
 - [ ] 3.10 Probar el control de acceso sin cambios: un anónimo que pide `/mi-panel` es redirigido a `/login`; un autenticado sin rol `admin` que pide `/admin` es redirigido a `/mi-panel`
 - [ ] 3.11 Desplegar **solo este grupo** y re-contar las rutas de `/mi-panel` con el procedimiento de 1.8. Esperado: desaparece la segunda lectura del profesional y baja la cantidad de esperas serializadas del layout. Registrar en `baseline.md`
