@@ -29,7 +29,7 @@ import { BeneficioRepository } from "@/lib/repositories/BeneficioRepository";
 import { NoticiaRepository } from "@/lib/repositories/NoticiaRepository";
 import { CapacitacionRepository } from "@/lib/repositories/CapacitacionRepository";
 
-export const dynamic = "force-dynamic";
+export const revalidate = 300;
 
 const TIPO_BADGE: Record<string, string> = {
   CURSO: "bg-blue-100 text-blue-700",

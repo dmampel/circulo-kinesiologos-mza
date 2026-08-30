@@ -9,7 +9,7 @@ import { Metadata } from "next";
 import ReactMarkdown from "react-markdown";
 import ShareButton from "./ShareButton";
 
-export const dynamic = "force-dynamic";
+export const revalidate = 3600;
 
 interface Props {
   params: Promise<{ slug: string }>;

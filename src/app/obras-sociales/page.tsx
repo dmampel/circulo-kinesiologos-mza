@@ -7,8 +7,6 @@ import Link from "next/link";
 import { ObraSocialRepository } from "@/lib/repositories/ObraSocialRepository";
 import ObrasSocialesGrid from "./ObrasSocialesGrid";
 
-export const dynamic = "force-dynamic";
-
 export const metadata: Metadata = {
   title: "Obras Sociales | Círculo de Kinesiólogos de Mendoza",
   description: "Consultá qué obras sociales y prepagas trabajan con kinesiólogos del Círculo de Mendoza. Información actualizada de convenios.",
@@ -19,7 +17,7 @@ export const metadata: Metadata = {
   },
 };
 
-export const revalidate = 60; // Revalidate every 60 seconds
+export const revalidate = 3600;
 
 export default async function ObrasSocialesPage() {
   const obrasSociales = await ObraSocialRepository.getAllActive();

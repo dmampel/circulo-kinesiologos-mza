@@ -2,7 +2,7 @@ import { MetadataRoute } from "next";
 import { ProfesionalRepository } from "@/lib/repositories/ProfesionalRepository";
 import { NoticiaRepository } from "@/lib/repositories/NoticiaRepository";
 
-export const dynamic = "force-dynamic";
+export const revalidate = 3600;
 
 const BASE_URL = process.env.NEXT_PUBLIC_SITE_URL ?? "https://www.circulokinesiologos.com.ar";
 

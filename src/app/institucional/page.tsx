@@ -5,7 +5,7 @@ import { AutoridadRepository } from "@/lib/repositories/AutoridadRepository";
 import { ProfesionalRepository } from "@/lib/repositories/ProfesionalRepository";
 import { ObraSocialRepository } from "@/lib/repositories/ObraSocialRepository";
 
-export const dynamic = "force-dynamic";
+export const revalidate = 3600;
 
 export const metadata: Metadata = {
   title: "Institucional | Círculo de Kinesiólogos de Mendoza",

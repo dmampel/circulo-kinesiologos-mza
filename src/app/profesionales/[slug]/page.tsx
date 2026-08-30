@@ -18,7 +18,7 @@ import {
 import Link from "next/link";
 import WaveTransition from "@/components/WaveTransition";
 
-export const dynamic = "force-dynamic";
+export const revalidate = 3600;
 
 interface Props {
   params: Promise<{ slug: string }>;
