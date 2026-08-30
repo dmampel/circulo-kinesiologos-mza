@@ -128,3 +128,23 @@ archivo y comparar el TTFB de las rutas dinámicas (`/profesionales`,
 `/noticias`), que son las que no se benefician del cache de edge y por lo tanto
 reflejan directamente el costo de las queries. Si el TTFB no baja, la hipótesis
 de la latencia entre regiones era incorrecta y hay que seguir buscando.
+
+### Resultado tras co-locar la región (2026-08-30)
+
+`x-vercel-id: gru1::pdx1::...` — función confirmada en Portland, ~75 s tras el push.
+
+Mediana de 5 muestras por ruta, todas rutas dinámicas (sin cache de edge, o sea
+que reflejan directamente el costo de las queries):
+
+| Ruta | Baseline (iad1) | Tras pdx1 | Mejora |
+|---|---|---|---|
+| `/profesionales` | 1,05 s | **0,63 s** | −40% |
+| `/noticias` | 0,79 s | **0,50 s** | −37% |
+| `/profesionales?query=gonzalez` | 1,09 s | **0,49 s** | −55% |
+
+Hipótesis confirmada: el ahorro de ~0,3-0,6 s por request es consistente con
+~60-70 ms de RTT multiplicados por las 6-9 sentencias que emite cada página.
+
+Queda un piso de ~0,45-0,50 s en las rutas dinámicas. Ese piso es el objetivo
+del trabajo de round-trips (reducir la cantidad de sentencias por request), que
+NO se hace en este change.
