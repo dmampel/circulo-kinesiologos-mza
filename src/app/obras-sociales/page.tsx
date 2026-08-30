@@ -6,6 +6,7 @@ import {
 import Link from "next/link";
 import { ObraSocialRepository } from "@/lib/repositories/ObraSocialRepository";
 import ObrasSocialesGrid from "./ObrasSocialesGrid";
+import { construirUrlAbsoluta } from "@/lib/site";
 
 export const metadata: Metadata = {
   title: "Obras Sociales | Círculo de Kinesiólogos de Mendoza",
@@ -13,7 +14,7 @@ export const metadata: Metadata = {
   openGraph: {
     title: "Obras Sociales | CKM Mendoza",
     description: "Obras sociales y prepagas con convenio con el Círculo de Kinesiólogos de Mendoza.",
-    url: "https://www.circulokinesiologos.com.ar/obras-sociales",
+    url: construirUrlAbsoluta("/obras-sociales"),
   },
 };
 

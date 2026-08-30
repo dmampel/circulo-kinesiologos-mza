@@ -17,6 +17,7 @@ import {
 } from "lucide-react";
 import Link from "next/link";
 import WaveTransition from "@/components/WaveTransition";
+import { construirUrlAbsoluta } from "@/lib/site";
 
 export const revalidate = 3600;
 
@@ -44,7 +45,7 @@ export async function generateMetadata({ params }: Props): Promise<Metadata> {
       title: nombre,
       description,
       images: profesional.foto_url ? [profesional.foto_url] : [],
-      url: `https://www.circulokinesiologos.com.ar/profesionales/${slug}`,
+      url: construirUrlAbsoluta(`/profesionales/${slug}`),
     },
   };
 }

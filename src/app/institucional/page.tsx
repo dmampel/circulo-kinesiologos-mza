@@ -4,6 +4,7 @@ import { FileText, ArrowUpRight } from "lucide-react";
 import { AutoridadRepository } from "@/lib/repositories/AutoridadRepository";
 import { ProfesionalRepository } from "@/lib/repositories/ProfesionalRepository";
 import { ObraSocialRepository } from "@/lib/repositories/ObraSocialRepository";
+import { construirUrlAbsoluta } from "@/lib/site";
 
 export const revalidate = 3600;
 
@@ -13,7 +14,7 @@ export const metadata: Metadata = {
   openGraph: {
     title: "Institucional | CKM Mendoza",
     description: "Historia, misión y Comisión Directiva del Círculo de Kinesiólogos de Mendoza.",
-    url: "https://www.circulokinesiologos.com.ar/institucional",
+    url: construirUrlAbsoluta("/institucional"),
   },
 };
 

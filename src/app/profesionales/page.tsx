@@ -10,7 +10,7 @@ export const metadata: Metadata = {
   openGraph: {
     title: "Padrón de Profesionales | CKM Mendoza",
     description: "Directorio oficial de kinesiólogos habilitados en la provincia de Mendoza.",
-    url: "https://www.circulokinesiologos.com.ar/profesionales",
+    url: construirUrlAbsoluta("/profesionales"),
   },
 };
 import {
@@ -32,6 +32,7 @@ import WaveTransition from "@/components/WaveTransition";
 import { Suspense } from "react";
 
 import { profesionalSearchSchema } from "@/lib/validations/searchParams";
+import { construirUrlAbsoluta } from "@/lib/site";
 
 const PAGE_SIZE = 24;
 

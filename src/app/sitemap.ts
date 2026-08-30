@@ -1,10 +1,11 @@
 import { MetadataRoute } from "next";
 import { ProfesionalRepository } from "@/lib/repositories/ProfesionalRepository";
 import { NoticiaRepository } from "@/lib/repositories/NoticiaRepository";
+import { SITE_URL } from "@/lib/site";
 
 export const revalidate = 3600;
 
-const BASE_URL = process.env.NEXT_PUBLIC_SITE_URL ?? "https://www.circulokinesiologos.com.ar";
+const BASE_URL = SITE_URL;
 
 const STATIC_ROUTES: MetadataRoute.Sitemap = [
   { url: BASE_URL, priority: 1.0, changeFrequency: "weekly" },
