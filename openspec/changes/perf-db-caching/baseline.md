@@ -99,3 +99,32 @@ de Prisma capturado con su duración, sólo en desarrollo) y deja evidencia repr
 y tipo de queries por página, que es lo que la tarea 1.4 pide registrar. La comparación de TTFB
 válida contra el baseline de producción es la de la sección anterior (`curl` contra el deploy),
 no esta.
+
+---
+
+## Hallazgo de infraestructura: región de la función vs. región de la base
+
+Medido el 2026-08-30, durante el grupo 1.
+
+- **Función de Vercel**: `iad1` (Washington D.C., us-east-1). Confirmado con
+  `curl -sI <deploy> | grep x-vercel-id` → `x-vercel-id: gru1::iad1::...`
+- **Proyecto de Supabase**: `us-west-2` (Oregón). Confirmado por la usuaria en
+  Supabase → Settings → General.
+
+Es decir: **costa a costa**. Cada sentencia SQL sale de Virginia y va a Oregón.
+El RTT esperado entre ambas regiones es de ~60-70 ms **por sentencia**.
+
+Esto importa porque la instrumentación de Prisma mostró que la app emite muchas
+más sentencias de las necesarias: 391 sentencias en 7 páginas, de las cuales
+228 (58%) son `BEGIN`/`COMMIT`/`DEALLOCATE ALL` — overhead de protocolo, no
+consultas. Una página que emite ~8 sentencias paga ~500 ms sólo en geografía.
+
+**Acción tomada**: se agregó `vercel.json` con `"regions": ["pdx1"]` (Portland,
+la región de Vercel que corresponde a `us-west-2`) para co-locar la función con
+la base.
+
+**Verificación pendiente**: tras el deploy, repetir las mediciones de este
+archivo y comparar el TTFB de las rutas dinámicas (`/profesionales`,
+`/noticias`), que son las que no se benefician del cache de edge y por lo tanto
+reflejan directamente el costo de las queries. Si el TTFB no baja, la hipótesis
+de la latencia entre regiones era incorrecta y hay que seguir buscando.
