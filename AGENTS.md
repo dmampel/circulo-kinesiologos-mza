@@ -56,3 +56,33 @@ CKM-Web es la plataforma institucional y de gestión para el Círculo de Kinesi�
 2. **No Console Logs**: Limpiar todos los logs antes de cada commit, a menos que sean críticos para depuración en desarrollo.
 3. **Error Handling**: Siempre capturar errores en Server Actions y devolver un objeto `{ success: boolean, error?: string }`.
 4. **Clean Code**: Mantener las funciones pequeñas y enfocadas en una sola responsabilidad.
+
+---
+
+## 🔁 OPSX: convenciones de apply / verify / archive
+
+> Estas reglas vivían en `openspec/config.yaml` bajo `rules:`, pero el schema
+> `spec-driven` sólo reconoce los artifacts `proposal`, `specs`, `design` y
+> `tasks` — el resto lo descartaba con warning y **no se estaba aplicando**.
+> Viven acá, que es lo que los agentes sí leen.
+
+### apply
+1. Seguir patrones de Next.js 16: Server Components por defecto, `"use client"` sólo si hace falta interactividad.
+2. Mantener type safety estricto. Nada de `any` para salir del paso.
+3. Todo acceso a datos pasa por `src/lib/repositories/`. Si tocás una query, dejala del lado correcto del patrón.
+
+### verify
+1. Correr la suite: `npx vitest run`. El proyecto **sí** tiene test runner (`vitest.config.ts`).
+2. Complementar con verificación manual en navegador para lo que no está cubierto por tests (UI, flujos de auth, Storage).
+3. Reportar el resultado real de la corrida — si algo falla, se dice, no se omite.
+
+### archive
+1. Antes de archivar, volver a `tasks.md` y marcar con `[x]` todas las tareas finalizadas.
+2. Asegurar que las specs quedaron actualizadas con los detalles de implementación.
+3. Tras archivar: `git commit` (Conventional Commits) + `git push`.
+
+### Nota sobre `strict_tdd`
+`openspec/config.yaml` declara `strict_tdd: false`. Vitest está disponible, así
+que activarlo es posible — pero es una decisión deliberada: pondría todas las
+fases de apply en ciclo RED-GREEN-REFACTOR obligatorio. No lo cambies sin
+acordarlo explícitamente.

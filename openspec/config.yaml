@@ -6,31 +6,29 @@ context: |
   Database: Supabase (Auth/Storage) + Prisma (ORM).
   Styling: Tailwind CSS 4.
 
-strict_tdd: false # No test runner detected. Recommended: install vitest.
+strict_tdd: false # Vitest disponible; ver nota en AGENTS.md antes de activarlo.
 
+# NOTA: el schema `spec-driven` sólo conoce los artifacts `proposal`, `specs`,
+# `design` y `tasks`. Cualquier otra clave acá dentro se descarta con warning.
+# Las convenciones de apply / verify / archive viven en AGENTS.md.
 rules:
   proposal:
-    - Include database schema changes in the proposal.
-    - Identify if Supabase migrations are needed.
+    - "Include database schema changes in the proposal."
+    - "Identify if Supabase migrations are needed."
   specs:
-    - Use Given/When/Then format for scenarios.
-    - Document specific Supabase edge cases (auth, RLS).
+    - "Use Given/When/Then format for scenarios."
+    - "Document specific Supabase edge cases (auth, RLS)."
   design:
-    - Detail Prisma schema updates.
-    - Include UI component breakdown (Atomic Design or similar).
+    - "Detail Prisma schema updates."
+    - "Include UI component breakdown (Atomic Design or similar)."
   tasks:
-    - Group by: DB/Prisma -> Supabase -> Backend -> Frontend.
-  apply:
-    - Follow Next.js 16 specific patterns (Server Components by default).
-    - Maintain strict type safety.
-  verify:
-    - Manual verification via browser tool (until Vitest is added).
-  archive:
-    - Ensure all specs are updated with implementation details.
+    - "Group by DB/Prisma, then Supabase, then Backend, then Frontend."
+    - "Follow Next.js 16 patterns: Server Components by default, strict type safety."
 
 testing:
-  runner: null
+  runner: vitest
+  command: npx vitest run
   layers:
-    unit: false
+    unit: true
     integration: false
     e2e: false
