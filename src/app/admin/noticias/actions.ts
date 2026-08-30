@@ -1,7 +1,7 @@
 "use server";
 
 import prisma from "@/lib/prisma";
-import { revalidatePath } from "next/cache";
+import { revalidatePath, updateTag } from "next/cache";
 import { NoticiaRepository } from "@/lib/repositories/NoticiaRepository";
 import { requireAdmin } from "@/utils/supabase/require-admin";
 
@@ -42,6 +42,10 @@ export async function crearNoticia(formData: FormData) {
     revalidatePath("/admin/noticias");
     revalidatePath("/noticias");
     revalidatePath("/");
+    // El conteo de noticias por categoría está embebido en el resultado
+    // cacheado de CategoriaNoticiaRepository.getAll() (grupo 3, tarea 3.3) —
+    // hay que invalidarlo también acá, no sólo desde categoria-actions.ts.
+    updateTag("categorias-noticias");
 
     return { success: true };
   } catch (error: any) {
@@ -85,6 +89,7 @@ export async function actualizarNoticia(id: string, formData: FormData) {
     revalidatePath("/admin/noticias");
     revalidatePath("/noticias");
     revalidatePath("/");
+    updateTag("categorias-noticias");
 
     return { success: true };
   } catch (error: any) {
@@ -97,6 +102,7 @@ export async function eliminarNoticia(id: string) {
   try {
     await prisma.noticia.delete({ where: { id } });
     revalidatePath("/admin/noticias");
+    updateTag("categorias-noticias");
     return { success: true };
   } catch (error: any) {
     return { success: false, error: error.message };

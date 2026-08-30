@@ -1,4 +1,5 @@
 import prisma from "@/lib/prisma";
+import { unstable_cache } from "next/cache";
 
 function toSlug(nombre: string) {
   return nombre
@@ -10,18 +11,29 @@ function toSlug(nombre: string) {
     .replace(/^-|-$/g, "");
 }
 
-export class CategoriaNoticiaRepository {
-  static async getAll() {
-    return prisma.categoriaNoticia.findMany({
+// Filtro de /noticias: incluye el conteo de noticias por categoría, así que
+// se invalida por tag "categorias-noticias" tanto desde las Server Actions
+// que crean/editan/borran categorías como desde las que crean/editan/borran
+// noticias (afectan el conteo embebido en este mismo resultado cacheado).
+const getCachedCategoriasNoticia = unstable_cache(
+  async () =>
+    prisma.categoriaNoticia.findMany({
       include: {
         _count: {
-          select: { noticias: true }
-        }
+          select: { noticias: true },
+        },
       },
       orderBy: {
         nombre: "asc",
       },
-    });
+    }),
+  ["categorias-noticia-all"],
+  { tags: ["categorias-noticias"], revalidate: 3600 },
+);
+
+export class CategoriaNoticiaRepository {
+  static async getAll() {
+    return getCachedCategoriasNoticia();
   }
 
   static async getBySlug(slug: string) {

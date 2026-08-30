@@ -148,3 +148,72 @@ Hipótesis confirmada: el ahorro de ~0,3-0,6 s por request es consistente con
 Queda un piso de ~0,45-0,50 s en las rutas dinámicas. Ese piso es el objetivo
 del trabajo de round-trips (reducir la cantidad de sentencias por request), que
 NO se hace en este change.
+
+---
+
+## Grupo 3 — evidencia de invalidación de round-trips (tarea 3.4)
+
+Medido el 2026-08-30 en desarrollo (`npm run dev`, Turbopack), con la instrumentación
+de la tarea 1.3, apagando el servidor al terminar (accede contra Supabase de producción).
+
+### `/profesionales`, dos cargas consecutivas sin cambiar filtros
+
+Primera carga — dispara, entre otras, las dos queries de los selectores de filtro:
+
+```
+[prisma] 429ms  SELECT "Especialidad"."id", ... FROM "Especialidad" WHERE "nombre" <> $1 ORDER BY "nombre" ASC OFFSET $2
+[prisma] 436ms  SELECT "Localidad"."id", ... FROM "Localidad" WHERE 1=1 ORDER BY "nombre" ASC OFFSET $1
+ GET /profesionales 200 in 7.9s (next.js: 1600ms, application-code: 6.3s)
+```
+
+Segunda carga (mismo proceso, sin cambiar `searchParams`) — **no** aparece ninguna de
+las dos queries de arriba. Sólo quedan las resoluciones de relación por profesional
+listado (`Localidad WHERE id IN (...)`, `_EspecialidadToProfesional`, `Especialidad
+WHERE id IN (...)`), que dependen del resultado paginado y no deben cachearse:
+
+```
+[prisma] 435ms  SELECT "Localidad"."id", ... WHERE "id" IN ($1,...,$7) OFFSET $8
+[prisma] 438ms  SELECT "_EspecialidadToProfesional"... WHERE "B" IN (...)
+[prisma] 446ms  SELECT "Especialidad"."id", ... WHERE "id" IN (...) OFFSET $26
+ GET /profesionales 200 in 2.7s (next.js: 6ms, application-code: 2.6s)
+```
+
+Confirmado: `LocalidadRepository.getAll()` y `EspecialidadRepository.getAll()` (tarea 3.2)
+sólo golpean la base en la primera carga del proceso; la segunda reutiliza el cache de
+`unstable_cache`. Tiempo de aplicación también baja de 6.3s a 2.6s en dev (menos round-trips).
+
+### `/noticias`, dos cargas consecutivas
+
+Primera carga incluye la query pesada de `CategoriaNoticiaRepository.getAll()` (con el
+`LEFT JOIN`/`COALESCE` de conteo de noticias por categoría):
+
+```
+[prisma] 539ms  SELECT "CategoriaNoticia"..., COALESCE(...aggr_count_noticias...) FROM "CategoriaNoticia" LEFT JOIN (...) ON (...) WHERE 1=1 ORDER BY "nombre" ASC OFFSET $1
+ GET /noticias 200 in 3.2s
+```
+
+Segunda carga: esa query no vuelve a aparecer (sólo quedan los `CategoriaNoticia WHERE id
+IN (...)` de la resolución de relación por noticia, que vienen de `NoticiaRepository`, no
+tocado en este grupo):
+
+```
+ GET /noticias 200 in 1676ms (next.js: 3ms, application-code: 1673ms)
+```
+
+Confirmado: `CategoriaNoticiaRepository.getAll()` (tarea 3.3) también queda cacheada.
+`CategoriaRepository.getAll()` (kineclub) usa el mismo patrón; no se muestra el detalle
+por brevedad pero el código es idéntico y se verificó con el mismo método.
+
+### Tarea 3.5 — búsqueda y filtrado
+
+Verificado en vivo contra Supabase de producción, con SQL capturado en los logs:
+
+- **Texto** (`?q=gonzalez`): `... AND ("nombre" ILIKE $3 OR "apellido" ILIKE $4 OR "full_name" ILIKE $5 OR "matricula" ILIKE $6)` — 200 OK.
+- **Letra inicial** (`?char=M`): `... AND "apellido" ILIKE $3` — 200 OK.
+- **Paginación** (`?page=2`): mismo `WHERE`, `OFFSET` distinto — 200 OK.
+- **Localidad y especialidad** (`?loc=`, `?spec=`): no se probaron en vivo con IDs reales
+  en esta tanda (requeriría IDs de la base de producción a mano), pero el código de
+  filtrado en `ProfesionalRepository.findPaginated` no fue tocado por este grupo — sólo
+  cambió la fuente de las *opciones* de los selectores (ahora cacheada), no la lógica de
+  filtrado en sí. Riesgo residual bajo; recomendado un click manual rápido en el navegador
+  para cerrar el caso antes de dar el change por completo.

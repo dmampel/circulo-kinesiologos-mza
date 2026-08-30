@@ -9,8 +9,6 @@ import { Metadata } from "next";
 import { Suspense } from "react";
 import SearchBar from "./SearchBar";
 
-export const dynamic = "force-dynamic";
-
 export const metadata: Metadata = {
   title: "Noticias | CKM Mendoza",
   description: "Las últimas novedades, convenios y eventos de la comunidad kinesiológica mendocina.",

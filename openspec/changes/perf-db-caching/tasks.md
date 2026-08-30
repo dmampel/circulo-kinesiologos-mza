@@ -23,11 +23,11 @@
 
 ## 3. Rutas públicas con `searchParams` (Backend + Frontend)
 
-- [ ] 3.1 En `src/app/profesionales/page.tsx`, `src/app/noticias/page.tsx` y `src/app/kineclub/page.tsx`: eliminar `export const dynamic = "force-dynamic"` (es redundante — leer `searchParams` ya fuerza render dinámico)
-- [ ] 3.2 Envolver la lectura de localidades y especialidades que alimenta los filtros de `/profesionales` en el cache de datos de Next (`unstable_cache`) con una etiqueta y TTL, manteniendo el acceso detrás de la capa de repositorios
-- [ ] 3.3 Envolver de la misma forma la lectura de categorías que alimenta los filtros de `/noticias` y `/kineclub`
-- [ ] 3.4 Verificar en desarrollo, con los logs de query de 1.3, que una recarga de `/profesionales` sin cambiar filtros ya no dispara las queries de localidades ni de especialidades
-- [ ] 3.5 Confirmar que la búsqueda y el filtrado siguen funcionando: por texto, por localidad, por especialidad, por letra inicial y por paginación
+- [x] 3.1 En `src/app/profesionales/page.tsx`, `src/app/noticias/page.tsx` y `src/app/kineclub/page.tsx`: eliminar `export const dynamic = "force-dynamic"` (es redundante — leer `searchParams` ya fuerza render dinámico)
+- [x] 3.2 Envolver la lectura de localidades y especialidades que alimenta los filtros de `/profesionales` en el cache de datos de Next (`unstable_cache`) con una etiqueta y TTL, manteniendo el acceso detrás de la capa de repositorios
+- [x] 3.3 Envolver de la misma forma la lectura de categorías que alimenta los filtros de `/noticias` y `/kineclub`
+- [x] 3.4 Verificar en desarrollo, con los logs de query de 1.3, que una recarga de `/profesionales` sin cambiar filtros ya no dispara las queries de localidades ni de especialidades
+- [x] 3.5 Confirmar que la búsqueda y el filtrado siguen funcionando: por texto, por localidad, por especialidad, por letra inicial y por paginación
 
 ## 4. Alcance del middleware de sesión (Supabase)
 

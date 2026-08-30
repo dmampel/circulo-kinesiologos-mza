@@ -33,8 +33,6 @@ import { Suspense } from "react";
 
 import { profesionalSearchSchema } from "@/lib/validations/searchParams";
 
-export const dynamic = "force-dynamic";
-
 const PAGE_SIZE = 24;
 
 interface Props {

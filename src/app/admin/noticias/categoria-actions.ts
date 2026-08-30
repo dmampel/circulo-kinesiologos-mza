@@ -1,6 +1,6 @@
 "use server";
 
-import { revalidatePath } from "next/cache";
+import { revalidatePath, updateTag } from "next/cache";
 import { CategoriaNoticiaRepository } from "@/lib/repositories/CategoriaNoticiaRepository";
 import { requireAdmin } from "@/utils/supabase/require-admin";
 
@@ -15,6 +15,7 @@ export async function crearCategoria(formData: FormData) {
 
     revalidatePath("/admin/noticias");
     revalidatePath("/noticias");
+    updateTag("categorias-noticias");
     return { success: true };
   } catch (error: any) {
     return { success: false, error: error.message };
@@ -32,6 +33,7 @@ export async function actualizarCategoria(id: string, formData: FormData) {
 
     revalidatePath("/admin/noticias");
     revalidatePath("/noticias");
+    updateTag("categorias-noticias");
     return { success: true };
   } catch (error: any) {
     return { success: false, error: error.message };
@@ -45,6 +47,7 @@ export async function eliminarCategoria(id: string) {
 
     revalidatePath("/admin/noticias");
     revalidatePath("/noticias");
+    updateTag("categorias-noticias");
     return { success: true };
   } catch (error: any) {
     return { success: false, error: error.message };

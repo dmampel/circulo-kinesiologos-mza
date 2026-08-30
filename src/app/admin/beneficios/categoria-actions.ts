@@ -1,7 +1,7 @@
 "use server";
 
 import prisma from "@/lib/prisma";
-import { revalidatePath } from "next/cache";
+import { revalidatePath, updateTag } from "next/cache";
 import { requireAdmin } from "@/utils/supabase/require-admin";
 
 export async function crearCategoria(formData: FormData) {
@@ -30,6 +30,7 @@ export async function crearCategoria(formData: FormData) {
 
     revalidatePath("/admin/beneficios");
     revalidatePath("/kineclub");
+    updateTag("categorias-beneficios");
     return { success: true };
   } catch (error: any) {
     return { success: false, error: error.message };
@@ -63,6 +64,7 @@ export async function actualizarCategoria(id: string, formData: FormData) {
 
     revalidatePath("/admin/beneficios");
     revalidatePath("/kineclub");
+    updateTag("categorias-beneficios");
     return { success: true };
   } catch (error: any) {
     return { success: false, error: error.message };
@@ -86,6 +88,7 @@ export async function eliminarCategoria(id: string) {
 
     revalidatePath("/admin/beneficios");
     revalidatePath("/kineclub");
+    updateTag("categorias-beneficios");
     return { success: true };
   } catch (error: any) {
     return { success: false, error: error.message };
