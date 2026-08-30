@@ -4,6 +4,7 @@ import { redirect, notFound } from "next/navigation";
 import Link from "next/link";
 import { ReadTracker } from "./ReadTracker";
 import { ArrowLeft, ExternalLink, FileText, Image as ImageIcon, File } from "lucide-react";
+import { firmarUrlCircular } from "@/lib/storage/circulares";
 
 export const dynamic = "force-dynamic";
 
@@ -43,7 +44,12 @@ export default async function CircularDetallePage({ params }: Props) {
   }).format(circular.publicada_en || circular.createdAt);
 
   const tieneContenido = circular.contenido && circular.contenido.trim().length > 0;
-  const tieneArchivo = Boolean(circular.archivo_url);
+
+  // El bucket `circulares-adjuntos` es privado: el adjunto se firma por request
+  // y expira en 1 hora. Un `archivo_url` externo (pegado a mano por el admin)
+  // se devuelve sin tocar.
+  const archivoUrl = await firmarUrlCircular(circular.archivo_url);
+  const tieneArchivo = Boolean(archivoUrl);
   const fileType = circular.archivo_url ? getFileType(circular.archivo_url) : null;
 
   return (
@@ -97,7 +103,7 @@ export default async function CircularDetallePage({ params }: Props) {
                   Archivo adjunto · PDF
                 </div>
                 <a
-                  href={circular.archivo_url!}
+                  href={archivoUrl!}
                   target="_blank"
                   rel="noopener noreferrer"
                   className="flex items-center gap-1 text-[11px] font-bold text-blue-600 hover:text-blue-700 transition-colors"
@@ -107,7 +113,7 @@ export default async function CircularDetallePage({ params }: Props) {
                 </a>
               </div>
               <iframe
-                src={circular.archivo_url!}
+                src={archivoUrl!}
                 className="w-full"
                 style={{ height: "72vh", minHeight: "400px" }}
                 title={circular.titulo}
@@ -124,7 +130,7 @@ export default async function CircularDetallePage({ params }: Props) {
                   Imagen adjunta
                 </div>
                 <a
-                  href={circular.archivo_url!}
+                  href={archivoUrl!}
                   target="_blank"
                   rel="noopener noreferrer"
                   className="flex items-center gap-1 text-[11px] font-bold text-blue-600 hover:text-blue-700 transition-colors"
@@ -135,7 +141,7 @@ export default async function CircularDetallePage({ params }: Props) {
               </div>
               {/* eslint-disable-next-line @next/next/no-img-element */}
               <img
-                src={circular.archivo_url!}
+                src={archivoUrl!}
                 alt={circular.titulo}
                 className="w-full object-contain max-h-[60vh]"
               />
@@ -157,7 +163,7 @@ export default async function CircularDetallePage({ params }: Props) {
                 </div>
               </div>
               <a
-                href={circular.archivo_url!}
+                href={archivoUrl!}
                 target="_blank"
                 rel="noopener noreferrer"
                 className="flex items-center gap-2 px-4 py-2.5 bg-blue-600 text-white rounded-xl font-bold text-sm hover:bg-blue-700 transition-all shadow-md shadow-blue-100 shrink-0"

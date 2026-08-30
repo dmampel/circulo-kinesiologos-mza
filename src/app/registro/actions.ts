@@ -2,9 +2,16 @@
 
 import prisma from "@/lib/prisma";
 import { revalidatePath } from "next/cache";
-import { redirect } from "next/navigation";
 import { supabaseAdmin } from "@/lib/supabase/admin";
 import { getResend, canSendEmails, FROM_EMAIL, INSTITUTIONAL_EMAIL } from "@/lib/resend";
+import {
+  ARCHIVOS_REQUERIDOS,
+  construirPathArchivo,
+  crearSolicitudSchema,
+  prepararSubidaSchema,
+} from "@/lib/validations/solicitud";
+
+const BUCKET_SOLICITUDES = "solicitudes";
 
 export async function getLocalidades() {
   return await prisma.localidad.findMany({
@@ -20,79 +27,169 @@ export async function getEspecialidades() {
   });
 }
 
-export async function crearSolicitud(formData: FormData) {
-  // Usamos supabaseAdmin para tener permisos de escritura en Storage sin RLS (Service Role)
-  const supabase = supabaseAdmin;
-
-  // 1. Extraer datos del formulario
-  const nombre = formData.get("nombre") as string;
-  const apellido = formData.get("apellido") as string;
-  const email = formData.get("email") as string;
-  const matricula = formData.get("matricula") as string;
-  const especialidadId = formData.get("especialidad") as string;
-  const cuil = formData.get("dni") as string;
-  const telefono = formData.get("telefono") as string;
-
-  const especialidadNombre = especialidadId
-    ? (await prisma.especialidad.findUnique({ where: { id: especialidadId }, select: { nombre: true } }))?.nombre ?? especialidadId
-    : "No especificada";
-
-  // Validación de servidor básica
-  if (!nombre || !apellido || !email || !matricula) {
-    return { error: "Faltan campos obligatorios" };
-  }
-
-  // Verificar duplicados
+/**
+ * Verifica si ya existe una Solicitud registrada con el mismo email, matrícula,
+ * CUIL/DNI o teléfono. Devuelve el mensaje de error del primer duplicado encontrado,
+ * o `null` si no hay ninguno.
+ */
+export async function verificarDuplicados(input: {
+  email: string;
+  matricula: string;
+  cuil?: string;
+  telefono?: string;
+}): Promise<string | null> {
   const [emailExistente, matriculaExistente, cuilExistente, telefonoExistente] = await Promise.all([
-    prisma.solicitud.findFirst({ where: { email } }),
-    prisma.solicitud.findFirst({ where: { matricula } }),
-    cuil ? prisma.solicitud.findFirst({ where: { datos: { path: ["dni"], equals: cuil } } }) : null,
-    telefono ? prisma.solicitud.findFirst({ where: { datos: { path: ["telefono"], equals: telefono } } }) : null,
+    prisma.solicitud.findFirst({ where: { email: input.email } }),
+    prisma.solicitud.findFirst({ where: { matricula: input.matricula } }),
+    input.cuil
+      ? prisma.solicitud.findFirst({ where: { datos: { path: ["dni"], equals: input.cuil } } })
+      : null,
+    input.telefono
+      ? prisma.solicitud.findFirst({ where: { datos: { path: ["telefono"], equals: input.telefono } } })
+      : null,
   ]);
 
-  if (emailExistente) return { error: "Ya existe una solicitud registrada con ese email." };
-  if (matriculaExistente) return { error: "Ya existe una solicitud registrada con esa matrícula." };
-  if (cuilExistente) return { error: "Ya existe una solicitud registrada con ese CUIL/DNI." };
-  if (telefonoExistente) return { error: "Ya existe una solicitud registrada con ese teléfono." };
+  if (emailExistente) return "Ya existe una solicitud registrada con ese email.";
+  if (matriculaExistente) return "Ya existe una solicitud registrada con esa matrícula.";
+  if (cuilExistente) return "Ya existe una solicitud registrada con ese CUIL/DNI.";
+  if (telefonoExistente) return "Ya existe una solicitud registrada con ese teléfono.";
+  return null;
+}
 
-  // Validar documentos requeridos
-  const archivosRequeridos = ["dni", "titulo", "cuit", "seguro", "cv", "matricula_file"];
-  for (const key of archivosRequeridos) {
-    const allValues = formData.getAll(key);
-    const archivo = (allValues.find(v => v instanceof File) ?? null) as File | null;
-    if (!archivo || archivo.size === 0) {
-      return { error: `El documento "${key}" es obligatorio.` };
+type ManifiestoInput = {
+  key: string;
+  nombre: string;
+  tamano: number;
+  tipo: string;
+};
+
+type PrepararSubidaInput = {
+  nombre: string;
+  apellido: string;
+  email: string;
+  matricula: string;
+  dni: string;
+  telefono: string;
+  manifiesto: ManifiestoInput[];
+};
+
+type PrepararSubidaResult =
+  | { success: true; uploads: Array<{ key: string; path: string; token: string }> }
+  | { success: false; error: string };
+
+/**
+ * Paso 1 del flujo de registro: valida datos de texto + manifiesto de archivos,
+ * chequea duplicados y — sólo si todo pasa — emite una signed upload URL por
+ * documento con el path elegido por el servidor. Nunca lanza al cliente.
+ */
+export async function prepararSubidaSolicitud(input: PrepararSubidaInput): Promise<PrepararSubidaResult> {
+  try {
+    const parsed = prepararSubidaSchema.safeParse(input);
+    if (!parsed.success) {
+      return { success: false, error: parsed.error.issues[0]?.message ?? "Datos inválidos." };
+    }
+
+    const { email, matricula, dni, telefono, manifiesto } = parsed.data;
+
+    const errorDuplicado = await verificarDuplicados({ email, matricula, cuil: dni, telefono });
+    if (errorDuplicado) {
+      return { success: false, error: errorDuplicado };
+    }
+
+    const uploads = await Promise.all(
+      manifiesto.map(async (documento) => {
+        const path = construirPathArchivo(matricula, documento.key, documento.nombre);
+
+        const { data, error } = await supabaseAdmin.storage
+          .from(BUCKET_SOLICITUDES)
+          .createSignedUploadUrl(path);
+
+        if (error || !data) {
+          throw new Error(
+            `No se pudo generar el permiso de subida para "${documento.key}": ${error?.message ?? "error desconocido"}`
+          );
+        }
+
+        return { key: documento.key, path, token: data.token };
+      })
+    );
+
+    return { success: true, uploads };
+  } catch (error) {
+    const message = error instanceof Error ? error.message : "No se pudo preparar la subida de documentos.";
+    return { success: false, error: message };
+  }
+}
+
+type CrearSolicitudInput = {
+  nombre: string;
+  apellido: string;
+  email: string;
+  matricula: string;
+  dni: string;
+  telefono: string;
+  direccion: string;
+  localidadId: string;
+  especialidad: string;
+  archivos: Record<string, string>;
+};
+
+/**
+ * Paso 3 del flujo de registro: persiste la Solicitud a partir de paths ya
+ * subidos a Storage. No confía en el payload del cliente: re-chequea duplicados
+ * (protección de carrera) y verifica contra Storage que cada path exista y
+ * respete el prefijo `${matricula}-${key}-` emitido por el servidor.
+ */
+export async function crearSolicitud(input: CrearSolicitudInput): Promise<{ success: boolean; error?: string }> {
+  const parsed = crearSolicitudSchema.safeParse(input);
+  if (!parsed.success) {
+    return { success: false, error: parsed.error.issues[0]?.message ?? "Datos inválidos." };
+  }
+
+  const { nombre, apellido, email, matricula, dni, telefono, direccion, localidadId, especialidad, archivos } =
+    parsed.data;
+
+  // Re-ejecutar verificación de duplicados: protección contra carrera entre
+  // prepararSubidaSolicitud y crearSolicitud.
+  const errorDuplicado = await verificarDuplicados({ email, matricula, cuil: dni, telefono });
+  if (errorDuplicado) {
+    return { success: false, error: errorDuplicado };
+  }
+
+  // Confirmar que están los 6 documentos obligatorios.
+  for (const key of ARCHIVOS_REQUERIDOS) {
+    if (!archivos[key]) {
+      return { success: false, error: `El documento "${key}" es obligatorio.` };
     }
   }
 
-  // 2. Subir archivos a Supabase Storage en paralelo
-  const archivosKeys = ["dni", "titulo", "cuit", "seguro", "cv", "matricula_file", "super_salud", "habilitacion"];
-  const archivosUrls: Record<string, string | null> = {};
+  // El payload de archivos es tan falsificable como cualquier request del cliente:
+  // verificar contra Storage que cada path exista y respete el prefijo esperado.
+  for (const [key, path] of Object.entries(archivos)) {
+    const prefijoEsperado = `${matricula}-${key}-`;
+    if (!path.startsWith(prefijoEsperado)) {
+      return { success: false, error: `El documento "${key}" no es válido.` };
+    }
 
-  try {
-    await Promise.all(archivosKeys.map(async (key) => {
-      const allValues = formData.getAll(key);
-      const archivo = (allValues.find(v => v instanceof File) ?? null) as File | null;
-      if (archivo && archivo.size > 0) {
-        const fileExt = archivo.name.split('.').pop();
-        const fileName = `${matricula}-${key}-${Date.now()}.${fileExt}`;
-        
-        const { error: uploadError } = await supabase.storage
-          .from('solicitudes')
-          .upload(fileName, archivo);
+    const { data: listado, error: listError } = await supabaseAdmin.storage
+      .from(BUCKET_SOLICITUDES)
+      .list("", { search: prefijoEsperado });
 
-        if (uploadError) {
-          throw new Error(`Error subiendo ${key}: ${uploadError.message}`);
-        }
-        
-        archivosUrls[key] = fileName;
-      }
-    }));
-  } catch (uploadError: any) {
-    return { error: uploadError.message };
+    if (listError || !listado?.some((objeto) => objeto.name === path)) {
+      return { success: false, error: `El documento "${key}" no se encuentra en el almacenamiento.` };
+    }
   }
 
-  // 3. Guardar en la base de datos
+  let especialidadNombre = especialidad;
+  try {
+    const especialidadRegistro = especialidad
+      ? await prisma.especialidad.findUnique({ where: { id: especialidad }, select: { nombre: true } })
+      : null;
+    if (especialidadRegistro?.nombre) especialidadNombre = especialidadRegistro.nombre;
+  } catch {
+    // best-effort: si no se puede resolver el nombre de la especialidad, se usa el valor recibido
+  }
+
   try {
     await prisma.solicitud.create({
       data: {
@@ -102,21 +199,20 @@ export async function crearSolicitud(formData: FormData) {
         matricula,
         status: "PENDIENTE",
         datos: {
-          dni: formData.get("dni") as string,
-          telefono: formData.get("telefono") as string,
-          direccion: formData.get("direccion") as string,
-          localidadId: formData.get("localidadId") as string,
-          especialidad: formData.get("especialidad") as string,
-          archivos: archivosUrls,
+          dni,
+          telefono,
+          direccion,
+          localidadId,
+          especialidad,
+          archivos,
           fecha_solicitud: new Date().toISOString(),
         },
       },
     });
-    
-    // 4. Enviar emails transaccionales
+
     if (canSendEmails()) {
       const resend = getResend();
-      const siteUrl = process.env.NEXT_PUBLIC_SITE_URL || 'http://localhost:3000';
+      const siteUrl = process.env.NEXT_PUBLIC_SITE_URL || "http://localhost:3000";
 
       // Aviso institucional
       try {
@@ -147,7 +243,7 @@ export async function crearSolicitud(formData: FormData) {
                 Este es un mensaje automático del sistema de gestión de Círculo Kinesiólogos.
               </div>
             </div>
-          `
+          `,
         });
       } catch {
         // no bloquear si falla el aviso institucional
@@ -177,7 +273,7 @@ export async function crearSolicitud(formData: FormData) {
                 Este es un mensaje automático del sistema de gestión de Círculo Kinesiólogos.
               </div>
             </div>
-          `
+          `,
         });
       } catch {
         // no bloquear si falla la confirmación al solicitante
@@ -185,9 +281,25 @@ export async function crearSolicitud(formData: FormData) {
     }
 
     revalidatePath("/admin/solicitudes");
-  } catch (error: any) {
-    return { error: `Error DB: ${error.message || "Desconocido"}` };
+  } catch (error) {
+    const message = error instanceof Error ? error.message : "Desconocido";
+    return { success: false, error: `Error DB: ${message}` };
   }
 
-  redirect("/registro/exito");
+  return { success: true };
+}
+
+/**
+ * Limpieza best-effort de objetos huérfanos en Storage cuando la subida se
+ * completó pero la creación de la Solicitud falló, o el usuario abandonó.
+ * Nunca lanza: es invocada desde el `catch` del cliente.
+ */
+export async function cancelarSubidaSolicitud(paths: string[]): Promise<void> {
+  if (!paths.length) return;
+
+  try {
+    await supabaseAdmin.storage.from(BUCKET_SOLICITUDES).remove(paths);
+  } catch {
+    // best-effort: nunca debe lanzar
+  }
 }

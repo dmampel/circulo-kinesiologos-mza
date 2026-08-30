@@ -19,7 +19,7 @@
 - [x] 2.6 En `src/app/sitemap.ts`: eliminar `force-dynamic` y agregar `export const revalidate = 3600`
 - [x] 2.7 Verificar con `grep -rl 'force-dynamic' src/app` que quedan exactamente 46 archivos: los 43 de `/admin` y `/mi-panel` más los 3 del Grupo B, que se tratan en el grupo 3
 - [x] 2.8 Confirmar que **ninguna** página bajo `/admin` ni `/mi-panel` fue modificada en este grupo (`git diff --name-only` no debe listar rutas de esos directorios)
-- [x] 2.9 Desplegar y medir: repetir las mediciones de 1.2 y confirmar `x-vercel-cache: HIT` en la segunda request de cada ruta del grupo, y que `cache-control` ya no contiene `no-store` ni `private` — **PENDIENTE: requiere que la usuaria despliegue.** El comando exacto para correr después del deploy está en `baseline.md`.
+- [x] 2.9 Desplegar y medir: repetir las mediciones de 1.2 y confirmar `x-vercel-cache: HIT` en la segunda request de cada ruta del grupo, y que `cache-control` ya no contiene `no-store` ni `private` — **HECHO (2026-08-30)**: `x-vercel-cache: HIT` confirmado en `/`, `/institucional`, `/obras-sociales` y `/sitemap.xml`; `no-store` ya no aparece. Resultados en `baseline.md`.
 
 ## 3. Rutas públicas con `searchParams` (Backend + Frontend)
 

@@ -1,19 +1,34 @@
 "use client";
 
 import { useState } from "react";
-import { 
-  User, 
-  FileText, 
-  CheckCircle2, 
-  ChevronRight, 
-  ChevronLeft, 
-  Upload, 
+import { useRouter } from "next/navigation";
+import {
+  User,
+  FileText,
+  CheckCircle2,
+  ChevronRight,
+  ChevronLeft,
+  Upload,
   Info,
   ShieldCheck,
-  Loader2
+  Loader2,
+  AlertCircle
 } from "lucide-react";
 import { cn } from "@/lib/utils";
-import { crearSolicitud, getLocalidades, getEspecialidades } from "./actions";
+import {
+  crearSolicitud,
+  prepararSubidaSolicitud,
+  cancelarSubidaSolicitud,
+  getLocalidades,
+  getEspecialidades,
+} from "./actions";
+import { supabaseBrowser } from "@/lib/supabase/client";
+import {
+  validarArchivoCliente,
+  validarTamanoTotal,
+  construirManifiesto,
+  mapearPathsDesdeUploads,
+} from "@/lib/validations/archivoCliente";
 import { useEffect } from "react";
 
 const STEPS = [
@@ -22,7 +37,25 @@ const STEPS = [
   { id: 3, title: "Documentación", icon: FileText },
 ];
 
+const DOCUMENTOS = [
+  { id: "dni", label: "Fotocopia DNI (Frente y Dorso)" },
+  { id: "titulo", label: "Título Universitario (Frente y Dorso)" },
+  { id: "cuit", label: "Constancia de CUIT e Ingresos Brutos" },
+  { id: "seguro", label: "Póliza de Seguro Mala Praxis" },
+  { id: "cv", label: "Curriculum Vitae Actualizado" },
+  { id: "matricula_file", label: "Matrícula Provincial Vigente" },
+  { id: "super_salud", label: "Certificado Superintendencia de Salud" },
+  { id: "habilitacion", label: "Habilitación del Consultorio" },
+] as const;
+
+const LABELS_ARCHIVO: Record<string, string> = Object.fromEntries(
+  DOCUMENTOS.map((doc) => [doc.id, doc.label])
+);
+
+type EstadoArchivo = "pendiente" | "subiendo" | "listo" | "error";
+
 export default function RegistroPage() {
+  const router = useRouter();
   const [currentStep, setCurrentStep] = useState(1);
   const [isPending, setIsPending] = useState(false);
   const [localidades, setLocalidades] = useState<{id: string, nombre: string}[]>([]);
@@ -37,7 +70,10 @@ export default function RegistroPage() {
     super_salud: null,
     habilitacion: null,
   });
-  
+  const [erroresArchivo, setErroresArchivo] = useState<Record<string, string | null>>({});
+  const [errorGlobal, setErrorGlobal] = useState<string | null>(null);
+  const [estadoArchivos, setEstadoArchivos] = useState<Record<string, EstadoArchivo>>({});
+
   const [formData, setFormData] = useState({
     nombre: "",
     apellido: "",
@@ -61,9 +97,19 @@ export default function RegistroPage() {
 
   const handleFileChange = (e: React.ChangeEvent<HTMLInputElement>, field: string) => {
     const file = e.target.files?.[0];
-    if (file) {
-      setArchivos(prev => ({ ...prev, [field]: file }));
+    if (!file) return;
+
+    const error = validarArchivoCliente(file);
+    if (error) {
+      setErroresArchivo(prev => ({ ...prev, [field]: error }));
+      setArchivos(prev => ({ ...prev, [field]: null }));
+      e.target.value = "";
+      return;
     }
+
+    setErroresArchivo(prev => ({ ...prev, [field]: null }));
+    setEstadoArchivos(prev => ({ ...prev, [field]: "pendiente" }));
+    setArchivos(prev => ({ ...prev, [field]: file }));
   };
 
   const validateStep = (step: number) => {
@@ -91,22 +137,67 @@ export default function RegistroPage() {
 
   const handleSubmit = async () => {
     if (!validateStep(3)) {
-      alert("Por favor, cargá todos los documentos requeridos para procesar tu solicitud.");
+      setErrorGlobal("Por favor, cargá todos los documentos requeridos para procesar tu solicitud.");
+      return;
+    }
+
+    const avisoTotal = validarTamanoTotal(archivos);
+    if (avisoTotal) {
+      setErrorGlobal(avisoTotal);
       return;
     }
 
     setIsPending(true);
-    const data = new FormData();
-    
-    Object.entries(formData).forEach(([key, value]) => data.append(key, value));
-    Object.entries(archivos).forEach(([key, file]) => {
-      if (file) data.append(key, file);
-    });
-    
-    const result = await crearSolicitud(data);
-    
-    if (result?.error) {
-      alert(`Error: ${result.error}`);
+    setErrorGlobal(null);
+    setEstadoArchivos({});
+    const subidos: string[] = [];
+
+    try {
+      const manifiesto = construirManifiesto(archivos);
+      const prep = await prepararSubidaSolicitud({ ...formData, manifiesto });
+
+      if (!prep.success) {
+        setErrorGlobal(prep.error);
+        return;
+      }
+
+      for (const { key, path, token } of prep.uploads) {
+        const archivo = archivos[key];
+        if (!archivo) continue;
+
+        setEstadoArchivos(prev => ({ ...prev, [key]: "subiendo" }));
+
+        const { error } = await supabaseBrowser.storage
+          .from("solicitudes")
+          .uploadToSignedUrl(path, token, archivo);
+
+        if (error) {
+          setEstadoArchivos(prev => ({ ...prev, [key]: "error" }));
+          throw new Error(`No se pudo subir "${LABELS_ARCHIVO[key] ?? key}": ${error.message}`);
+        }
+
+        subidos.push(path);
+        setEstadoArchivos(prev => ({ ...prev, [key]: "listo" }));
+      }
+
+      const res = await crearSolicitud({
+        ...formData,
+        archivos: mapearPathsDesdeUploads(prep.uploads),
+      });
+
+      if (!res.success) {
+        await cancelarSubidaSolicitud(subidos).catch(() => {});
+        setErrorGlobal(res.error ?? "No se pudo completar la solicitud. Intentá nuevamente.");
+        return;
+      }
+
+      router.push("/registro/exito");
+    } catch (error) {
+      await cancelarSubidaSolicitud(subidos).catch(() => {});
+      setErrorGlobal(
+        error instanceof Error ? error.message : "Ocurrió un error inesperado. Reintentá en unos minutos."
+      );
+    } finally {
       setIsPending(false);
     }
   };
@@ -247,44 +338,84 @@ export default function RegistroPage() {
             <div className="animate-in fade-in slide-in-from-right-4 duration-500">
               <h2 className="text-2xl font-black text-slate-900 mb-4">Documentación Necesaria</h2>
               <p className="text-sm text-slate-500 mb-10">Por favor, cargá todos los documentos requeridos para procesar tu solicitud.</p>
-              
+
               <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                {[
-                  { id: "dni", label: "Fotocopia DNI (Frente y Dorso)" },
-                  { id: "titulo", label: "Título Universitario (Frente y Dorso)" },
-                  { id: "cuit", label: "Constancia de CUIT e Ingresos Brutos" },
-                  { id: "seguro", label: "Póliza de Seguro Mala Praxis" },
-                  { id: "cv", label: "Curriculum Vitae Actualizado" },
-                  { id: "matricula_file", label: "Matrícula Provincial Vigente" },
-                  { id: "super_salud", label: "Certificado Superintendencia de Salud" },
-                  { id: "habilitacion", label: "Habilitación del Consultorio" },
-                ].map((doc) => (
-                  <div key={doc.id} className="relative group">
-                    <input 
-                      type="file" 
-                      onChange={(e) => handleFileChange(e, doc.id)}
-                      className="absolute inset-0 w-full h-full opacity-0 cursor-pointer z-10"
-                    />
-                    <div className={cn(
-                      "flex items-center p-4 rounded-2xl border-2 border-dashed transition-all",
-                      archivos[doc.id] ? "bg-green-50 border-green-200" : "bg-slate-50 border-slate-100 group-hover:border-blue-400 group-hover:bg-blue-50"
-                    )}>
+                {DOCUMENTOS.map((doc) => {
+                  const errorDoc = erroresArchivo[doc.id];
+                  const estadoDoc = estadoArchivos[doc.id] ?? "pendiente";
+                  const tieneError = Boolean(errorDoc) || estadoDoc === "error";
+                  const subiendo = estadoDoc === "subiendo";
+
+                  return (
+                    <div key={doc.id} className="relative group">
+                      <input
+                        type="file"
+                        accept=".pdf,.jpg,.jpeg,.png,.webp,.heic,image/*,application/pdf"
+                        onChange={(e) => handleFileChange(e, doc.id)}
+                        className="absolute inset-0 w-full h-full opacity-0 cursor-pointer z-10"
+                      />
                       <div className={cn(
-                        "h-10 w-10 rounded-xl flex items-center justify-center mr-4",
-                        archivos[doc.id] ? "bg-white text-green-600" : "bg-white text-slate-400 group-hover:text-blue-600"
+                        "flex items-center p-4 rounded-2xl border-2 border-dashed transition-all",
+                        tieneError
+                          ? "bg-red-50 border-red-200"
+                          : subiendo
+                          ? "bg-blue-50 border-blue-200"
+                          : archivos[doc.id]
+                          ? "bg-green-50 border-green-200"
+                          : "bg-slate-50 border-slate-100 group-hover:border-blue-400 group-hover:bg-blue-50"
                       )}>
-                        {archivos[doc.id] ? <CheckCircle2 className="h-5 w-5" /> : <Upload className="h-5 w-5" />}
+                        <div className={cn(
+                          "h-10 w-10 rounded-xl flex items-center justify-center mr-4 shrink-0",
+                          tieneError
+                            ? "bg-white text-red-600"
+                            : subiendo
+                            ? "bg-white text-blue-600"
+                            : archivos[doc.id]
+                            ? "bg-white text-green-600"
+                            : "bg-white text-slate-400 group-hover:text-blue-600"
+                        )}>
+                          {subiendo ? (
+                            <Loader2 className="h-5 w-5 animate-spin" />
+                          ) : tieneError ? (
+                            <AlertCircle className="h-5 w-5" />
+                          ) : archivos[doc.id] ? (
+                            <CheckCircle2 className="h-5 w-5" />
+                          ) : (
+                            <Upload className="h-5 w-5" />
+                          )}
+                        </div>
+                        <div className="flex-1 min-w-0">
+                          <p className="text-xs font-black text-slate-900 truncate">{doc.label}</p>
+                          <p className="text-[10px] text-slate-400 truncate">
+                            {archivos[doc.id] ? archivos[doc.id]?.name : "Click para subir"}
+                          </p>
+                        </div>
                       </div>
-                      <div className="flex-1 min-w-0">
-                        <p className="text-xs font-black text-slate-900 truncate">{doc.label}</p>
-                        <p className="text-[10px] text-slate-400 truncate">
-                          {archivos[doc.id] ? archivos[doc.id]?.name : "Click para subir"}
+                      {errorDoc && (
+                        <p className="mt-2 px-1 text-xs font-bold text-red-600 leading-relaxed">
+                          {errorDoc}
                         </p>
-                      </div>
+                      )}
                     </div>
-                  </div>
-                ))}
+                  );
+                })}
               </div>
+
+              {validarTamanoTotal(archivos) && (
+                <div className="mt-6 flex items-start gap-3 rounded-2xl border border-amber-200 bg-amber-50 p-4 sm:p-6">
+                  <Info className="h-4 w-4 text-amber-600 shrink-0 mt-0.5" />
+                  <p className="text-xs font-bold text-amber-800 leading-relaxed">
+                    {validarTamanoTotal(archivos)}
+                  </p>
+                </div>
+              )}
+            </div>
+          )}
+
+          {errorGlobal && (
+            <div className="mt-8 flex items-start gap-3 rounded-2xl border border-red-200 bg-red-50 p-4 sm:p-6">
+              <AlertCircle className="h-5 w-5 text-red-600 shrink-0 mt-0.5" />
+              <p className="text-xs sm:text-sm font-bold text-red-700 leading-relaxed">{errorGlobal}</p>
             </div>
           )}
 
