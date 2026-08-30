@@ -29,6 +29,10 @@ vi.mock('@/lib/repositories/ProfesionalRepository', () => ({
   },
 }));
 
+vi.mock('@/utils/supabase/require-admin', () => ({
+  requireAdmin: vi.fn(),
+}));
+
 vi.mock('next/cache', () => ({ revalidatePath: vi.fn() }));
 
 vi.mock('@/lib/resend', () => ({
@@ -40,6 +44,7 @@ vi.mock('@/lib/resend', () => ({
 import prisma from '@/lib/prisma';
 import { supabaseAdmin } from '@/lib/supabase/admin';
 import { ProfesionalRepository } from '@/lib/repositories/ProfesionalRepository';
+import { requireAdmin } from '@/utils/supabase/require-admin';
 import { gestionarSolicitud } from './actions';
 
 const mockSolicitudFindUnique = vi.mocked(prisma.solicitud.findUnique);
@@ -48,6 +53,7 @@ const mockProfesionalCreate = vi.mocked(prisma.profesional.create);
 const mockInvite = vi.mocked(supabaseAdmin.auth.admin.inviteUserByEmail);
 const mockFindByEmail = vi.mocked(ProfesionalRepository.findByEmail);
 const mockFindByMatricula = vi.mocked(ProfesionalRepository.findByMatricula);
+const mockRequireAdmin = vi.mocked(requireAdmin);
 
 const solicitudBase = {
   id: 'sol-1',
@@ -121,5 +127,27 @@ describe('gestionarSolicitud — APROBAR', () => {
       expect.objectContaining({ data: expect.objectContaining({ status: 'APROBADA' }) })
     );
     expect(result).toEqual({ success: true });
+  });
+});
+
+describe('gestionarSolicitud — control de acceso', () => {
+  it('propaga el error y no toca la base si el usuario no es admin', async () => {
+    mockRequireAdmin.mockRejectedValue(new Error('Forbidden'));
+
+    await expect(gestionarSolicitud('sol-1', 'APROBAR')).rejects.toThrow('Forbidden');
+
+    expect(mockSolicitudFindUnique).not.toHaveBeenCalled();
+    expect(mockSolicitudUpdate).not.toHaveBeenCalled();
+    expect(mockProfesionalCreate).not.toHaveBeenCalled();
+    expect(mockInvite).not.toHaveBeenCalled();
+  });
+
+  it('propaga el error y no toca la base si no hay sesión', async () => {
+    mockRequireAdmin.mockRejectedValue(new Error('Unauthorized'));
+
+    await expect(gestionarSolicitud('sol-1', 'RECHAZAR')).rejects.toThrow('Unauthorized');
+
+    expect(mockSolicitudFindUnique).not.toHaveBeenCalled();
+    expect(mockSolicitudUpdate).not.toHaveBeenCalled();
   });
 });

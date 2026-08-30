@@ -18,6 +18,7 @@ import Link from "next/link";
 import { notFound } from "next/navigation";
 import { cn } from "@/lib/utils";
 import BotonesSolicitud from "../BotonesSolicitud";
+import { firmarUrlsDocumentos } from "@/lib/storage/solicitudes";
 
 export const dynamic = "force-dynamic";
 
@@ -43,8 +44,6 @@ export default async function DetalleSolicitudPage({ params }: Props) {
     especialidadNombre = esp?.nombre ?? especialidadRaw;
   }
   
-  const SUPABASE_STORAGE_URL = `${process.env.NEXT_PUBLIC_SUPABASE_URL}/storage/v1/object/public/solicitudes`;
-
   const DOCS = [
     { id: "dni", label: "Fotocopia DNI", file: archivos.dni },
     { id: "titulo", label: "Título Universitario", file: archivos.titulo },
@@ -55,6 +54,17 @@ export default async function DetalleSolicitudPage({ params }: Props) {
     { id: "super_salud", label: "Superintendencia de Salud", file: archivos.super_salud },
     { id: "habilitacion", label: "Habilitación Consultorio", file: archivos.habilitacion },
   ];
+
+  // El bucket `solicitudes` es privado: contiene documentación personal de los
+  // solicitantes. Los enlaces se firman por request y expiran en 1 hora.
+  const urlsFirmadas = await firmarUrlsDocumentos(
+    DOCS.map((doc) => doc.file).filter((file): file is string => Boolean(file))
+  );
+
+  const DOCS_CON_URL = DOCS.map((doc) => ({
+    ...doc,
+    url: doc.file ? urlsFirmadas[doc.file] : undefined,
+  }));
 
   return (
     <div className="space-y-8 animate-in fade-in duration-500">
@@ -138,33 +148,33 @@ export default async function DetalleSolicitudPage({ params }: Props) {
               <FileText className="mr-3 h-6 w-6 text-blue-600" /> Documentación Digital
             </h3>
             <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-              {DOCS.map((doc) => (
+              {DOCS_CON_URL.map((doc) => (
                 <div 
                   key={doc.id}
                   className={cn(
                     "p-4 rounded-2xl border transition-all flex items-center justify-between",
-                    doc.file ? "bg-slate-50 border-slate-100" : "bg-red-50/30 border-red-50 border-dashed opacity-60"
+                    doc.url ? "bg-slate-50 border-slate-100" : "bg-red-50/30 border-red-50 border-dashed opacity-60"
                   )}
                 >
                   <div className="flex items-center space-x-3 min-w-0">
                     <div className={cn(
                       "h-10 w-10 rounded-xl flex items-center justify-center",
-                      doc.file ? "bg-white text-blue-600 shadow-sm" : "bg-slate-100 text-slate-400"
+                      doc.url ? "bg-white text-blue-600 shadow-sm" : "bg-slate-100 text-slate-400"
                     )}>
                       <FileText className="h-5 w-5" />
                     </div>
                     <div className="min-w-0">
                       <p className="text-xs font-black text-slate-900 truncate">{doc.label}</p>
                       <p className="text-[10px] text-slate-400 font-bold uppercase tracking-tighter">
-                        {doc.file ? "Disponible" : "No adjuntado"}
+                        {doc.url ? "Disponible" : doc.file ? "No disponible" : "No adjuntado"}
                       </p>
                     </div>
                   </div>
                   
-                  {doc.file && (
+                  {doc.url && (
                     <div className="flex items-center space-x-2">
                       <a 
-                        href={`${SUPABASE_STORAGE_URL}/${doc.file}`}
+                        href={doc.url}
                         target="_blank"
                         className="h-8 w-8 rounded-lg bg-white border border-slate-100 flex items-center justify-center text-slate-400 hover:text-blue-600 hover:shadow-sm transition-all"
                         title="Ver online"
@@ -172,7 +182,7 @@ export default async function DetalleSolicitudPage({ params }: Props) {
                         <ExternalLink className="h-4 w-4" />
                       </a>
                       <a 
-                        href={`${SUPABASE_STORAGE_URL}/${doc.file}`}
+                        href={doc.url}
                         download
                         className="h-8 w-8 rounded-lg bg-blue-600 flex items-center justify-center text-white hover:bg-blue-700 hover:shadow-md transition-all"
                         title="Descargar"
