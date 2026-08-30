@@ -6,6 +6,7 @@ import { revalidatePath } from "next/cache";
 import { ProfesionalRepository } from "@/lib/repositories/ProfesionalRepository";
 import { getResend, canSendEmails, FROM_EMAIL } from "@/lib/resend";
 import { requireAdmin } from "@/utils/supabase/require-admin";
+import { construirUrlAbsoluta } from "@/lib/site";
 
 export async function gestionarSolicitud(id: string, accion: "APROBAR" | "RECHAZAR") {
   await requireAdmin();
@@ -84,7 +85,7 @@ export async function gestionarSolicitud(id: string, accion: "APROBAR" | "RECHAZ
           data: {
             full_name: `${solicitud.nombre} ${solicitud.apellido}`,
           },
-          redirectTo: `${process.env.NEXT_PUBLIC_SITE_URL || 'http://localhost:3000'}/auth/callback?next=/auth/set-password`,
+          redirectTo: construirUrlAbsoluta("auth/callback?next=/auth/set-password"),
         }
       );
 

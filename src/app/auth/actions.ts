@@ -1,9 +1,9 @@
 "use server";
 
 import { createClient } from "@/utils/supabase/server";
+import { construirUrlAbsoluta } from "@/lib/site";
 import { revalidatePath } from "next/cache";
 import { redirect } from "next/navigation";
-import { headers } from "next/headers";
 
 export async function login(formData: FormData) {
   const supabase = await createClient();
@@ -56,11 +56,12 @@ export async function logout() {
 export async function requestPasswordReset(formData: FormData) {
   const supabase = await createClient();
   const email = formData.get("email") as string;
-  const headersList = await headers();
-  const origin = headersList.get("origin") ?? "";
-
+  // La URL debe ser ABSOLUTA y estar en la lista de Redirect URLs de Supabase.
+  // Antes se armaba con el header `origin`, que no siempre llega: cuando venia
+  // vacio el `redirectTo` quedaba relativo, Supabase lo descartaba y caia al
+  // Site URL del proyecto. Se usa la misma fuente de verdad que el sitemap.
   const { error } = await supabase.auth.resetPasswordForEmail(email, {
-    redirectTo: `${origin}/auth/callback?next=/auth/set-password`,
+    redirectTo: construirUrlAbsoluta("auth/callback?next=/auth/set-password"),
   });
 
   if (error) {
