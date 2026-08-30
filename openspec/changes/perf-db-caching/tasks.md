@@ -51,7 +51,23 @@
 - [ ] 5.8 Confirmar que `/kineclub` y `/mi-panel/capacitaciones` siguen mostrando el conjunto completo que mostraban antes
 - [ ] 5.9 Confirmar con los logs de query que el home ya no lee las tablas completas de noticias, beneficios ni capacitaciones
 
-## 6. Índices de base de datos (DB/Prisma — gobernanza HIGH)
+## 6. Índices de base de datos (DB/Prisma — gobernanza HIGH) — DIFERIDO
+
+> **DIFERIDO el 2026-08-30, no se ejecuta en este change.** La medición
+> demostró que la ejecución de las queries no es el cuello de botella:
+> `/profesionales?query=gonzalez` (1,09 s) era indistinguible de la página sin
+> filtro (1,05 s), y la instrumentación de Prisma mostró que el 58% de las
+> sentencias son `BEGIN`/`COMMIT`/`DEALLOCATE` — overhead de round-trip, no
+> ejecución. Un índice acelera la ejecución de una query; no baja un `BEGIN`
+> de 224 ms. Aplicar una migración a la base de producción es la acción de
+> mayor riesgo de todo el plan y hoy atacaría lo que no duele.
+>
+> **Estas tareas quedan escritas tal cual para retomarlas cuando corresponda.**
+> Disparador para retomar: que el padrón crezca lo suficiente como para que una
+> búsqueda filtrada se vuelva medible más lenta que una sin filtrar, o que la
+> medición posterior al trabajo de round-trips deje a la ejecución de queries
+> como el costo dominante.
+
 
 - [ ] 6.1 Agregar a `prisma/schema.prisma` únicamente los 12 bloques `@@index` de la tabla de `design.md — D3`. No agregar, eliminar ni renombrar columnas, tablas ni relaciones
 - [ ] 6.2 Generar la migración con `prisma migrate dev` **contra una base de desarrollo**, nunca contra producción

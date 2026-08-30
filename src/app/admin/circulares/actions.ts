@@ -39,6 +39,10 @@ async function uploadFile(file: File): Promise<string | null> {
     throw new Error("No se pudo subir el archivo adjunto.");
   }
 
+  // El bucket es privado, así que esta URL pública no resuelve por sí sola.
+  // Se sigue guardando en `archivo_url` porque es el formato que ya tienen las
+  // circulares existentes: `firmarUrlCircular()` le extrae el path y lo firma
+  // al momento de servirlo. Cambiar el formato exigiría migrar esas filas.
   const { data } = supabaseAdmin.storage
     .from("circulares-adjuntos")
     .getPublicUrl(newPath);
