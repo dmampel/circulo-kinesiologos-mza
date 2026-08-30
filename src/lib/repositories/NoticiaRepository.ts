@@ -39,6 +39,20 @@ export class NoticiaRepository {
     return { items, total, totalPages: Math.ceil(total / pageSize), page };
   }
 
+  // Para listados de "últimas noticias" (ej. sidebar de /noticias) que no
+  // necesitan el total para paginar. A diferencia de `getPaginated`, no
+  // corre `count`: pedirlo ahí era trabajo íntegramente descartado, porque
+  // nada lee `total` ni `totalPages` de ese uso (design.md — D5).
+  // `getPaginated` no se toca: la grilla sigue necesitando el total.
+  static async getUltimas(limit: number) {
+    const items = await prisma.noticia.findMany({
+      include: { categoria: true },
+      orderBy: { publicada_en: "desc" },
+      take: limit,
+    });
+    return { items };
+  }
+
   static async getBySlug(slug: string) {
     return prisma.noticia.findUnique({
       where: { slug },

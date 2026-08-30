@@ -31,12 +31,12 @@
 
 ## 3. Deduplicación y paralelización del portal del socio (Backend + Frontend — mayor impacto esperado)
 
-- [ ] 3.1 Envolver `ProfesionalRepository.findByUserId` con `cache` de React (`import { cache } from "react"`), en la capa de repositorios, no en los llamadores (`design.md — D4b`)
-- [ ] 3.2 Envolver de la misma forma la resolución de identidad de Supabase Auth que hoy repiten el layout y el dashboard, de modo que `supabase.auth.getUser()` se resuelva una sola vez por request
-- [ ] 3.3 Verificar que se usó `cache` de **React** y **no** `unstable_cache` ni `use cache`: son datos privados por socio y no pueden sobrevivir a la request ni compartirse entre usuarios (`design.md — D4`, tabla comparativa)
-- [ ] 3.4 En `src/app/mi-panel/layout.tsx`: resolver `ProfesionalRepository.findByUserId` primero y agrupar `CircularRepository.countUnread`, `SorteoRepository.getLatestActive` y `CapacitacionRepository.getLatestPublicada` en un único `Promise.all` **posterior**. `countUnread` depende del profesional — meterla en un `Promise.all` anterior la rompe (`design.md — Risks`)
-- [ ] 3.5 En `src/app/mi-panel/page.tsx`: agrupar en `Promise.all` los `await` que no dependen entre sí, respetando las dependencias reales sobre `profesional.id`
-- [ ] 3.6 Confirmar que el JSX de ambos archivos quedó **intacto**: si el diff toca markup, `className` o componentes, se salió de alcance (`design.md — D7`)
+- [x] 3.1 Envolver `ProfesionalRepository.findByUserId` con `cache` de React (`import { cache } from "react"`), en la capa de repositorios, no en los llamadores (`design.md — D4b`)
+- [x] 3.2 Envolver de la misma forma la resolución de identidad de Supabase Auth que hoy repiten el layout y el dashboard, de modo que `supabase.auth.getUser()` se resuelva una sola vez por request
+- [x] 3.3 Verificar que se usó `cache` de **React** y **no** `unstable_cache` ni `use cache`: son datos privados por socio y no pueden sobrevivir a la request ni compartirse entre usuarios (`design.md — D4`, tabla comparativa)
+- [x] 3.4 En `src/app/mi-panel/layout.tsx`: resolver `ProfesionalRepository.findByUserId` primero y agrupar `CircularRepository.countUnread`, `SorteoRepository.getLatestActive` y `CapacitacionRepository.getLatestPublicada` en un único `Promise.all` **posterior**. `countUnread` depende del profesional — meterla en un `Promise.all` anterior la rompe (`design.md — Risks`)
+- [x] 3.5 En `src/app/mi-panel/page.tsx`: agrupar en `Promise.all` los `await` que no dependen entre sí, respetando las dependencias reales sobre `profesional.id`
+- [x] 3.6 Confirmar que el JSX de ambos archivos quedó **intacto**: si el diff toca markup, `className` o componentes, se salió de alcance (`design.md — D7`)
 - [ ] 3.7 Probar el caso del usuario autenticado **sin** perfil profesional vinculado: el dashboard debe seguir mostrando la pantalla "Usuario no vinculado" y no romper con un `profesional` indefinido
 - [ ] 3.8 Probar el aislamiento entre socios: dos profesionales distintos, dos sesiones, cada uno ve únicamente sus propios datos, circulares y turnos
 - [ ] 3.9 Probar que un dato modificado se refleja de inmediato: editar el perfil desde `/mi-panel/perfil`, recargar, y confirmar que el cambio aparece —la memoización no debe sobrevivir a la request
@@ -45,11 +45,11 @@
 
 ## 4. Query duplicada de `/noticias` (Backend + Frontend)
 
-- [ ] 4.1 Agregar `NoticiaRepository.getUltimas(limit)`: `findMany` con `include: { categoria: true }`, `orderBy: { publicada_en: "desc" }` y `take`, **sin `count`** (`design.md — D5`)
-- [ ] 4.2 **No modificar `getPaginated`.** La grilla sí necesita el total para paginar
-- [ ] 4.3 En `src/app/noticias/page.tsx`: reemplazar `NoticiaRepository.getPaginated(1, 5)` del sidebar "Últimas noticias" por `getUltimas(5)`, dejando intacta la llamada de la grilla
-- [ ] 4.4 Confirmar que el sidebar muestra las mismas 5 noticias, en el mismo orden, con la misma fecha y la misma imagen que antes
-- [ ] 4.5 Confirmar que la paginación de la grilla sigue siendo correcta: navegar entre páginas, filtrar por categoría y buscar por texto
+- [x] 4.1 Agregar `NoticiaRepository.getUltimas(limit)`: `findMany` con `include: { categoria: true }`, `orderBy: { publicada_en: "desc" }` y `take`, **sin `count`** (`design.md — D5`)
+- [x] 4.2 **No modificar `getPaginated`.** La grilla sí necesita el total para paginar
+- [x] 4.3 En `src/app/noticias/page.tsx`: reemplazar `NoticiaRepository.getPaginated(1, 5)` del sidebar "Últimas noticias" por `getUltimas(5)`, dejando intacta la llamada de la grilla
+- [x] 4.4 Confirmar que el sidebar muestra las mismas 5 noticias, en el mismo orden, con la misma fecha y la misma imagen que antes
+- [x] 4.5 Confirmar que la paginación de la grilla sigue siendo correcta: navegar entre páginas, filtrar por categoría y buscar por texto
 - [ ] 4.6 Desplegar **solo este grupo** y re-contar `/noticias`. Esperado: un listado y un conteo menos por request. Registrar en `baseline.md`
 
 ## 5. Habilitar `relationJoins` (DB/Prisma — cambio inerte por diseño)

@@ -1,6 +1,6 @@
 import Sidebar from "@/components/socio/Sidebar";
 import MobileSidebarShell from "@/components/socio/MobileSidebarShell";
-import { createClient } from "@/utils/supabase/server";
+import { getAuthUser } from "@/utils/supabase/server";
 import { ProfesionalRepository } from "@/lib/repositories/ProfesionalRepository";
 import { CircularRepository } from "@/lib/repositories/CircularRepository";
 import { SorteoRepository } from "@/lib/repositories/SorteoRepository";
@@ -12,26 +12,27 @@ export default async function PortalLayout({
 }: {
   children: React.ReactNode;
 }) {
-  const supabase = await createClient();
   const {
     data: { user },
-  } = await supabase.auth.getUser();
+  } = await getAuthUser();
 
   if (!user) {
     redirect("/login");
   }
 
   const profesional = await ProfesionalRepository.findByUserId(user.id);
-  let unreadCount = 0;
 
-  if (profesional) {
-    unreadCount = await CircularRepository.countUnread(profesional.id);
-  }
+  // `countUnread` depende del profesional resuelto arriba: no puede entrar
+  // en un `Promise.all` anterior. `getLatestActive` y `getLatestPublicada`
+  // no dependen de nada, ni siquiera del profesional, así que se agrupan acá
+  // (design.md — D4a / Risks).
+  const [unreadCount, latestSorteo, latestCapacitacion] = await Promise.all([
+    profesional ? CircularRepository.countUnread(profesional.id) : Promise.resolve(0),
+    SorteoRepository.getLatestActive(),
+    CapacitacionRepository.getLatestPublicada(),
+  ]);
 
-  const latestSorteo = await SorteoRepository.getLatestActive();
   const latestSorteoTime = latestSorteo ? latestSorteo.createdAt.toISOString() : null;
-
-  const latestCapacitacion = await CapacitacionRepository.getLatestPublicada();
   const latestCapacitacionTime = latestCapacitacion ? latestCapacitacion.createdAt.toISOString() : null;
 
   return (

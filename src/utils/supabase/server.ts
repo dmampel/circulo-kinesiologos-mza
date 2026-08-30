@@ -1,5 +1,6 @@
 import { createServerClient } from "@supabase/ssr";
 import { cookies } from "next/headers";
+import { cache } from "react";
 
 export async function createClient() {
   const cookieStore = await cookies();
@@ -27,3 +28,12 @@ export async function createClient() {
     }
   );
 }
+
+// Deduplica `supabase.auth.getUser()` dentro de un mismo render pass (una
+// request). `cache` de React, no `unstable_cache`: la identidad resuelta es
+// por-request y no debe sobrevivir ni compartirse entre usuarios
+// (openspec/changes/perf-prisma-roundtrips/design.md — D4).
+export const getAuthUser = cache(async () => {
+  const supabase = await createClient();
+  return supabase.auth.getUser();
+});

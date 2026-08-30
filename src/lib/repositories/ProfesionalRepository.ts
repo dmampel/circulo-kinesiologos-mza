@@ -1,5 +1,6 @@
 import prisma from "@/lib/prisma";
 import { Prisma } from "@prisma/client";
+import { cache } from "react";
 
 export interface ProfesionalFilters {
   query?: string;
@@ -79,7 +80,13 @@ export class ProfesionalRepository {
     });
   }
 
-  static async findByUserId(userId: string) {
+  // `cache` de React (no `unstable_cache`/`use cache`): deduplica dentro de
+  // un mismo render pass (una request). El perfil es un dato privado por
+  // socio y la memoización no debe sobrevivir a la request ni compartirse
+  // entre usuarios (design.md — D4b). `src/app/mi-panel/layout.tsx` y
+  // `src/app/mi-panel/page.tsx` llaman a este método con el mismo `userId`
+  // dentro de la misma request y comparten el resultado sin coordinarse.
+  static findByUserId = cache(async (userId: string) => {
     return prisma.profesional.findUnique({
       where: { userId },
       include: {
@@ -87,7 +94,7 @@ export class ProfesionalRepository {
         especialidades: true,
       },
     });
-  }
+  });
 
   static async findByEmail(email: string) {
     return prisma.profesional.findUnique({

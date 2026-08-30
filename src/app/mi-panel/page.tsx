@@ -1,5 +1,5 @@
 import Image from "next/image";
-import { createClient } from "@/utils/supabase/server";
+import { getAuthUser } from "@/utils/supabase/server";
 import { ProfesionalRepository } from "@/lib/repositories/ProfesionalRepository";
 import { BeneficioRepository } from "@/lib/repositories/BeneficioRepository";
 import { CapacitacionRepository } from "@/lib/repositories/CapacitacionRepository";
@@ -63,22 +63,24 @@ const MODALIDAD_COLORS: Record<string, { bar: string; bg: string; icon: string }
 // ─── Page ─────────────────────────────────────────────────────────────────────
 
 export default async function DashboardPage() {
-  const supabase = await createClient();
   const {
     data: { user },
-  } = await supabase.auth.getUser();
+  } = await getAuthUser();
 
   if (!user) {
     redirect("/login");
   }
 
+  // Deduplicado con `src/app/mi-panel/layout.tsx` vía `cache` de React: el
+  // layout ya resolvió este mismo `userId` en esta request, así que esta
+  // llamada no emite una segunda sentencia (design.md — D4b).
   const profesional = await ProfesionalRepository.findByUserId(user.id);
-  const beneficios = await BeneficioRepository.findRandom(3);
-  const circulares = profesional
-    ? await CircularRepository.getAllPublishedWithStatus(profesional.id, 3)
-    : [];
 
   if (!profesional) {
+    // Nada de lo que sigue depende de otra cosa que no sea `profesional.id`,
+    // así que cortar acá también evita pedir `beneficios` y `circulares`
+    // para una pantalla que no los usa (design.md — D7: sólo se toca la
+    // obtención de datos, el JSX de este branch queda igual).
     return (
       <div className="flex flex-col items-center justify-center min-h-[60vh] text-center px-4">
         <div className="h-20 w-20 bg-red-50 rounded-[2rem] flex items-center justify-center text-red-500 mb-8 animate-bounce">
@@ -96,13 +98,25 @@ export default async function DashboardPage() {
     );
   }
 
-  const proximasInscripciones =
-    await CapacitacionRepository.getProximasInscripcionesSocio(profesional.id);
-
   const hoy = new Date();
   const lunes = getLunesDeSemana(hoy);
-  await TurnoRepository.autoCompletarPasados(profesional.id);
-  const turnosSemana = await TurnoRepository.getByProfesionalAndWeek(profesional.id, lunes);
+
+  // Las tres primeras lecturas sólo dependen de `profesional.id` y no entre
+  // sí: van en un único `Promise.all`. Los turnos son la excepción real:
+  // `autoCompletarPasados` es una escritura que puede cambiar el `estado`
+  // que `getByProfesionalAndWeek` lee a continuación, así que esa cadena se
+  // mantiene secuencial puertas adentro de su propia promesa, en paralelo
+  // con las otras tres (design.md — Risks: "paralelizar mal es peor que no
+  // paralelizar").
+  const [beneficios, circulares, proximasInscripciones, turnosSemana] = await Promise.all([
+    BeneficioRepository.findRandom(3),
+    CircularRepository.getAllPublishedWithStatus(profesional.id, 3),
+    CapacitacionRepository.getProximasInscripcionesSocio(profesional.id),
+    (async () => {
+      await TurnoRepository.autoCompletarPasados(profesional.id);
+      return TurnoRepository.getByProfesionalAndWeek(profesional.id, lunes);
+    })(),
+  ]);
 
   const diasSemana = Array.from({ length: 7 }, (_, i) => {
     const d = new Date(lunes);

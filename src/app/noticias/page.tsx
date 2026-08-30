@@ -41,7 +41,10 @@ export default async function NoticiasPage({ searchParams }: Props) {
   const [noticiasRes, categorias, ultimasNoticias] = await Promise.all([
     NoticiaRepository.getPaginated(currentPage, 12, categoriaSlug, busqueda),
     CategoriaNoticiaRepository.getAll(),
-    NoticiaRepository.getPaginated(1, 5),
+    // `getUltimas`, no `getPaginated(1, 5)`: el sidebar no lee `total` ni
+    // `totalPages`, así que el segundo `count` era trabajo descartado
+    // (design.md — D5).
+    NoticiaRepository.getUltimas(5),
   ]);
 
   const { items: noticias, totalPages } = noticiasRes;
