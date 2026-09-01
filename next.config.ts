@@ -1,4 +1,5 @@
 import type { NextConfig } from "next";
+import { REDIRECCIONES_LEGADO } from "./src/lib/redirecciones";
 
 const securityHeaders = [
   { key: "X-Content-Type-Options", value: "nosniff" },
@@ -21,6 +22,9 @@ const nextConfig: NextConfig = {
     remotePatterns: [
       { protocol: "https", hostname: "**" },
     ],
+  },
+  async redirects() {
+    return REDIRECCIONES_LEGADO;
   },
   async headers() {
     return [
