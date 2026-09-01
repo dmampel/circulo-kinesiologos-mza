@@ -12,15 +12,32 @@ import { construirUrlAbsoluta } from "@/lib/site";
 export async function gestionarSolicitud(id: string, accion: "APROBAR" | "RECHAZAR") {
   await requireAdmin();
   try {
-    if (accion === "RECHAZAR") {
-      const solicitud = await prisma.solicitud.findUnique({ where: { id } });
+    // Guard de idempotencia. La lista de solicitudes renderizaba los botones
+    // para filas ya resueltas, asi que un segundo click reenviaba el mail al
+    // profesional — y ocurrio: un solicitante recibio dos veces el correo de
+    // rechazo. Esconder el boton no alcanza: las server actions son endpoints
+    // publicos y la accion puede llegar desde dos pestañas, dos admins o un
+    // reintento de red. La defensa vive aca, en el servidor.
+    const solicitud = await prisma.solicitud.findUnique({ where: { id } });
 
+    if (!solicitud) {
+      return { success: false, error: "Solicitud no encontrada." };
+    }
+
+    if (solicitud.status !== "PENDIENTE") {
+      return {
+        success: false,
+        error: `Esta solicitud ya fue procesada (${solicitud.status}). No se envió ningún correo.`,
+      };
+    }
+
+    if (accion === "RECHAZAR") {
       await prisma.solicitud.update({
         where: { id },
         data: { status: "RECHAZADA", revisada_en: new Date() },
       });
 
-      if (solicitud && canSendEmails()) {
+      if (canSendEmails()) {
         const resend = getResend();
         try {
           await resend.emails.send({
@@ -50,13 +67,6 @@ export async function gestionarSolicitud(id: string, accion: "APROBAR" | "RECHAZ
 
       return { success: true };
     } else {
-      // 1. Obtener datos de la solicitud
-      const solicitud = await prisma.solicitud.findUnique({
-        where: { id },
-      });
-
-      if (!solicitud) throw new Error("Solicitud no encontrada");
-
       // 2. Validar duplicados y estado de cuenta
       const emailNormalizado = solicitud.email.toLowerCase();
       const [existeEmail, existeMatricula] = await Promise.all([

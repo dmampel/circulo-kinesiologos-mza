@@ -130,6 +130,45 @@ describe('gestionarSolicitud — APROBAR', () => {
   });
 });
 
+describe('gestionarSolicitud — idempotencia', () => {
+  /**
+   * El caso real: la lista mostraba los botones tambien para solicitudes ya
+   * resueltas, el admin volvio a hacer click y el solicitante recibio dos
+   * veces el mail de rechazo. El guard tiene que estar en el servidor.
+   */
+  it.each(['RECHAZADA', 'APROBADA'] as const)(
+    'no reprocesa ni reenvia mail si la solicitud ya esta %s',
+    async (status) => {
+      mockSolicitudFindUnique.mockResolvedValue({ ...solicitudBase, status } as any);
+
+      const result = await gestionarSolicitud('sol-1', 'RECHAZAR');
+
+      expect(result.success).toBe(false);
+      expect(result.error).toContain(status);
+      expect(mockSolicitudUpdate).not.toHaveBeenCalled();
+    }
+  );
+
+  it('tampoco crea identidad en Auth al re-aprobar una solicitud ya APROBADA', async () => {
+    mockSolicitudFindUnique.mockResolvedValue({ ...solicitudBase, status: 'APROBADA' } as any);
+
+    const result = await gestionarSolicitud('sol-1', 'APROBAR');
+
+    expect(result.success).toBe(false);
+    expect(mockInvite).not.toHaveBeenCalled();
+    expect(mockProfesionalCreate).not.toHaveBeenCalled();
+  });
+
+  it('retorna error claro si la solicitud no existe', async () => {
+    mockSolicitudFindUnique.mockResolvedValue(null);
+
+    const result = await gestionarSolicitud('inexistente', 'RECHAZAR');
+
+    expect(result).toEqual({ success: false, error: 'Solicitud no encontrada.' });
+    expect(mockSolicitudUpdate).not.toHaveBeenCalled();
+  });
+});
+
 describe('gestionarSolicitud — control de acceso', () => {
   it('propaga el error y no toca la base si el usuario no es admin', async () => {
     mockRequireAdmin.mockRejectedValue(new Error('Forbidden'));

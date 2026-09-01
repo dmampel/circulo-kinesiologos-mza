@@ -132,7 +132,13 @@ export default async function SolicitudesAdminPage({
                     </p>
                   </td>
                   <td className="px-8 py-6 text-right">
-                    <BotonesSolicitud id={s.id} />
+                    {s.status === "PENDIENTE" ? (
+                      <BotonesSolicitud id={s.id} />
+                    ) : (
+                      <span className="text-xs font-bold text-slate-300 uppercase tracking-wider">
+                        Resuelta
+                      </span>
+                    )}
                   </td>
                 </tr>
               ))}
