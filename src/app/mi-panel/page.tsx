@@ -5,6 +5,8 @@ import { BeneficioRepository } from "@/lib/repositories/BeneficioRepository";
 import { CapacitacionRepository } from "@/lib/repositories/CapacitacionRepository";
 import { CircularRepository } from "@/lib/repositories/CircularRepository";
 import { redirect } from "next/navigation";
+import { EMAIL_INSTITUCIONAL } from "@/lib/site";
+import { logout } from "@/app/auth/actions";
 import CarnetDigital from "@/components/socio/CarnetDigital";
 import QRModal from "@/components/socio/QRModal";
 
@@ -81,19 +83,62 @@ export default async function DashboardPage() {
     // así que cortar acá también evita pedir `beneficios` y `circulares`
     // para una pantalla que no los usa (design.md — D7: sólo se toca la
     // obtención de datos, el JSX de este branch queda igual).
+    // El socio no puede resolver esto por su cuenta: el vínculo entre su
+    // usuario de Auth y su ficha del padrón lo crea administración. Por eso la
+    // pantalla no ofrece "volver a iniciar sesión" — ya está logueado, y
+    // reintentar lo devolvería exactamente acá. Se le da el único camino que
+    // destraba: escribir, con su correo a la vista para que puedan buscarlo.
+    const asuntoConsulta = encodeURIComponent("Vincular mi cuenta del portal de socios");
+    const cuerpoConsulta = encodeURIComponent(
+      `Hola,\n\nActivé mi cuenta del portal de socios con el correo ${user.email}, ` +
+        `pero todavía no aparece asociada a mi ficha del padrón.\n\n` +
+        `Mis datos:\n- Nombre y apellido:\n- Matrícula:\n\n¡Gracias!`
+    );
+
     return (
       <div className="flex flex-col items-center justify-center min-h-[60vh] text-center px-4">
-        <div className="h-20 w-20 bg-red-50 rounded-[2rem] flex items-center justify-center text-red-500 mb-8 animate-bounce">
+        <div className="h-20 w-20 bg-amber-50 rounded-[2rem] flex items-center justify-center text-amber-500 mb-8">
           <AlertCircle className="h-10 w-10" />
         </div>
+
         <h2 className="text-3xl font-black text-slate-900 mb-4 tracking-tight">
-          Usuario no vinculado
+          Ya casi estás
         </h2>
+
         <p className="text-slate-500 max-w-md mx-auto leading-relaxed">
-          Tu cuenta no está asociada a un perfil profesional en nuestro padrón
-          oficial. Por favor, comunicate con administración para regularizar tu
-          situación.
+          Tu cuenta quedó <strong className="text-slate-700">activada correctamente</strong>. Falta
+          un último paso, y lo hace administración: asociarla a tu ficha en el
+          padrón del Círculo.
         </p>
+
+        <p className="text-slate-500 max-w-md mx-auto leading-relaxed mt-4">
+          Escribinos y la vinculamos. Cuando esté lista vas a ver acá tu carnet
+          digital, las circulares, las capacitaciones y los beneficios de KineClub.
+        </p>
+
+        <div className="mt-8 px-6 py-4 bg-slate-50 rounded-2xl border border-slate-100">
+          <p className="text-[10px] font-black text-slate-400 uppercase tracking-widest mb-1">
+            Tu cuenta
+          </p>
+          <p className="text-sm font-bold text-slate-700">{user.email}</p>
+        </div>
+
+        <div className="mt-8 flex flex-col sm:flex-row items-center gap-3">
+          <a
+            href={`mailto:${EMAIL_INSTITUCIONAL}?subject=${asuntoConsulta}&body=${cuerpoConsulta}`}
+            className="px-8 py-4 bg-slate-900 text-white rounded-2xl font-black text-sm hover:bg-slate-800 transition-all shadow-lg"
+          >
+            Escribir a administración
+          </a>
+          <form action={logout}>
+            <button
+              type="submit"
+              className="px-8 py-4 text-slate-400 rounded-2xl font-bold text-sm hover:text-slate-600 transition-all"
+            >
+              Cerrar sesión
+            </button>
+          </form>
+        </div>
       </div>
     );
   }
