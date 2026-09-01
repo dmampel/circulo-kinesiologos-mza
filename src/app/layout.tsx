@@ -3,6 +3,7 @@ import { Geist, Geist_Mono } from "next/font/google";
 import "./globals.css";
 import ConditionalLayout from "@/components/ConditionalLayout";
 import ScrollReset from "@/components/ScrollReset";
+import { construirMetadataRaiz } from "@/lib/metadata";
 
 const geistSans = Geist({
   variable: "--font-geist-sans",
@@ -14,13 +15,7 @@ const geistMono = Geist_Mono({
   subsets: ["latin"],
 });
 
-export const metadata: Metadata = {
-  title: "Círculo de Kinesiólogos de Mendoza | Institución Profesional",
-  description: "Entidad que agrupa y representa a los profesionales de la kinesiología en la provincia de Mendoza, Argentina.",
-  icons: {
-    icon: "/favicon.png",
-  },
-};
+export const metadata: Metadata = construirMetadataRaiz();
 
 export default function RootLayout({
   children,
