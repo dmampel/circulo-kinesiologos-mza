@@ -105,13 +105,13 @@ export default async function DashboardPage() {
           Ya casi estás
         </h2>
 
-        <p className="text-slate-500 max-w-md mx-auto leading-relaxed">
+        <p className="text-slate-500 max-w-md mx-auto leading-relaxed text-left">
           Tu cuenta quedó <strong className="text-slate-700">activada correctamente</strong>. Falta
           un último paso, y lo hace administración: asociarla a tu ficha en el
           padrón del Círculo.
         </p>
 
-        <p className="text-slate-500 max-w-md mx-auto leading-relaxed mt-4">
+        <p className="text-slate-500 max-w-md mx-auto leading-relaxed text-left mt-4">
           Escribinos y la vinculamos. Cuando esté lista vas a ver acá tu carnet
           digital, las circulares, las capacitaciones y los beneficios de KineClub.
         </p>
