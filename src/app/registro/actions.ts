@@ -10,6 +10,7 @@ import {
   crearSolicitudSchema,
   prepararSubidaSchema,
 } from "@/lib/validations/solicitud";
+import { SITE_URL } from "@/lib/site";
 
 const BUCKET_SOLICITUDES = "solicitudes";
 
@@ -212,7 +213,7 @@ export async function crearSolicitud(input: CrearSolicitudInput): Promise<{ succ
 
     if (canSendEmails()) {
       const resend = getResend();
-      const siteUrl = process.env.NEXT_PUBLIC_SITE_URL || "http://localhost:3000";
+      const siteUrl = SITE_URL;
 
       // Aviso institucional
       try {

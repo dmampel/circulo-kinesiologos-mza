@@ -3,8 +3,7 @@
 import { useState, useRef } from "react";
 import { QrCode, X, Download, ArrowUpRight } from "lucide-react";
 import { QRCodeCanvas } from "qrcode.react";
-
-const BASE_URL = process.env.NEXT_PUBLIC_SITE_URL ?? "https://ckmendoza.com.ar";
+import { construirUrlAbsoluta } from "@/lib/site";
 
 interface QRModalProps {
   slug: string;
@@ -15,7 +14,7 @@ interface QRModalProps {
 export default function QRModal({ slug, nombre, matricula }: QRModalProps) {
   const [open, setOpen] = useState(false);
   const canvasRef = useRef<HTMLDivElement>(null);
-  const url = `${BASE_URL}/profesionales/${slug}`;
+  const url = construirUrlAbsoluta(`profesionales/${slug}`);
 
   function handleDownload() {
     const canvas = canvasRef.current?.querySelector("canvas") as HTMLCanvasElement | null;

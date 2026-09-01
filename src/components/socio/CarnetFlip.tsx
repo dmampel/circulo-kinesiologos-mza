@@ -4,8 +4,7 @@ import Image from "next/image";
 import { useState, useRef } from "react";
 import { QRCodeCanvas } from "qrcode.react";
 import { ShieldCheck, Copy, Check, MessageCircle, Mail } from "lucide-react";
-
-const BASE_URL = process.env.NEXT_PUBLIC_SITE_URL ?? "https://ckmendoza.com.ar";
+import { SITE_URL, construirUrlAbsoluta } from "@/lib/site";
 
 interface Profesional {
   nombre: string;
@@ -28,7 +27,7 @@ export default function CarnetFlip({ profesional }: Props) {
   const [copied, setCopied] = useState(false);
   const cardRef = useRef<HTMLDivElement>(null);
 
-  const url = `${BASE_URL}/profesionales/${profesional.slug}`;
+  const url = construirUrlAbsoluta(`profesionales/${profesional.slug}`);
 
   function handleFlip() {
     setFlipping(true);
@@ -193,7 +192,7 @@ export default function CarnetFlip({ profesional }: Props) {
                   <QRCodeCanvas value={url} size={140} bgColor="#ffffff" fgColor="#0f172a" level="M" />
                 </div>
                 <p className="text-white/25 text-[8px] font-medium text-center tracking-wide">
-                  {BASE_URL.replace(/^https?:\/\//, "")}/profesionales/{profesional.slug}
+                  {SITE_URL.replace(/^https?:\/\//, "")}/profesionales/{profesional.slug}
                 </p>
               </div>
 
