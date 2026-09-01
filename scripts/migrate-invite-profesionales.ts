@@ -12,8 +12,9 @@
  */
 
 import { PrismaClient } from "@prisma/client";
-import { createClient } from "@supabase/supabase-js";
+import { createClient, type User } from "@supabase/supabase-js";
 import * as dotenv from "dotenv";
+import { construirUrlAbsoluta, normalizarBaseUrl } from "../src/lib/site";
 
 dotenv.config({ path: ".env" });
 
@@ -25,7 +26,16 @@ const supabaseAdmin = createClient(
   { auth: { autoRefreshToken: false, persistSession: false } }
 );
 
-const SITE_URL = process.env.NEXT_PUBLIC_SITE_URL || "http://localhost:3000";
+// La base se resuelve DESPUES de dotenv.config() y con el helper compartido:
+// `normalizarBaseUrl` cae al dominio real de produccion cuando la variable no
+// esta, en vez de a localhost. Un fallback a localhost aca significa mandar el
+// padron entero de mails con un link muerto — que es exactamente lo que paso
+// cuando el Site URL de Supabase apuntaba ahi.
+const BASE_URL = normalizarBaseUrl(process.env.NEXT_PUBLIC_SITE_URL);
+const DESTINO_INVITACION = construirUrlAbsoluta(
+  "auth/callback?next=/auth/set-password",
+  BASE_URL
+);
 const DRY_RUN = process.env.DRY_RUN === "true";
 
 // Pausa entre invitaciones para no saturar el rate limit de Supabase
@@ -33,8 +43,42 @@ const DELAY_MS = 500;
 
 const sleep = (ms: number) => new Promise((r) => setTimeout(r, ms));
 
+/**
+ * `listUsers` pagina de a 1000. Antes se pedia una sola pagina y se asumia que
+ * ahi entraba todo el padron: pasado ese numero un usuario que SI existe en
+ * Auth queda fuera del listado y el script concluye que no existe. Ademas se
+ * llamaba dentro del loop, una vez por profesional. Ahora se trae completo y
+ * una sola vez.
+ */
+let cacheUsuariosAuth: Map<string, User> | null = null;
+
+async function usuariosAuthPorEmail(): Promise<Map<string, User>> {
+  if (cacheUsuariosAuth) return cacheUsuariosAuth;
+
+  const usuarios: User[] = [];
+  const porPagina = 1000;
+
+  for (let pagina = 1; ; pagina++) {
+    const { data, error } = await supabaseAdmin.auth.admin.listUsers({
+      page: pagina,
+      perPage: porPagina,
+    });
+    if (error) throw new Error(`No pude listar usuarios: ${error.message}`);
+
+    usuarios.push(...data.users);
+    if (data.users.length < porPagina) break;
+  }
+
+  cacheUsuariosAuth = new Map(
+    usuarios.filter((u) => u.email).map((u) => [u.email!.toLowerCase(), u])
+  );
+
+  return cacheUsuariosAuth;
+}
+
 async function main() {
-  console.log(`\n🚀 Migrate Invite Profesionales — ${DRY_RUN ? "DRY RUN" : "LIVE"}\n`);
+  console.log(`\n🚀 Migrate Invite Profesionales — ${DRY_RUN ? "DRY RUN" : "LIVE"}`);
+  console.log(`🔗 Los links de activación apuntan a: ${DESTINO_INVITACION}\n`);
 
   // 1. Obtener todos los profesionales sin userId y con email
   const profesionales = await prisma.profesional.findMany({
@@ -88,7 +132,7 @@ async function main() {
         prof.email,
         {
           data: { full_name: `${prof.nombre} ${prof.apellido}` },
-          redirectTo: `${SITE_URL}/auth/callback?next=/auth/set-password`,
+          redirectTo: DESTINO_INVITACION,
         }
       );
 
@@ -101,15 +145,9 @@ async function main() {
         ) {
           console.log(`  🔄 Ya existe en Auth — sincronizando userId: ${label}`);
 
-          // Buscar el usuario en Auth por email
-          const { data: listData, error: listError } =
-            await supabaseAdmin.auth.admin.listUsers({ page: 1, perPage: 1000 });
-
-          if (listError) throw new Error(`No pude listar usuarios: ${listError.message}`);
-
-          const authUser = listData.users.find(
-            (u) => u.email?.toLowerCase() === prof.email!.toLowerCase()
-          );
+          // Buscar el usuario en Auth por email (padron completo, cacheado)
+          const porEmail = await usuariosAuthPorEmail();
+          const authUser = porEmail.get(prof.email!.toLowerCase());
 
           if (!authUser) throw new Error(`Existe en Auth pero no lo encontré en la lista`);
 
