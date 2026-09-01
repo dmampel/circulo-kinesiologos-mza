@@ -5,6 +5,7 @@ import { supabaseAdmin } from "@/lib/supabase/admin";
 import { revalidatePath } from "next/cache";
 import { ProfesionalRepository } from "@/lib/repositories/ProfesionalRepository";
 import { getResend, canSendEmails, FROM_EMAIL } from "@/lib/resend";
+import { EMAIL_INSTITUCIONAL } from "@/lib/site";
 import { requireAdmin } from "@/utils/supabase/require-admin";
 import { construirUrlAbsoluta } from "@/lib/site";
 
@@ -34,7 +35,7 @@ export async function gestionarSolicitud(id: string, accion: "APROBAR" | "RECHAZ
                 <div style="padding: 30px;">
                   <p>Hola <strong>${solicitud.nombre}</strong>,</p>
                   <p>Luego de revisar tu solicitud de asociación, lamentablemente no podemos procesarla en este momento.</p>
-                  <p>Si considerás que hay un error o querés más información, podés contactarnos respondiendo este email.</p>
+                  <p>Este es un correo automático, no respondas a esta dirección. Si considerás que hay un error o querés más información, escribinos a <a href="mailto:${EMAIL_INSTITUCIONAL}">${EMAIL_INSTITUCIONAL}</a>.</p>
                 </div>
                 <div style="background: #f8fafc; padding: 20px; text-align: center; color: #64748b; font-size: 12px;">
                   Este es un mensaje automático del sistema de gestión de Círculo Kinesiólogos.

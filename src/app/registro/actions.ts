@@ -11,6 +11,7 @@ import {
   prepararSubidaSchema,
 } from "@/lib/validations/solicitud";
 import { SITE_URL } from "@/lib/site";
+import { EMAIL_INSTITUCIONAL } from "@/lib/site";
 
 const BUCKET_SOLICITUDES = "solicitudes";
 
@@ -268,7 +269,7 @@ export async function crearSolicitud(input: CrearSolicitudInput): Promise<{ succ
                 <p><strong>Matrícula:</strong> ${matricula}</p>
                 <p><strong>Especialidad:</strong> ${especialidadNombre}</p>
                 <hr style="border: 0; border-top: 1px solid #eee; margin: 20px 0;" />
-                <p>Si tenés alguna consulta, podés contactarnos respondiendo este email.</p>
+                <p>Este es un correo automático, no respondas a esta dirección. Si tenés alguna consulta, escribinos a <a href="mailto:${EMAIL_INSTITUCIONAL}">${EMAIL_INSTITUCIONAL}</a>.</p>
               </div>
               <div style="background: #f8fafc; padding: 20px; text-align: center; color: #64748b; font-size: 12px;">
                 Este es un mensaje automático del sistema de gestión de Círculo Kinesiólogos.

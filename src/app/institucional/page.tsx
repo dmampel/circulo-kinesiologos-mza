@@ -1,4 +1,5 @@
 import type { Metadata } from "next";
+import { EMAIL_INSTITUCIONAL } from "@/lib/site";
 import Image from "next/image";
 import { FileText, ArrowUpRight } from "lucide-react";
 import { AutoridadRepository } from "@/lib/repositories/AutoridadRepository";
@@ -295,10 +296,10 @@ export default async function InstitucionalPage() {
             <div className="py-10 md:py-0 md:px-10">
               <p className="text-xs font-black text-slate-400 uppercase tracking-widest mb-4">Email</p>
               <a
-                href="mailto:presidencia@kinesiologosmza.com"
+                href={`mailto:${EMAIL_INSTITUCIONAL}`}
                 className="text-base md:text-lg font-bold text-blue-600 hover:underline underline-offset-4 break-all"
               >
-                kinesiologosmza@gmail.com
+                {EMAIL_INSTITUCIONAL}
               </a>
             </div>
             <div className="pt-10 md:pt-0 md:pl-10">

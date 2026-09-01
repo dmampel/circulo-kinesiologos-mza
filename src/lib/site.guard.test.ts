@@ -49,4 +49,30 @@ describe('guardas del dominio publico', () => {
 
     expect(infractores).toEqual([]);
   });
+
+  /**
+   * La guarda anterior solo miraba URLs `https://`, y por eso dejo pasar
+   * `mailto:presidencia@kinesiologosmza.com` en el Footer y en la pagina
+   * institucional: el dominio sin `.ar` no existe, asi que todo visitante que
+   * escribio desde el sitio recibio un rebote.
+   */
+  it('ningun archivo hardcodea la casilla institucional fuera de site.ts', () => {
+    const casilla = /[\w.+-]+@(?:www\.)?kinesiologosmza\.com(?:\.ar)?/;
+
+    const infractores = FUENTES.filter(
+      (f) => casilla.test(f.contenido) && f.ruta.split(sep).join(sep) !== FUENTE_DE_VERDAD,
+    ).map((f) => f.ruta);
+
+    expect(infractores).toEqual([]);
+  });
+
+  it('no queda ninguna referencia a los dominios muertos del proyecto', () => {
+    // kinesiologosmza.com SIN .ar, ckmendoza.* y circulokinesiologos.*:
+    // ninguno de los tres esta registrado.
+    const muertos = /ckmendoza\.|circulokinesiologos\.|kinesiologosmza\.com(?!\.ar)/;
+
+    const infractores = FUENTES.filter((f) => muertos.test(f.contenido)).map((f) => f.ruta);
+
+    expect(infractores).toEqual([]);
+  });
 });

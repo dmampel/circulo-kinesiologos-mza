@@ -5,7 +5,7 @@ import { SITE_URL } from "./site";
  * Configuracion de mail transaccional.
  *
  * Este modulo tenia fallbacks hardcodeados a dominios inexistentes
- * (`admin@circulokinesiologos.com`) y al remitente sandbox de Resend. Con eso,
+ * (un dominio sin NS ni MX) y al remitente sandbox de Resend. Con eso,
  * una variable mal cargada no daba error: el mail simplemente no llegaba, y el
  * Circulo se enteraba meses despues. Ahora falta de configuracion = no se
  * manda, y queda avisado en los logs.
