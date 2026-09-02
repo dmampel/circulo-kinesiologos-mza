@@ -118,7 +118,11 @@ export default async function ProfesionalesAdminPage({
                     </span>
                   </td>
                   <td className="px-8 py-6 text-right">
-                    <BotonesProfesional id={p.id} status={p.status as "ACTIVO" | "INACTIVO" | "PENDIENTE"} />
+                    <BotonesProfesional
+                      id={p.id}
+                      status={p.status as "ACTIVO" | "INACTIVO" | "PENDIENTE"}
+                      tieneCuenta={Boolean(p.userId)}
+                    />
                   </td>
                 </tr>
               ))}
