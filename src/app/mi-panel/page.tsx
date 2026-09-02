@@ -363,7 +363,7 @@ export default async function DashboardPage() {
                 </a>
 
                 <a
-                  href="https://ajrpt.com/revista/"
+                  href="https://ajrpt.com/ingresar/"
                   target="_blank"
                   rel="noopener noreferrer"
                   className="flex items-center gap-4 p-4 sm:p-5 bg-white border border-slate-100 rounded-2xl hover:border-green-200 hover:shadow-md transition-all group w-full"
@@ -376,7 +376,7 @@ export default async function DashboardPage() {
                       Revista AJRPT
                     </p>
                     <p className="text-[11px] text-slate-400 font-medium">
-                      Accedé a la última edición de la Revista Argentina de Fisioterapia y Kinesiología.
+                      Ingresá con tu cuenta a la Revista Argentina de Fisioterapia y Kinesiología.
                     </p>
                   </div>
                   <ArrowUpRight className="h-4 w-4 ml-auto text-slate-300 group-hover:text[#469588] transition-colors" />
