@@ -87,7 +87,9 @@ export const crearSolicitudSchema = z.object({
   ...camposTextoSchema,
   direccion: z.string().min(1, "La dirección es obligatoria."),
   localidadId: z.string().min(1, "La localidad es obligatoria."),
-  especialidad: z.string().min(1, "La especialidad es obligatoria."),
+  especialidades: z
+    .array(z.string().min(1))
+    .min(1, "Tenés que elegir al menos una especialidad."),
   archivos: z.record(z.string(), z.string()),
 });
 

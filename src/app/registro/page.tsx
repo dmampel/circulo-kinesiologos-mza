@@ -81,7 +81,7 @@ export default function RegistroPage() {
     email: "",
     telefono: "",
     matricula: "",
-    especialidad: "",
+    especialidades: [] as string[],
     direccion: "",
     localidadId: "",
   });
@@ -93,6 +93,17 @@ export default function RegistroPage() {
 
   const handleChange = (e: React.ChangeEvent<HTMLInputElement | HTMLSelectElement>) => {
     setFormData({ ...formData, [e.target.name]: e.target.value });
+  };
+
+  // Un profesional puede tener más de una especialidad: la relación en la base
+  // siempre fue N:M, el formulario era el único que forzaba una sola.
+  const toggleEspecialidad = (id: string) => {
+    setFormData(prev => ({
+      ...prev,
+      especialidades: prev.especialidades.includes(id)
+        ? prev.especialidades.filter(actual => actual !== id)
+        : [...prev.especialidades, id],
+    }));
   };
 
   const handleFileChange = (e: React.ChangeEvent<HTMLInputElement>, field: string) => {
@@ -117,7 +128,7 @@ export default function RegistroPage() {
       return formData.nombre && formData.apellido && formData.dni && formData.email;
     }
     if (step === 2) {
-      return formData.matricula && formData.especialidad && formData.direccion && formData.localidadId;
+      return formData.matricula && formData.especialidades.length > 0 && formData.direccion && formData.localidadId;
     }
     if (step === 3) {
       return archivos.dni && archivos.titulo && archivos.cuit && archivos.seguro && archivos.cv && archivos.matricula_file;
@@ -308,14 +319,32 @@ export default function RegistroPage() {
                   <label className="text-xs font-bold text-slate-400 uppercase ml-1">Matrícula Profesional <span className="text-red-500">*</span></label>
                   <input name="matricula" value={formData.matricula} onChange={handleChange} type="text" required className="w-full px-6 py-4 rounded-2xl bg-slate-50 border-transparent focus:bg-white focus:border-blue-600 focus:ring-4 focus:ring-blue-100 transition-all text-sm font-medium" placeholder="K-XXXX" />
                 </div>
-                <div className="space-y-2">
-                  <label className="text-xs font-bold text-slate-400 uppercase ml-1">Especialidad Principal <span className="text-red-500">*</span></label>
-                  <select name="especialidad" value={formData.especialidad} onChange={handleChange} required className="w-full px-6 py-4 rounded-2xl bg-slate-50 border-transparent focus:bg-white focus:border-blue-600 focus:ring-4 focus:ring-blue-100 transition-all text-sm font-medium appearance-none">
-                    <option value="">Seleccioná tu especialidad</option>
-                    {especialidades.map((esp) => (
-                      <option key={esp.id} value={esp.id}>{esp.nombre}</option>
-                    ))}
-                  </select>
+                <div className="space-y-2 md:col-span-2">
+                  <label className="text-xs font-bold text-slate-400 uppercase ml-1">Especialidades <span className="text-red-500">*</span></label>
+                  <p className="text-xs text-slate-400 ml-1">Podés elegir todas las que ejercés.</p>
+                  <div className="grid grid-cols-2 sm:grid-cols-3 gap-3 pt-1">
+                    {especialidades.map((esp) => {
+                      const seleccionada = formData.especialidades.includes(esp.id);
+                      return (
+                        <button
+                          type="button"
+                          key={esp.id}
+                          onClick={() => toggleEspecialidad(esp.id)}
+                          aria-pressed={seleccionada}
+                          className={`px-4 py-3 text-sm font-bold rounded-xl transition-all border text-left ${
+                            seleccionada
+                              ? "bg-blue-50 border-blue-200 text-blue-700"
+                              : "bg-white border-slate-200 text-slate-600 hover:border-blue-200 hover:bg-slate-50"
+                          }`}
+                        >
+                          {esp.nombre}
+                        </button>
+                      );
+                    })}
+                  </div>
+                  {formData.especialidades.length === 0 && (
+                    <p className="text-xs font-medium text-slate-400 ml-1 pt-1">Elegí al menos una para continuar.</p>
+                  )}
                 </div>
                 <div className="space-y-2">
                   <label className="text-xs font-bold text-slate-400 uppercase ml-1">Localidad <span className="text-red-500">*</span></label>

@@ -8,6 +8,51 @@ import { getResend, canSendEmails, FROM_EMAIL } from "@/lib/resend";
 import { EMAIL_INSTITUCIONAL } from "@/lib/site";
 import { requireAdmin } from "@/utils/supabase/require-admin";
 import { construirUrlAbsoluta } from "@/lib/site";
+import { normalizarEspecialidadesSolicitud, esIdGenerado } from "@/lib/especialidades";
+
+/**
+ * Traduce las especialidades declaradas en `Solicitud.datos` al payload de relación
+ * de Prisma. Acepta el formato nuevo (`especialidades: string[]`) y el viejo
+ * (`especialidad: string`), y resuelve cada valor contra la tabla por ID o por nombre.
+ *
+ * Antes esto hacía `connectOrCreate` por `nombre` con el ID que mandaba el formulario:
+ * cada aprobación creaba una Especialidad llamada como un cuid y la dejaba visible en
+ * el select público. Por eso los valores sin resolver que parecen IDs generados se
+ * descartan en vez de crearse — sólo un nombre real puede dar de alta una especialidad.
+ *
+ * Usa `connect` (aditivo) y nunca `set`: al vincular una solicitud con un profesional
+ * que ya está en el padrón, sus especialidades actuales se conservan.
+ */
+async function resolverEspecialidades(datos: unknown) {
+  const valores = normalizarEspecialidadesSolicitud(datos);
+  if (valores.length === 0) return undefined;
+
+  const existentes = await prisma.especialidad.findMany({
+    where: { OR: [{ id: { in: valores } }, { nombre: { in: valores } }] },
+    select: { id: true, nombre: true },
+  });
+
+  const idPorValor = new Map<string, string>();
+  for (const especialidad of existentes) {
+    idPorValor.set(especialidad.id, especialidad.id);
+    idPorValor.set(especialidad.nombre, especialidad.id);
+  }
+
+  const ids = [...new Set(valores.flatMap((valor) => idPorValor.get(valor) ?? []))];
+  const nombresNuevos = valores.filter((valor) => !idPorValor.has(valor) && !esIdGenerado(valor));
+
+  const relacion: {
+    connect?: { id: string }[];
+    connectOrCreate?: { where: { nombre: string }; create: { nombre: string } }[];
+  } = {};
+
+  if (ids.length > 0) relacion.connect = ids.map((id) => ({ id }));
+  if (nombresNuevos.length > 0) {
+    relacion.connectOrCreate = nombresNuevos.map((nombre) => ({ where: { nombre }, create: { nombre } }));
+  }
+
+  return Object.keys(relacion).length > 0 ? relacion : undefined;
+}
 
 export async function gestionarSolicitud(id: string, accion: "APROBAR" | "RECHAZAR") {
   await requireAdmin();
@@ -118,12 +163,7 @@ export async function gestionarSolicitud(id: string, accion: "APROBAR" | "RECHAZ
               direccion: datos.direccion || existeMatricula.direccion,
               dni: datos.dni || existeMatricula.dni,
               localidadId: datos.localidadId || existeMatricula.localidadId,
-              especialidades: datos.especialidad ? {
-                connectOrCreate: {
-                  where: { nombre: datos.especialidad },
-                  create: { nombre: datos.especialidad }
-                }
-              } : undefined,
+              especialidades: await resolverEspecialidades(datos),
             },
           });
         } else {
@@ -141,12 +181,7 @@ export async function gestionarSolicitud(id: string, accion: "APROBAR" | "RECHAZ
               localidadId: datos.localidadId,
               status: "ACTIVO",
               userId: authUserId,
-              especialidades: {
-                connectOrCreate: {
-                  where: { nombre: datos.especialidad },
-                  create: { nombre: datos.especialidad }
-                }
-              }
+              especialidades: await resolverEspecialidades(datos)
             },
           });
         }

@@ -19,6 +19,7 @@ import { notFound } from "next/navigation";
 import { cn } from "@/lib/utils";
 import BotonesSolicitud from "../BotonesSolicitud";
 import { firmarUrlsDocumentos } from "@/lib/storage/solicitudes";
+import { normalizarEspecialidadesSolicitud } from "@/lib/especialidades";
 
 export const dynamic = "force-dynamic";
 
@@ -37,12 +38,21 @@ export default async function DetalleSolicitudPage({ params }: Props) {
   const datos = solicitud.datos as any;
   const archivos = datos?.archivos || {};
 
-  const especialidadRaw = datos?.especialidad as string | undefined;
-  let especialidadNombre = especialidadRaw || "General";
-  if (especialidadRaw && especialidadRaw.length > 20) {
-    const esp = await prisma.especialidad.findUnique({ where: { id: especialidadRaw }, select: { nombre: true } });
-    especialidadNombre = esp?.nombre ?? especialidadRaw;
-  }
+  // Acepta el formato nuevo (array de IDs) y el viejo (un solo valor) — hay
+  // solicitudes PENDIENTES creadas antes del cambio. Los valores pueden ser IDs
+  // o, en las más viejas, nombres: se resuelve por ambos.
+  const especialidadesDeclaradas = normalizarEspecialidadesSolicitud(datos);
+  const especialidadesEncontradas = especialidadesDeclaradas.length
+    ? await prisma.especialidad.findMany({
+        where: {
+          OR: [{ id: { in: especialidadesDeclaradas } }, { nombre: { in: especialidadesDeclaradas } }],
+        },
+        select: { nombre: true },
+        orderBy: { nombre: "asc" },
+      })
+    : [];
+  const especialidadNombre =
+    especialidadesEncontradas.map((esp) => esp.nombre).join(", ") || "Sin especialidad";
   
   const DOCS = [
     { id: "dni", label: "Fotocopia DNI", file: archivos.dni },
@@ -128,7 +138,7 @@ export default async function DetalleSolicitudPage({ params }: Props) {
                 </div>
               </div>
               <div className="space-y-1">
-                <p className="text-[10px] font-black text-slate-400 uppercase tracking-widest">Especialidad</p>
+                <p className="text-[10px] font-black text-slate-400 uppercase tracking-widest">Especialidades</p>
                 <div className="flex items-center text-slate-900 font-bold">
                   <ShieldCheck className="h-4 w-4 mr-2 text-slate-400" /> {especialidadNombre}
                 </div>

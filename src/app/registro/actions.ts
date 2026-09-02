@@ -132,7 +132,7 @@ type CrearSolicitudInput = {
   telefono: string;
   direccion: string;
   localidadId: string;
-  especialidad: string;
+  especialidades: string[];
   archivos: Record<string, string>;
 };
 
@@ -148,7 +148,7 @@ export async function crearSolicitud(input: CrearSolicitudInput): Promise<{ succ
     return { success: false, error: parsed.error.issues[0]?.message ?? "Datos inválidos." };
   }
 
-  const { nombre, apellido, email, matricula, dni, telefono, direccion, localidadId, especialidad, archivos } =
+  const { nombre, apellido, email, matricula, dni, telefono, direccion, localidadId, especialidades, archivos } =
     parsed.data;
 
   // Re-ejecutar verificación de duplicados: protección contra carrera entre
@@ -182,14 +182,18 @@ export async function crearSolicitud(input: CrearSolicitudInput): Promise<{ succ
     }
   }
 
-  let especialidadNombre = especialidad;
+  // Sólo para los mails: los IDs no le dicen nada a nadie. Si la consulta falla,
+  // se cae a los valores recibidos en vez de bloquear la solicitud.
+  let especialidadNombre = especialidades.join(", ");
   try {
-    const especialidadRegistro = especialidad
-      ? await prisma.especialidad.findUnique({ where: { id: especialidad }, select: { nombre: true } })
-      : null;
-    if (especialidadRegistro?.nombre) especialidadNombre = especialidadRegistro.nombre;
+    const registros = await prisma.especialidad.findMany({
+      where: { id: { in: especialidades } },
+      select: { nombre: true },
+      orderBy: { nombre: "asc" },
+    });
+    if (registros.length > 0) especialidadNombre = registros.map((e) => e.nombre).join(", ");
   } catch {
-    // best-effort: si no se puede resolver el nombre de la especialidad, se usa el valor recibido
+    // best-effort: si no se pueden resolver los nombres, se usan los valores recibidos
   }
 
   try {
@@ -205,7 +209,7 @@ export async function crearSolicitud(input: CrearSolicitudInput): Promise<{ succ
           telefono,
           direccion,
           localidadId,
-          especialidad,
+          especialidades,
           archivos,
           fecha_solicitud: new Date().toISOString(),
         },

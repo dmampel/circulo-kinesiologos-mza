@@ -8,6 +8,10 @@ vi.mock('@/lib/prisma', () => ({
     },
     profesional: {
       create: vi.fn(),
+      update: vi.fn(),
+    },
+    especialidad: {
+      findMany: vi.fn(),
     },
   },
 }));
@@ -50,6 +54,8 @@ import { gestionarSolicitud } from './actions';
 const mockSolicitudFindUnique = vi.mocked(prisma.solicitud.findUnique);
 const mockSolicitudUpdate = vi.mocked(prisma.solicitud.update);
 const mockProfesionalCreate = vi.mocked(prisma.profesional.create);
+const mockProfesionalUpdate = vi.mocked(prisma.profesional.update);
+const mockEspecialidadFindMany = vi.mocked(prisma.especialidad.findMany);
 const mockInvite = vi.mocked(supabaseAdmin.auth.admin.inviteUserByEmail);
 const mockFindByEmail = vi.mocked(ProfesionalRepository.findByEmail);
 const mockFindByMatricula = vi.mocked(ProfesionalRepository.findByMatricula);
@@ -69,7 +75,7 @@ const solicitudBase = {
     telefono: '2614000000',
     direccion: 'Calle 1',
     localidadId: 'loc-1',
-    especialidad: 'Kinesiología General',
+    especialidades: ['esp-1'],
     archivos: {},
     fecha_solicitud: new Date().toISOString(),
   },
@@ -77,6 +83,7 @@ const solicitudBase = {
 
 beforeEach(() => {
   vi.clearAllMocks();
+  mockEspecialidadFindMany.mockResolvedValue([]);
 });
 
 describe('gestionarSolicitud — RECHAZAR', () => {
@@ -188,5 +195,77 @@ describe('gestionarSolicitud — control de acceso', () => {
 
     expect(mockSolicitudFindUnique).not.toHaveBeenCalled();
     expect(mockSolicitudUpdate).not.toHaveBeenCalled();
+  });
+});
+
+describe('gestionarSolicitud — especialidades', () => {
+  function prepararAprobacion(datos: Record<string, unknown>) {
+    mockSolicitudFindUnique.mockResolvedValue({
+      ...solicitudBase,
+      datos: { ...solicitudBase.datos, ...datos },
+    } as any);
+    mockRequireAdmin.mockResolvedValue(undefined as any);
+    mockFindByEmail.mockResolvedValue(null);
+    mockFindByMatricula.mockResolvedValue(null);
+    mockInvite.mockResolvedValue({ data: { user: { id: 'auth-uuid' } }, error: null } as any);
+    mockProfesionalCreate.mockResolvedValue({ id: 'prof-nuevo' } as any);
+    mockSolicitudUpdate.mockResolvedValue({ ...solicitudBase, status: 'APROBADA' } as any);
+  }
+
+  function especialidadesConectadas() {
+    return mockProfesionalCreate.mock.calls[0]![0].data.especialidades;
+  }
+
+  it('conecta por ID todas las especialidades declaradas en el formato nuevo', async () => {
+    prepararAprobacion({ especialidades: ['esp-1', 'esp-2'] });
+    mockEspecialidadFindMany.mockResolvedValue([
+      { id: 'esp-1', nombre: 'NEURO' },
+      { id: 'esp-2', nombre: 'TRAUMATO' },
+    ] as any);
+
+    const result = await gestionarSolicitud('sol-1', 'APROBAR');
+
+    expect(result).toEqual({ success: true });
+    expect(especialidadesConectadas()).toEqual({
+      connect: [{ id: 'esp-1' }, { id: 'esp-2' }],
+    });
+  });
+
+  it('sigue funcionando con solicitudes viejas que guardaron una sola especialidad', async () => {
+    prepararAprobacion({ especialidades: undefined, especialidad: 'esp-1' });
+    mockEspecialidadFindMany.mockResolvedValue([{ id: 'esp-1', nombre: 'NEURO' }] as any);
+
+    await gestionarSolicitud('sol-1', 'APROBAR');
+
+    expect(especialidadesConectadas()).toEqual({ connect: [{ id: 'esp-1' }] });
+  });
+
+  /**
+   * Regresión del bug real: se hacía `connectOrCreate` por `nombre` con el ID que
+   * mandaba el formulario, así que cada aprobación creaba una Especialidad llamada
+   * como un cuid (`cmorf6cmc000f21fbv5y792dv`) y ensuciaba el select público.
+   */
+  it('nunca crea una Especialidad nueva a partir de un ID generado', async () => {
+    prepararAprobacion({ especialidades: ['cmorf6cmc000f21fbv5y792dv'] });
+    mockEspecialidadFindMany.mockResolvedValue([] as any);
+
+    await gestionarSolicitud('sol-1', 'APROBAR');
+
+    const conectadas = especialidadesConectadas();
+    expect(JSON.stringify(conectadas ?? {})).not.toContain('connectOrCreate');
+    expect(JSON.stringify(conectadas ?? {})).not.toContain('cmorf6cmc000f21fbv5y792dv');
+  });
+
+  it('suma especialidades sin pisar las que ya tenía un profesional del padrón', async () => {
+    prepararAprobacion({ especialidades: ['esp-2'] });
+    mockFindByMatricula.mockResolvedValue({ id: 'prof-padron', telefono: null } as any);
+    mockEspecialidadFindMany.mockResolvedValue([{ id: 'esp-2', nombre: 'TRAUMATO' }] as any);
+    mockProfesionalUpdate.mockResolvedValue({ id: 'prof-padron' } as any);
+
+    await gestionarSolicitud('sol-1', 'APROBAR');
+
+    const data = mockProfesionalUpdate.mock.calls[0]![0].data;
+    expect(data.especialidades).toEqual({ connect: [{ id: 'esp-2' }] });
+    expect(JSON.stringify(data.especialidades)).not.toContain('set');
   });
 });

@@ -7,7 +7,7 @@ vi.mock("@/lib/prisma", () => ({
       create: vi.fn(),
     },
     especialidad: {
-      findUnique: vi.fn(),
+      findMany: vi.fn(),
     },
   },
 }));
@@ -54,7 +54,7 @@ import {
 
 const mockSolicitudFindFirst = vi.mocked(prisma.solicitud.findFirst);
 const mockSolicitudCreate = vi.mocked(prisma.solicitud.create);
-const mockEspecialidadFindUnique = vi.mocked(prisma.especialidad.findUnique);
+const mockEspecialidadFindMany = vi.mocked(prisma.especialidad.findMany);
 
 const storageFromResult = supabaseAdmin.storage.from("solicitudes");
 const mockCreateSignedUploadUrl = vi.mocked(storageFromResult.createSignedUploadUrl);
@@ -267,7 +267,7 @@ const crearSolicitudInputBase = {
   ...campoTextoBase,
   direccion: "Calle 1",
   localidadId: "loc-1",
-  especialidad: "esp-1",
+  especialidades: ["esp-1", "esp-2"],
   archivos: Object.fromEntries(
     ARCHIVOS_REQUERIDOS.map((key) => [key, `${campoTextoBase.matricula}-${key}-1234567890.pdf`])
   ),
@@ -280,7 +280,7 @@ describe("crearSolicitud", () => {
       data: Object.values(crearSolicitudInputBase.archivos).map((name) => ({ name })),
       error: null,
     } as any);
-    mockEspecialidadFindUnique.mockResolvedValue({ nombre: "Kinesiología General" } as any);
+    mockEspecialidadFindMany.mockResolvedValue([{ nombre: "NEURO" }] as any);
     mockSolicitudCreate.mockResolvedValue({ id: "sol-1" } as any);
 
     const resultado = await crearSolicitud(crearSolicitudInputBase);
@@ -357,5 +357,56 @@ describe("cancelarSubidaSolicitud", () => {
   it("no llama a Storage.remove si la lista de paths está vacía (triangulación)", async () => {
     await cancelarSubidaSolicitud([]);
     expect(mockRemove).not.toHaveBeenCalled();
+  });
+});
+
+describe("crearSolicitud — especialidades múltiples", () => {
+  function prepararStorageOk() {
+    mockSolicitudFindFirst.mockResolvedValue(null);
+    mockList.mockResolvedValue({
+      data: Object.values(crearSolicitudInputBase.archivos).map((name) => ({ name })),
+      error: null,
+    } as any);
+    mockEspecialidadFindMany.mockResolvedValue([{ nombre: "NEURO" }, { nombre: "TRAUMATO" }] as any);
+    mockSolicitudCreate.mockResolvedValue({ id: "sol-1" } as any);
+  }
+
+  it("persiste todas las especialidades elegidas como array de IDs", async () => {
+    prepararStorageOk();
+
+    const resultado = await crearSolicitud(crearSolicitudInputBase);
+
+    expect(resultado).toEqual({ success: true });
+    expect(mockSolicitudCreate).toHaveBeenCalledWith(
+      expect.objectContaining({
+        data: expect.objectContaining({
+          datos: expect.objectContaining({ especialidades: ["esp-1", "esp-2"] }),
+        }),
+      })
+    );
+  });
+
+  it("acepta una sola especialidad (el caso más común sigue funcionando)", async () => {
+    prepararStorageOk();
+
+    const resultado = await crearSolicitud({ ...crearSolicitudInputBase, especialidades: ["esp-1"] });
+
+    expect(resultado).toEqual({ success: true });
+    expect(mockSolicitudCreate).toHaveBeenCalledWith(
+      expect.objectContaining({
+        data: expect.objectContaining({
+          datos: expect.objectContaining({ especialidades: ["esp-1"] }),
+        }),
+      })
+    );
+  });
+
+  it("rechaza la solicitud si no se eligió ninguna especialidad", async () => {
+    prepararStorageOk();
+
+    const resultado = await crearSolicitud({ ...crearSolicitudInputBase, especialidades: [] });
+
+    expect(resultado.success).toBe(false);
+    expect(mockSolicitudCreate).not.toHaveBeenCalled();
   });
 });
