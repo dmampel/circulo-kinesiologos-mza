@@ -20,6 +20,7 @@ export interface UpdateProfesionalData {
   direccion?: string;
   horarios?: string;
   foto_url?: string;
+  localidadId?: string;
 }
 
 export class ProfesionalRepository {

@@ -2,7 +2,7 @@
 
 import { useActionState, useRef, useState } from "react";
 import { updateDatosContacto, updateFotoPerfil } from "@/app/mi-panel/perfil/actions";
-import { Phone, MessageCircle, MapPin, Clock, Camera, CheckCircle, AlertCircle, User, CreditCard, Mail, Stethoscope } from "lucide-react";
+import { Phone, MessageCircle, MapPin, Clock, Camera, CheckCircle, AlertCircle, User, CreditCard, Mail, Stethoscope, Building2 } from "lucide-react";
 import Image from "next/image";
 
 type ActionResult = { success: true } | { success: false; error: string } | null;
@@ -19,7 +19,9 @@ interface PerfilFormProps {
     direccion: string | null;
     horarios: string | null;
     foto_url: string | null;
+    localidadId: string;
   };
+  localidades: { id: string; nombre: string }[];
 }
 
 function Feedback({ state }: { state: ActionResult }) {
@@ -40,7 +42,7 @@ function Feedback({ state }: { state: ActionResult }) {
   );
 }
 
-export default function PerfilForm({ profesional }: PerfilFormProps) {
+export default function PerfilForm({ profesional, localidades }: PerfilFormProps) {
   const [contactState, contactAction, contactPending] = useActionState(
     updateDatosContacto,
     null
@@ -181,19 +183,43 @@ export default function PerfilForm({ profesional }: PerfilFormProps) {
             ))}
           </div>
 
-          <div className="space-y-1.5">
-            <label htmlFor="direccion" className="flex items-center gap-2 text-[10px] font-black text-slate-500 uppercase tracking-widest">
-              <MapPin className="h-3.5 w-3.5" />
-              Dirección del Consultorio
-            </label>
-            <input
-              id="direccion"
-              name="direccion"
-              type="text"
-              placeholder="Ej: Av. San Martín 1234, Mendoza"
-              defaultValue={profesional.direccion ?? ""}
-              className="w-full px-4 py-3 rounded-xl border border-slate-200 text-sm font-medium text-slate-800 placeholder-slate-300 bg-white focus:outline-none focus:ring-2 focus:ring-blue-500/20 focus:border-blue-400 transition-all"
-            />
+          <div className="grid grid-cols-1 sm:grid-cols-2 gap-5">
+            <div className="space-y-1.5">
+              <label htmlFor="direccion" className="flex items-center gap-2 text-[10px] font-black text-slate-500 uppercase tracking-widest">
+                <MapPin className="h-3.5 w-3.5" />
+                Dirección del Consultorio
+              </label>
+              <input
+                id="direccion"
+                name="direccion"
+                type="text"
+                placeholder="Ej: Av. San Martín 1234"
+                defaultValue={profesional.direccion ?? ""}
+                className="w-full px-4 py-3 rounded-xl border border-slate-200 text-sm font-medium text-slate-800 placeholder-slate-300 bg-white focus:outline-none focus:ring-2 focus:ring-blue-500/20 focus:border-blue-400 transition-all"
+              />
+            </div>
+
+            <div className="space-y-1.5">
+              <label htmlFor="localidadId" className="flex items-center gap-2 text-[10px] font-black text-slate-500 uppercase tracking-widest">
+                <Building2 className="h-3.5 w-3.5" />
+                Localidad
+              </label>
+              <select
+                id="localidadId"
+                name="localidadId"
+                defaultValue={profesional.localidadId}
+                className="w-full px-4 py-3 rounded-xl border border-slate-200 text-sm font-medium text-slate-800 bg-white focus:outline-none focus:ring-2 focus:ring-blue-500/20 focus:border-blue-400 transition-all"
+              >
+                {localidades.map((localidad) => (
+                  <option key={localidad.id} value={localidad.id}>
+                    {localidad.nombre}
+                  </option>
+                ))}
+              </select>
+              <p className="text-[10px] text-slate-400">
+                Define en qué localidad aparecés en el Padrón Público.
+              </p>
+            </div>
           </div>
 
           <div className="space-y-1.5">

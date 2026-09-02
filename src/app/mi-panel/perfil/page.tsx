@@ -1,5 +1,6 @@
 import { createClient } from "@/utils/supabase/server";
 import { ProfesionalRepository } from "@/lib/repositories/ProfesionalRepository";
+import { LocalidadRepository } from "@/lib/repositories/LocalidadRepository";
 import { redirect } from "next/navigation";
 import { AlertCircle } from "lucide-react";
 import PerfilForm from "@/components/socio/PerfilForm";
@@ -21,7 +22,10 @@ export default async function PerfilPage() {
     redirect("/login");
   }
 
-  const profesional = await ProfesionalRepository.findByUserId(user.id);
+  const [profesional, localidades] = await Promise.all([
+    ProfesionalRepository.findByUserId(user.id),
+    LocalidadRepository.getAll(),
+  ]);
 
   if (!profesional) {
     return (
@@ -63,7 +67,9 @@ export default async function PerfilPage() {
           direccion: profesional.direccion ?? null,
           horarios: profesional.horarios ?? null,
           foto_url: profesional.foto_url ?? null,
+          localidadId: profesional.localidadId,
         }}
+        localidades={localidades.map((l) => ({ id: l.id, nombre: l.nombre }))}
       />
     </div>
   );

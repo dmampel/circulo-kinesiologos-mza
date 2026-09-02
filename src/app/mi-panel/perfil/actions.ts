@@ -3,7 +3,8 @@
 import { createClient } from "@/utils/supabase/server";
 import { revalidatePath } from "next/cache";
 import { redirect } from "next/navigation";
-import { ProfesionalRepository } from "@/lib/repositories/ProfesionalRepository";
+import { ProfesionalRepository, type UpdateProfesionalData } from "@/lib/repositories/ProfesionalRepository";
+import { LocalidadRepository } from "@/lib/repositories/LocalidadRepository";
 import { supabaseAdmin } from "@/lib/supabase/admin";
 
 type ActionResult = { success: true } | { success: false; error: string };
@@ -24,17 +25,33 @@ export async function updateDatosContacto(
     redirect("/login");
   }
 
-  const data = {
+  const data: UpdateProfesionalData = {
     telefono: (formData.get("telefono") as string) || undefined,
     whatsapp: (formData.get("whatsapp") as string) || undefined,
     direccion: (formData.get("direccion") as string) || undefined,
     horarios: (formData.get("horarios") as string) || undefined,
   };
 
+  // La localidad es una FK: no se confía en el value que llega del <select>.
+  // Sin esta validación un id inventado explota como error de FK en Prisma y
+  // el socio sólo vería el mensaje genérico de "no se pudieron guardar".
+  const localidadId = (formData.get("localidadId") as string) || undefined;
+  if (localidadId) {
+    const localidades = await LocalidadRepository.getAll();
+    if (!localidades.some((l) => l.id === localidadId)) {
+      return { success: false, error: "La localidad seleccionada no es válida." };
+    }
+    data.localidadId = localidadId;
+  }
+
   try {
-    await ProfesionalRepository.update(user.id, data);
+    const actualizado = await ProfesionalRepository.update(user.id, data);
     revalidatePath("/mi-panel");
     revalidatePath("/mi-panel/perfil");
+    // El Padrón Público muestra estos datos y filtra por localidad. El perfil
+    // individual es ISR de 1h: sin esto, el socio no vería su cambio reflejado.
+    revalidatePath("/profesionales");
+    revalidatePath(`/profesionales/${actualizado.slug}`);
     return { success: true };
   } catch {
     return { success: false, error: "No se pudieron guardar los cambios. Intentá de nuevo." };
