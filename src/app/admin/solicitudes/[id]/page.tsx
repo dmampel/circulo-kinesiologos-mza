@@ -9,6 +9,7 @@ import {
   Briefcase,
   FileText,
   Download,
+  FileDown,
   ExternalLink,
   CheckCircle2,
   XCircle,
@@ -20,6 +21,7 @@ import { cn } from "@/lib/utils";
 import BotonesSolicitud from "../BotonesSolicitud";
 import { firmarUrlsDocumentos } from "@/lib/storage/solicitudes";
 import { normalizarEspecialidadesSolicitud } from "@/lib/especialidades";
+import { DOCUMENTOS_SOLICITUD } from "@/lib/solicitudes/ficha";
 
 export const dynamic = "force-dynamic";
 
@@ -54,16 +56,12 @@ export default async function DetalleSolicitudPage({ params }: Props) {
   const especialidadNombre =
     especialidadesEncontradas.map((esp) => esp.nombre).join(", ") || "Sin especialidad";
   
-  const DOCS = [
-    { id: "dni", label: "Fotocopia DNI", file: archivos.dni },
-    { id: "titulo", label: "Título Universitario", file: archivos.titulo },
-    { id: "cuit", label: "Constancia CUIT/IIBB", file: archivos.cuit },
-    { id: "seguro", label: "Póliza Mala Praxis", file: archivos.seguro },
-    { id: "cv", label: "Curriculum Vitae", file: archivos.cv },
-    { id: "matricula_file", label: "Matrícula Provincial", file: archivos.matricula_file },
-    { id: "super_salud", label: "Superintendencia de Salud", file: archivos.super_salud },
-    { id: "habilitacion", label: "Habilitación Consultorio", file: archivos.habilitacion },
-  ];
+  // Catálogo compartido con la ficha exportable: una sola fuente de verdad para
+  // el orden y las etiquetas de la documentación.
+  const DOCS = DOCUMENTOS_SOLICITUD.map((doc) => ({
+    ...doc,
+    file: archivos[doc.id] as string | undefined,
+  }));
 
   // El bucket `solicitudes` es privado: contiene documentación personal de los
   // solicitantes. Los enlaces se firman por request y expiran en 1 hora.
@@ -106,7 +104,15 @@ export default async function DetalleSolicitudPage({ params }: Props) {
           </div>
         </div>
         
-        <BotonesSolicitud id={solicitud.id} />
+        <div className="flex items-center gap-3">
+          <Link
+            href={`/admin/solicitudes/${solicitud.id}/ficha`}
+            className="flex h-12 items-center gap-2 rounded-2xl border border-slate-100 bg-white px-5 text-sm font-bold text-slate-600 transition-all hover:text-blue-600 hover:shadow-md"
+          >
+            <FileDown className="h-4 w-4" /> Ficha
+          </Link>
+          <BotonesSolicitud id={solicitud.id} />
+        </div>
       </div>
 
       <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">

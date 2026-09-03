@@ -24,9 +24,11 @@ export default async function AdminLayout({
     <div className="flex min-h-screen bg-slate-50 font-sans">
       <AdminSidebar />
       {/* Main Content Area */}
-      <main className="flex-grow lg:ml-64">
+      {/* Al imprimir (ficha de solicitud) se descarta el chrome del admin:
+          sin sidebar, sin margen lateral y sin padding de viewport. */}
+      <main className="flex-grow lg:ml-64 print:ml-0">
         {/* Viewport */}
-        <div className="pt-20 p-8">{children}</div>
+        <div className="pt-20 p-8 print:p-0 print:pt-0">{children}</div>
       </main>
     </div>
   );

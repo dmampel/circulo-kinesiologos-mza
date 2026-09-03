@@ -55,7 +55,7 @@ export default function AdminSidebar() {
   return (
     <>
       {/* Mensaje desktop-only en mobile */}
-      <div className="lg:hidden fixed inset-0 z-50 bg-slate-900 flex flex-col items-center justify-center p-8 text-center">
+      <div className="lg:hidden print:hidden fixed inset-0 z-50 bg-slate-900 flex flex-col items-center justify-center p-8 text-center">
         <div className="h-20 w-20 rounded-3xl bg-blue-600/20 border border-blue-500/30 flex items-center justify-center mb-8">
           <Monitor className="h-10 w-10 text-blue-400" />
         </div>
@@ -68,7 +68,7 @@ export default function AdminSidebar() {
       </div>
 
       {/* Sidebar */}
-      <aside className="w-64 bg-slate-900 text-white fixed h-full z-20 hidden lg:flex flex-col">
+      <aside className="w-64 bg-slate-900 text-white fixed h-full z-20 hidden lg:flex flex-col print:hidden">
         <div className="p-6">
           <div className="flex items-center gap-3">
             <div className="h-10 w-10 rounded-xl bg-slate-100 flex items-center justify-center text-slate-400">
