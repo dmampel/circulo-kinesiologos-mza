@@ -81,3 +81,54 @@ export function mensajeDeErrorDeContrasena(
     ? MENSAJES[codigo]
     : MENSAJES.password_no_guardada;
 }
+
+/**
+ * Avisos de las pantallas de auth (/login, /forgot-password).
+ *
+ * Mismo principio que arriba, y por el mismo motivo: /login pintaba
+ * `params.error` TAL CUAL venía en la query string. Con eso, un link armado a
+ * mano — `/login?error=Tu matrícula fue suspendida, regularizá en <lo que sea>`
+ * — se le mostraba al socio con la tipografía, el logo y el dominio del
+ * Círculo. Un socio no tiene cómo distinguir eso de un aviso real.
+ *
+ * Por la URL viajan códigos. El texto vive acá.
+ */
+const ERRORES_AUTH: Record<string, string> = {
+  credenciales_invalidas:
+    "El email o la contraseña no son correctos. Revisalos e intentá de nuevo.",
+  registro_fallido:
+    "No pudimos crear la cuenta. Revisá los datos e intentá de nuevo.",
+  enlace_invalido:
+    "El enlace venció o ya se usó. Pedí uno nuevo desde «¿Olvidaste tu contraseña?».",
+  mail_no_enviado:
+    "No pudimos enviar el correo en este momento. Intentá de nuevo en un rato.",
+};
+
+const ERROR_AUTH_GENERICO =
+  "No pudimos completar la operación. Intentá de nuevo.";
+
+const AVISOS_AUTH: Record<string, string> = {
+  revisar_email:
+    "Te enviamos un correo para confirmar tu cuenta. Revisá tu bandeja de entrada.",
+};
+
+/**
+ * Un código desconocido cae al genérico: preferimos un mensaje vago y honesto
+ * antes que uno preciso escrito por un tercero.
+ */
+export function mensajeDeErrorDeAuth(codigo: string | undefined): string | null {
+  if (!codigo) return null;
+  return ERRORES_AUTH[codigo] ?? ERROR_AUTH_GENERICO;
+}
+
+/**
+ * A diferencia de los errores, un aviso desconocido NO cae a un genérico: se
+ * descarta. Un cartel verde de "todo salió bien" inventado por un tercero es
+ * más peligroso que uno rojo — invita a confiar, no a desconfiar.
+ */
+export function mensajeInformativoDeAuth(
+  codigo: string | undefined
+): string | null {
+  if (!codigo) return null;
+  return AVISOS_AUTH[codigo] ?? null;
+}

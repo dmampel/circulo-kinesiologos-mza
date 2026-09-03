@@ -1,4 +1,5 @@
 import { login } from "@/app/auth/actions";
+import { mensajeDeErrorDeAuth, mensajeInformativoDeAuth } from "@/lib/auth-errores";
 import { ShieldCheck, Mail, Lock, ArrowRight } from "lucide-react";
 import Image from "next/image";
 import Link from "next/link";
@@ -9,6 +10,12 @@ export default async function LoginPage({
   searchParams: Promise<{ error?: string; message?: string }>;
 }) {
   const params = await searchParams;
+  // Nunca se pinta `params.error`/`params.message` crudo: vienen de la URL y
+  // un link armado a mano mostraria el texto que quiera quien lo armo, con la
+  // cara del sitio del Circulo. Por la URL viajan codigos; el texto sale de
+  // auth-errores.ts.
+  const error = mensajeDeErrorDeAuth(params.error);
+  const aviso = mensajeInformativoDeAuth(params.message);
   return (
     <div className="min-h-screen bg-slate-50 flex items-center justify-center p-4">
       <div className="max-w-md w-full">
@@ -30,29 +37,29 @@ export default async function LoginPage({
           <h1 className="text-2xl font-black text-slate-900 mb-2">Bienvenido</h1>
           <p className="text-sm text-slate-500 mb-6">Ingresá tus credenciales para acceder al panel.</p>
 
-          {params.error && (
-            <div className="mb-6 p-4 bg-red-50 border border-red-100 rounded-2xl flex items-start gap-3 animate-in fade-in slide-in-from-top-1">
+          {error && (
+            <div
+              role="alert"
+              className="mb-6 p-4 bg-red-50 border border-red-100 rounded-2xl flex items-start gap-3 animate-in fade-in slide-in-from-top-1"
+            >
               <ShieldCheck className="h-5 w-5 text-red-500 shrink-0 mt-0.5" />
-              <p className="text-xs font-bold text-red-600 leading-relaxed">
-                {params.error === "Could not authenticate user" 
-                  ? "Credenciales incorrectas. Por favor verificá tu email y contraseña." 
-                  : params.error}
-              </p>
+              <p className="text-xs font-bold text-red-600 leading-relaxed">{error}</p>
             </div>
           )}
 
-          {params.message && (
-            <div className="mb-6 p-4 bg-blue-50 border border-blue-100 rounded-2xl flex items-start gap-3">
+          {aviso && (
+            <div
+              role="status"
+              className="mb-6 p-4 bg-blue-50 border border-blue-100 rounded-2xl flex items-start gap-3"
+            >
               <Mail className="h-5 w-5 text-blue-500 shrink-0 mt-0.5" />
-              <p className="text-xs font-bold text-blue-600 leading-relaxed">
-                {params.message}
-              </p>
+              <p className="text-xs font-bold text-blue-600 leading-relaxed">{aviso}</p>
             </div>
           )}
 
           <form className="space-y-6">
             <div className="space-y-2">
-              <label className="text-xs font-black text-slate-400 uppercase ml-1 flex items-center">
+              <label htmlFor="email" className="text-xs font-black text-slate-400 uppercase ml-1 flex items-center">
                 <Mail className="mr-2 h-3 w-3" /> Correo Electrónico
               </label>
               <input 
@@ -65,7 +72,7 @@ export default async function LoginPage({
               />
             </div>
             <div className="space-y-2">
-              <label className="text-xs font-black text-slate-400 uppercase ml-1 flex items-center">
+              <label htmlFor="password" className="text-xs font-black text-slate-400 uppercase ml-1 flex items-center">
                 <Lock className="mr-2 h-3 w-3" /> Contraseña
               </label>
               <input

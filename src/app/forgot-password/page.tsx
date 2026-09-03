@@ -1,4 +1,5 @@
 import { requestPasswordReset } from "@/app/auth/actions";
+import { mensajeDeErrorDeAuth } from "@/lib/auth-errores";
 import { ShieldCheck, Mail, ArrowRight, CheckCircle2 } from "lucide-react";
 import Link from "next/link";
 
@@ -9,6 +10,7 @@ export default async function ForgotPasswordPage({
 }) {
   const params = await searchParams;
   const sent = params.message === "sent";
+  const error = mensajeDeErrorDeAuth(params.error);
 
   return (
     <div className="min-h-screen bg-slate-50 flex items-center justify-center p-4">
@@ -52,16 +54,19 @@ export default async function ForgotPasswordPage({
                 Ingresá tu email y te enviaremos un link para restablecer tu contraseña.
               </p>
 
-              {params.error && (
-                <div className="mb-6 p-4 bg-red-50 border border-red-100 rounded-2xl flex items-start gap-3 animate-in fade-in slide-in-from-top-1">
+              {error && (
+                <div
+                  role="alert"
+                  className="mb-6 p-4 bg-red-50 border border-red-100 rounded-2xl flex items-start gap-3 animate-in fade-in slide-in-from-top-1"
+                >
                   <ShieldCheck className="h-5 w-5 text-red-500 shrink-0 mt-0.5" />
-                  <p className="text-xs font-bold text-red-600 leading-relaxed">{params.error}</p>
+                  <p className="text-xs font-bold text-red-600 leading-relaxed">{error}</p>
                 </div>
               )}
 
               <form className="space-y-6">
                 <div className="space-y-2">
-                  <label className="text-xs font-black text-slate-400 uppercase ml-1 flex items-center">
+                  <label htmlFor="email" className="text-xs font-black text-slate-400 uppercase ml-1 flex items-center">
                     <Mail className="mr-2 h-3 w-3" /> Correo Electrónico
                   </label>
                   <input

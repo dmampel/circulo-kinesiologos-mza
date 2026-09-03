@@ -49,7 +49,7 @@ export async function GET(request: Request) {
   const next = explicitNext ?? "/mi-panel";
 
   const fallar = () =>
-    NextResponse.redirect(`${origin}/login?error=Invalid or expired token`);
+    NextResponse.redirect(`${origin}/login?error=enlace_invalido`);
 
   const supabase = await createClient();
   let user: User | null = null;

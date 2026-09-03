@@ -17,7 +17,7 @@ export async function login(formData: FormData) {
   const { data: { user }, error } = await supabase.auth.signInWithPassword(data);
 
   if (error || !user) {
-    redirect("/login?error=Could not authenticate user");
+    redirect("/login?error=credenciales_invalidas");
   }
 
   revalidatePath("/", "layout");
@@ -40,11 +40,11 @@ export async function signup(formData: FormData) {
   const { error } = await supabase.auth.signUp(data);
 
   if (error) {
-    redirect("/login?error=Could not authenticate user");
+    redirect("/login?error=registro_fallido");
   }
 
   revalidatePath("/", "layout");
-  redirect("/login?message=Check your email to confirm your account");
+  redirect("/login?message=revisar_email");
 }
 
 export async function logout() {
@@ -66,7 +66,7 @@ export async function requestPasswordReset(formData: FormData) {
   });
 
   if (error) {
-    redirect("/forgot-password?error=No se pudo enviar el correo. Intentá de nuevo.");
+    redirect("/forgot-password?error=mail_no_enviado");
   }
 
   redirect("/forgot-password?message=sent");
