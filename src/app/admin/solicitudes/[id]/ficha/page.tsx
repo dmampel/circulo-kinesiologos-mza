@@ -4,7 +4,7 @@ import Image from "next/image";
 import { notFound } from "next/navigation";
 import { ArrowLeft } from "lucide-react";
 import { cn } from "@/lib/utils";
-import { construirFicha } from "@/lib/solicitudes/ficha";
+import { construirFicha, type DocumentoFicha } from "@/lib/solicitudes/ficha";
 import { normalizarEspecialidadesSolicitud } from "@/lib/especialidades";
 import BotonImprimir from "./BotonImprimir";
 
@@ -22,6 +22,50 @@ function Campo({ label, valor, className }: { label: string; valor: string; clas
         {label}
       </p>
       <p className="font-bold text-slate-900 break-words">{valor}</p>
+    </div>
+  );
+}
+
+/**
+ * Bloque de documentación. Cada ítem declara su estado en palabras
+ * ("Presentado" / "No presentado") en vez de depender de una casilla o un
+ * color: la ficha se imprime en blanco y negro y tiene que leerse sin
+ * interpretar símbolos.
+ */
+function GrupoDocumentos({
+  titulo,
+  documentos,
+  className,
+}: {
+  titulo: string;
+  documentos: DocumentoFicha[];
+  className?: string;
+}) {
+  if (documentos.length === 0) return null;
+
+  return (
+    <div className={className}>
+      <h3 className="mb-3 text-[10px] font-black uppercase tracking-widest text-slate-500">
+        Documentación {titulo}
+      </h3>
+      <ul>
+        {documentos.map((doc) => (
+          <li
+            key={doc.id}
+            className="flex items-baseline justify-between gap-4 border-b border-slate-100 py-2"
+          >
+            <span className="text-sm font-bold text-slate-900">{doc.label}</span>
+            <span
+              className={cn(
+                "shrink-0 text-[10px] font-black uppercase tracking-widest",
+                doc.adjuntado ? "text-slate-900" : "text-red-600"
+              )}
+            >
+              {doc.adjuntado ? "Presentado" : "No presentado"}
+            </span>
+          </li>
+        ))}
+      </ul>
     </div>
   );
 }
@@ -57,6 +101,11 @@ export default async function FichaSolicitudPage({ params }: Props) {
     localidad: localidad?.nombre ?? "",
     especialidades: especialidades.map((e) => e.nombre),
   });
+
+  const obligatorios = ficha.documentos.filter((doc) => doc.obligatorio);
+  const opcionales = ficha.documentos.filter((doc) => !doc.obligatorio);
+  const presentados = ficha.documentos.filter((doc) => doc.adjuntado);
+  const noPresentados = ficha.documentos.filter((doc) => !doc.adjuntado);
 
   const emitidaEl = new Date().toLocaleDateString("es-AR", {
     day: "numeric",
@@ -122,65 +171,62 @@ export default async function FichaSolicitudPage({ params }: Props) {
         <section className="pt-10">
           <div className="mb-6 flex items-baseline justify-between gap-4">
             <h2 className="text-[10px] font-black uppercase tracking-[0.2em] text-slate-400">
-              Documentación Presentada
+              Documentación
             </h2>
-            <span
-              className={cn(
-                "text-[10px] font-black uppercase tracking-widest",
-                ficha.documentacionCompleta ? "text-green-600" : "text-red-600"
-              )}
-            >
-              {ficha.documentacionCompleta ? "Completa" : `Faltan ${ficha.faltantes.length}`}
+            <span className="text-[10px] font-black uppercase tracking-widest text-slate-500">
+              {presentados.length} de {ficha.documentos.length} presentados
             </span>
           </div>
 
-          <ul className="grid grid-cols-1 gap-x-12 gap-y-3 md:grid-cols-2">
-            {ficha.documentos.map((doc) => (
-              <li key={doc.id} className="flex items-center gap-3 border-b border-slate-100 pb-2">
-                {/* Casilla dibujada con borde: sobrevive a la impresión en B/N,
-                    a diferencia de un ícono de color o un fondo. */}
-                <span
-                  className="flex h-4 w-4 shrink-0 items-center justify-center border border-slate-900 text-[11px] font-black leading-none text-slate-900"
-                  aria-hidden
-                >
-                  {doc.adjuntado ? "X" : ""}
-                </span>
-                <span className="text-sm font-bold text-slate-900">{doc.label}</span>
-                {!doc.obligatorio && (
-                  <span className="ml-auto text-[9px] font-black uppercase tracking-widest text-slate-400">
-                    Opcional
-                  </span>
-                )}
-              </li>
-            ))}
-          </ul>
+          <GrupoDocumentos titulo="Obligatoria" documentos={obligatorios} />
+          <GrupoDocumentos titulo="Opcional" documentos={opcionales} className="mt-8" />
+
+          {/* El resumen se repite en texto corrido: es lo que se lee de un
+              vistazo cuando la ficha llega impresa a administración. */}
+          <div className="mt-8 space-y-2 border-t border-slate-200 pt-6 text-sm">
+            <p className="font-bold text-slate-900">
+              <span className="font-black uppercase tracking-widest text-[10px] text-slate-400">
+                Presentó:{" "}
+              </span>
+              {presentados.length > 0
+                ? presentados.map((doc) => doc.label).join(", ")
+                : "Ningún documento."}
+            </p>
+            <p className="font-bold text-slate-900">
+              <span className="font-black uppercase tracking-widest text-[10px] text-slate-400">
+                No presentó:{" "}
+              </span>
+              {noPresentados.length > 0
+                ? noPresentados
+                    .map((doc) => (doc.obligatorio ? doc.label : `${doc.label} (opcional)`))
+                    .join(", ")
+                : "Nada pendiente. Presentó toda la documentación."}
+            </p>
+          </div>
 
           {!ficha.documentacionCompleta && (
             <p className="mt-6 border-l-4 border-red-600 bg-red-50 px-4 py-3 text-sm font-bold text-red-700 print:bg-transparent">
-              Documentación obligatoria faltante: {ficha.faltantes.join(", ")}.
+              Falta documentación obligatoria: {ficha.faltantes.join(", ")}.
             </p>
           )}
         </section>
 
-        <footer className="mt-12 flex flex-wrap items-end justify-between gap-8 border-t border-slate-200 pt-6">
-          <div className="space-y-1 text-[11px] font-bold uppercase tracking-wider text-slate-400">
-            <p>
-              Solicitud recibida el{" "}
-              {new Date(ficha.creadaEn).toLocaleDateString("es-AR", {
-                day: "numeric",
-                month: "long",
-                year: "numeric",
-              })}
-            </p>
-            {ficha.revisadaEn && (
-              <p>Revisada el {new Date(ficha.revisadaEn).toLocaleDateString("es-AR")}</p>
-            )}
-            <p>Ficha emitida el {emitidaEl}</p>
-          </div>
-
-          <div className="w-64 border-t border-slate-900 pt-2 text-center text-[10px] font-black uppercase tracking-widest text-slate-500">
-            Firma y sello
-          </div>
+        <footer className="mt-12 space-y-1 border-t border-slate-200 pt-6 text-[11px] font-bold uppercase tracking-wider text-slate-400">
+          <p>
+            Solicitud recibida el{" "}
+            {new Date(ficha.creadaEn).toLocaleDateString("es-AR", {
+              day: "numeric",
+              month: "long",
+              year: "numeric",
+            })}
+          </p>
+          {ficha.revisadaEn && (
+            <p>Revisada el {new Date(ficha.revisadaEn).toLocaleDateString("es-AR")}</p>
+          )}
+          <p>Ficha emitida el {emitidaEl}</p>
+          <p className="pt-2 normal-case tracking-normal text-slate-400">
+            Documento informativo. No constituye constancia ni certificación.
+          </p>
         </footer>
       </article>
     </div>
