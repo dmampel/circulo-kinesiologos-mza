@@ -6,6 +6,7 @@ import { usePathname } from "next/navigation";
 import {
   LayoutDashboard,
   Users,
+  MailCheck,
   FileText,
   LogOut,
   Bell,
@@ -31,6 +32,7 @@ const SIDEBAR_LINKS: {
   { name: "Resumen", href: "/admin", icon: LayoutDashboard },
   { name: "Solicitudes", href: "/admin/solicitudes", icon: Bell },
   { name: "Profesionales", href: "/admin/profesionales", icon: Users },
+  { name: "Invitaciones", href: "/admin/invitaciones", icon: MailCheck },
   { name: "Obras Sociales", href: "/admin/obras-sociales", icon: Briefcase },
   { name: "KineClub", href: "/admin/beneficios", icon: Ticket },
   { name: "Noticias", href: "/admin/noticias", icon: FileText },
