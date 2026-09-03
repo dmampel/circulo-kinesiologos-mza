@@ -38,6 +38,18 @@ const DESTINO_INVITACION = construirUrlAbsoluta(
 );
 const DRY_RUN = process.env.DRY_RUN === "true";
 
+/**
+ * Tope de invitaciones por corrida. Existe por el limite diario de Resend
+ * (100 en el plan gratis, compartido con los mails que manda la web sola).
+ * Pasado ese limite Supabase puede devolver exito con el mail ya perdido rio
+ * abajo: el socio queda con `userId` seteado, sin haber recibido nada, y como
+ * el filtro de abajo es `userId: null` no vuelve a entrar nunca mas.
+ *
+ * Como el orden es siempre por apellido y los ya invitados quedan fuera del
+ * filtro, cada corrida continua exactamente donde termino la anterior.
+ */
+const LIMITE = process.env.LIMITE ? Number(process.env.LIMITE) : undefined;
+
 // Pausa entre invitaciones para no saturar el rate limit de Supabase
 const DELAY_MS = 500;
 
@@ -95,9 +107,10 @@ async function main() {
       matricula: true,
     },
     orderBy: { apellido: "asc" },
+    ...(LIMITE ? { take: LIMITE } : {}),
   });
 
-  console.log(`📋 Profesionales sin cuenta Auth: ${profesionales.length}\n`);
+  console.log(`📋 Profesionales sin cuenta Auth: ${profesionales.length}${LIMITE ? ` (tope de ${LIMITE} por corrida)` : ""}\n`);
 
   if (profesionales.length === 0) {
     console.log("✅ Todos los profesionales ya tienen cuenta. Nada que hacer.");
