@@ -54,10 +54,10 @@
 
 ## 5. Habilitar `relationJoins` (DB/Prisma — cambio inerte por diseño)
 
-- [ ] 5.1 En `prisma/schema.prisma`, agregar `previewFeatures = ["relationJoins"]` al bloque `generator client`. **Ese es el único cambio del archivo en todo el change**: no se agregan, eliminan ni renombran modelos, campos, relaciones, enums ni `@@index`, y el bloque `datasource db` no se toca (`design.md — D1`)
-- [ ] 5.2 Ejecutar `npx prisma generate` y verificar con `grep -c "relationLoadStrategy" node_modules/.prisma/client/index.d.ts` que el conteo pasó de `0` a un número mayor que cero. Si sigue en `0`, el paso falló: **detenerse**
-- [ ] 5.3 Confirmar que **no** se generó ninguna migración y que no se ejecutó `prisma migrate dev`, `prisma migrate deploy` ni `prisma db push`. `git status` no debe listar nada bajo `prisma/migrations/`
-- [ ] 5.4 Ejecutar `npx tsc --noEmit` y confirmar que la regeneración del cliente no rompió ningún tipo
+- [x] 5.1 En `prisma/schema.prisma`, agregar `previewFeatures = ["relationJoins"]` al bloque `generator client`. **Ese es el único cambio del archivo en todo el change**: no se agregan, eliminan ni renombran modelos, campos, relaciones, enums ni `@@index`, y el bloque `datasource db` no se toca (`design.md — D1`)
+- [x] 5.2 **VERIFICADO 2026-09-03**: `grep -c relationLoadStrategy` pasó de `0` a `190`. Ejecutar `npx prisma generate` y verificar con `grep -c "relationLoadStrategy" node_modules/.prisma/client/index.d.ts` que el conteo pasó de `0` a un número mayor que cero. Si sigue en `0`, el paso falló: **detenerse**
+- [x] 5.3 Confirmar que **no** se generó ninguna migración y que no se ejecutó `prisma migrate dev`, `prisma migrate deploy` ni `prisma db push`. `git status` no debe listar nada bajo `prisma/migrations/`
+- [x] 5.4 **VERIFICADO 2026-09-03**: `npx tsc --noEmit` sin errores y `npx vitest run` 19/19 archivos, 149/149 tests. Ejecutar `npx tsc --noEmit` y confirmar que la regeneración del cliente no rompió ningún tipo
 - [ ] 5.5 Desplegar **solo este grupo**. Es inerte por diseño: `relationLoadStrategy` sigue en su default `"query"` hasta que una query pida otra cosa
 - [ ] 5.6 Re-contar las rutas y confirmar que el conteo es **idéntico** al del grupo 4. Si cambió algo, **detenerse e investigar** antes de seguir
 
