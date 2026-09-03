@@ -1,8 +1,20 @@
 import { updatePassword } from "@/app/auth/actions";
-import { Lock, ArrowRight, ShieldCheck } from "lucide-react";
+import { mensajeDeErrorDeContrasena } from "@/lib/auth-errores";
+import { Lock, ArrowRight, ShieldCheck, AlertCircle } from "lucide-react";
 import Link from "next/link";
 
-export default function SetPasswordPage() {
+export default async function SetPasswordPage({
+  searchParams,
+}: {
+  searchParams: Promise<{ error?: string }>;
+}) {
+  const params = await searchParams;
+  const error = mensajeDeErrorDeContrasena(params.error);
+  // Si el link ya no sirve, reintentar en esta pantalla no arregla nada: lo
+  // único que destraba al socio es pedir un enlace nuevo.
+  const ofrecerEnlaceNuevo =
+    params.error === "sesion_vencida" || params.error === "password_no_guardada";
+
   return (
     <div className="min-h-screen bg-slate-50 flex items-center justify-center p-4">
       <div className="max-w-md w-full">
@@ -26,9 +38,29 @@ export default function SetPasswordPage() {
             Tu solicitud ha sido aprobada. Ahora definí una contraseña segura para acceder a tu panel.
           </p>
 
+          {error && (
+            <div
+              role="alert"
+              className="mb-8 p-4 bg-red-50 border border-red-100 rounded-2xl flex items-start gap-3 animate-in fade-in slide-in-from-top-1"
+            >
+              <AlertCircle className="h-5 w-5 text-red-500 shrink-0 mt-0.5" />
+              <div className="text-xs font-bold text-red-600 leading-relaxed">
+                <p>{error}</p>
+                {ofrecerEnlaceNuevo && (
+                  <Link href="/forgot-password" className="mt-2 inline-block underline">
+                    Pedir un enlace nuevo
+                  </Link>
+                )}
+              </div>
+            </div>
+          )}
+
           <form className="space-y-6">
             <div className="space-y-2">
-              <label className="text-xs font-black text-slate-400 uppercase ml-1 flex items-center">
+              <label
+                htmlFor="password"
+                className="text-xs font-black text-slate-400 uppercase ml-1 flex items-center"
+              >
                 <Lock className="mr-2 h-3 w-3" /> Nueva Contraseña
               </label>
               <input 
