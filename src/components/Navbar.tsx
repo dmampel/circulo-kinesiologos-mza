@@ -3,7 +3,7 @@
 import Link from "next/link";
 import Image from "next/image";
 import { useEffect, useState } from "react";
-import { Menu, X, User, LogOut } from "lucide-react";
+import { Menu, X, User, LogOut, ShieldCheck } from "lucide-react";
 import { cn } from "@/lib/utils";
 import { createClient } from "@/utils/supabase/client";
 import { useRouter } from "next/navigation";
@@ -43,6 +43,10 @@ export default function Navbar() {
     return () => subscription.unsubscribe();
   }, [supabase]);
 
+  // El guard real vive en src/app/admin/layout.tsx (server-side).
+  // Esto solo decide si mostramos el acceso directo.
+  const isAdmin = user?.app_metadata?.role === "admin";
+
   const handleLogout = async () => {
     await supabase.auth.signOut();
     router.refresh();
@@ -75,6 +79,14 @@ export default function Navbar() {
               <>
                 {user ? (
                   <div className="flex items-center space-x-4">
+                    {isAdmin && (
+                      <Link
+                        href="/admin"
+                        className="flex items-center rounded-full bg-blue-50 px-4 py-2 text-sm font-bold text-blue-700 hover:bg-blue-100 transition-colors"
+                      >
+                        <ShieldCheck className="mr-2 h-4 w-4" /> Admin
+                      </Link>
+                    )}
                     <Link
                       href="/mi-panel"
                       className="flex items-center text-sm font-bold text-slate-900 hover:text-blue-600 transition-colors"
@@ -144,6 +156,15 @@ export default function Navbar() {
                 <>
                   {user ? (
                     <>
+                      {isAdmin && (
+                        <Link
+                          href="/admin"
+                          onClick={() => setIsOpen(false)}
+                          className="flex items-center w-full rounded-xl bg-blue-600 text-white px-3 py-4 text-center text-base font-bold shadow-md"
+                        >
+                          <ShieldCheck className="mr-3 h-5 w-5" /> Panel de Administración
+                        </Link>
+                      )}
                       <Link
                         href="/mi-panel"
                         onClick={() => setIsOpen(false)}
