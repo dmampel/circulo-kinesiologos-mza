@@ -48,7 +48,13 @@ export default function Footer() {
         </div>
 
         {/* Mid: Links grid */}
-        <div className="py-12 grid grid-cols-3 md:grid-cols-4 gap-10 border-b border-slate-800">
+        {/*
+          La columna de Contacto lleva 1.6fr en vez de 1fr: con las cuatro
+          iguales le tocaban ~246px de texto util y el mail institucional pide
+          ~265px, asi que entraba cortado. El extra es solo para ella; las tres
+          columnas de links son todas de una o dos palabras y no lo necesitan.
+        */}
+        <div className="py-12 grid grid-cols-3 md:grid-cols-[1fr_1fr_1fr_1.6fr] gap-10 border-b border-slate-800">
           <div>
             <h3 className="text-white font-black text-xs uppercase tracking-widest mb-5">Institucional</h3>
             <ul className="space-y-3 text-sm">
