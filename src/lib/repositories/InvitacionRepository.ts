@@ -1,5 +1,6 @@
 import prisma from "@/lib/prisma";
 import { supabaseAdmin } from "@/lib/supabase/admin";
+import { activacionCompletada } from "@/lib/activacion";
 import type { User } from "@supabase/supabase-js";
 
 /**
@@ -8,13 +9,25 @@ import type { User } from "@supabase/supabase-js";
  * La fuente de verdad son dos lados que hay que cruzar:
  *  - Prisma  → `Profesional.userId` dice si el socio quedó vinculado a Auth.
  *  - Supabase Auth → `invited_at`, `email_confirmed_at` y `last_sign_in_at`
- *    dicen si el invite salió y si la persona efectivamente entró.
+ *    dicen si el invite salió y si la persona efectivamente entró;
+ *    `user_metadata` dice si además definió su contraseña.
  *
- * Nada de esto necesita columnas nuevas: es la misma lógica de
- * `scripts/listar-profesionales-sin-activar.ts`, expuesta para la UI.
+ * `ACTIVADO` significaba "abrió el link". Ahora significa "tiene contraseña
+ * propia", que es lo que la palabra siempre dio a entender. Hasta este change
+ * los dos números coincidían de casualidad; en cuanto alguien abriera su link
+ * sin terminar de activar, el panel iba a mentir sin que nadie lo notara. Ese
+ * caso ahora tiene nombre propio: `SIN_CONTRASENA`.
+ *
+ * `EN_LIMBO` conserva su significado de "nunca entró" en vez de reciclarse para
+ * el caso nuevo: reusar la etiqueta cambiaría en silencio el sentido de un
+ * número que el Círculo ya viene mirando.
+ *
+ * Nada de esto necesita columnas nuevas ni consultas nuevas: `listUsers` ya
+ * devuelve `user_metadata` dentro del objeto `User` que se está pidiendo.
  */
 export type EstadoInvitacion =
   | "ACTIVADO"
+  | "SIN_CONTRASENA"
   | "EN_LIMBO"
   | "SIN_INVITAR"
   | "SIN_EMAIL"
@@ -48,6 +61,9 @@ export interface ResumenInvitaciones {
   total: number;
   invitados: number;
   activados: number;
+  /** Entraron por el link pero nunca guardaron contraseña. Campo agregado: los
+   *  consumidores que no lo miran siguen compilando igual. */
+  sinContrasena: number;
   enLimbo: number;
   sinInvitar: number;
   sinEmail: number;
@@ -152,11 +168,20 @@ export class InvitacionRepository {
         return { ...base, estado: "HUERFANO", invitadoEl: null, ultimoIngreso: null };
       }
 
+      // Tres casos, en este orden:
+      //   con marca de activación      → ACTIVADO       (tiene contraseña propia)
+      //   sin marca, pero entró alguna vez → SIN_CONTRASENA (entró y no activó)
+      //   sin marca y nunca entró      → EN_LIMBO       (la invitación no prendió)
       const entro = Boolean(cuenta.email_confirmed_at || cuenta.last_sign_in_at);
+      const estado: EstadoInvitacion = activacionCompletada(cuenta)
+        ? "ACTIVADO"
+        : entro
+          ? "SIN_CONTRASENA"
+          : "EN_LIMBO";
 
       return {
         ...base,
-        estado: entro ? "ACTIVADO" : "EN_LIMBO",
+        estado,
         invitadoEl: aIso(cuenta.invited_at ?? cuenta.created_at),
         ultimoIngreso: aIso(cuenta.last_sign_in_at),
       };
@@ -169,9 +194,10 @@ export class InvitacionRepository {
       generadoEl: new Date().toISOString(),
       total: filas.length,
       invitados: filas.filter((fila) =>
-        ["ACTIVADO", "EN_LIMBO", "HUERFANO"].includes(fila.estado)
+        ["ACTIVADO", "SIN_CONTRASENA", "EN_LIMBO", "HUERFANO"].includes(fila.estado)
       ).length,
       activados: cuenta("ACTIVADO"),
+      sinContrasena: cuenta("SIN_CONTRASENA"),
       enLimbo: cuenta("EN_LIMBO"),
       sinInvitar: cuenta("SIN_INVITAR"),
       sinEmail: cuenta("SIN_EMAIL"),
@@ -198,6 +224,23 @@ export class InvitacionRepository {
         { fecha, invitados: 0, entraron: 0, enLimbo: 0, huerfanos: 0, porcentaje: 0 };
 
       tanda.invitados += 1;
+
+      // CRITERIO: `SIN_CONTRASENA` NO cuenta como "entró".
+      //
+      // Es discutible —esa persona literalmente entró— pero lo que mide esta
+      // tabla es si la tanda prendió, y alguien sin contraseña propia no puede
+      // volver a entrar: funcionalmente quedó afuera. Contarlo como éxito
+      // reproduce acá adentro exactamente el número falso que este change viene
+      // a corregir en la métrica de arriba: se arreglaría la tarjeta de
+      // "Activados" y la tabla de tandas seguiría mintiendo igual.
+      //
+      // Consecuencia asumida: una fila `SIN_CONTRASENA` suma en `invitados` y no
+      // suma ni en `entraron` ni en `enLimbo`, así que las dos columnas pueden no
+      // sumar el total de la tanda. Se prefiere eso —visible y honesto— antes que
+      // meterla en `enLimbo`, que significa "nunca entró" y se volvería a mezclar
+      // el caso nuevo con el viejo. Si el hueco molesta, la salida es una columna
+      // propia en la tabla, no reasignar el número a un balde que no le
+      // corresponde.
       if (fila.estado === "ACTIVADO") tanda.entraron += 1;
       if (fila.estado === "EN_LIMBO") tanda.enLimbo += 1;
 

@@ -34,8 +34,16 @@ export default async function SetPasswordPage({
         {/* Form Card */}
         <div className="bg-white rounded-[3rem] p-10 shadow-xl shadow-slate-200/50 border border-slate-50">
           <h1 className="text-2xl font-black text-slate-900 mb-2 tracking-tight">Elegí tu contraseña</h1>
+          {/* PENDIENTE DE APROBACIÓN DEL CÍRCULO — texto propuesto, no definitivo.
+              El anterior decía "Tu solicitud ha sido aprobada", que a un socio
+              devuelto por el guard —alguien que ya entró alguna vez y sólo le
+              falta guardar la contraseña— le suena a error o a un trámite que no
+              hizo. Este sirve para los dos casos: el que activa por primera vez y
+              el que vuelve. No afirma nada sobre solicitudes ni aprobaciones, y
+              dice para qué sirve lo que está por elegir. */}
           <p className="text-sm text-slate-500 mb-8 leading-relaxed">
-            Tu solicitud ha sido aprobada. Ahora definí una contraseña segura para acceder a tu panel.
+            Para entrar al Portal de Socios necesitás una contraseña propia. Elegila
+            acá: es la que vas a usar cada vez que ingreses.
           </p>
 
           {error && (

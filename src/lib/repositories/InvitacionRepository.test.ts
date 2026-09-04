@@ -42,6 +42,12 @@ const profesional = (
   ...extra,
 });
 
+/** Marca de activación tal como la escribe `updatePassword` o el backfill. */
+const marcaDeActivacion = (cuando = "2026-09-02T18:05:00.000Z") => ({
+  activacion_completada_en: cuando,
+  activacion_origen: "usuario",
+});
+
 const usuarioAuth = (
   id: string,
   extra: Partial<{
@@ -49,6 +55,7 @@ const usuarioAuth = (
     created_at: string;
     email_confirmed_at: string | null;
     last_sign_in_at: string | null;
+    user_metadata: Record<string, unknown>;
   }> = {}
 ) => ({
   id,
@@ -134,38 +141,100 @@ describe("InvitacionRepository.agruparEnTandas", () => {
       { fecha: "2026-09-03", invitados: 1, entraron: 0, enLimbo: 1, huerfanos: 0, porcentaje: 0 },
     ]);
   });
+
+  /**
+   * Criterio del change: alguien sin contraseña propia NO cuenta como "entró".
+   * Entró, sí, pero no puede volver — funcionalmente quedó afuera, y contarlo
+   * como éxito de la tanda repite acá el número falso que el change corrige
+   * arriba. Suma en `invitados` y en ninguna de las dos columnas: por eso 1 de 2
+   * da 50% y no 100%.
+   */
+  it("SIN_CONTRASENA no cuenta como entrada en el porcentaje de la tanda", () => {
+    const fila = (
+      id: string,
+      estado: InvitacionProfesional["estado"]
+    ): InvitacionProfesional => ({
+      id,
+      matricula: `K-${id}`,
+      apellido: id,
+      nombre: id,
+      email: `${id}@x.com`,
+      estado,
+      invitadoEl: "2026-09-02T14:00:00.000Z",
+      ultimoIngreso: null,
+    });
+
+    expect(
+      InvitacionRepository.agruparEnTandas([
+        fila("1", "ACTIVADO"),
+        fila("2", "SIN_CONTRASENA"),
+      ])
+    ).toEqual([
+      { fecha: "2026-09-02", invitados: 2, entraron: 1, enLimbo: 0, huerfanos: 0, porcentaje: 50 },
+    ]);
+  });
 });
 
 describe("InvitacionRepository.getResumen", () => {
   it("clasifica cada profesional según su cuenta de Auth", async () => {
     mockFindMany.mockResolvedValue([
-      profesional("K-1", { userId: "auth-1" }), // entró
-      profesional("K-2", { userId: "auth-2" }), // invitado, sin activar
+      profesional("K-1", { userId: "auth-1" }), // activó: tiene contraseña
+      profesional("K-2", { userId: "auth-2" }), // invitado, nunca entró
       profesional("K-3"), // nunca invitado
       profesional("K-4", { email: null }), // no invitable
       profesional("K-5", { userId: "auth-fantasma" }), // huérfano
+      profesional("K-6", { userId: "auth-6" }), // entró, no guardó contraseña
     ] as never);
 
     mockListUsers.mockResolvedValue(
       paginaAuth([
-        usuarioAuth("auth-1", { last_sign_in_at: "2026-09-02T18:00:00.000Z" }),
+        usuarioAuth("auth-1", {
+          last_sign_in_at: "2026-09-02T18:00:00.000Z",
+          user_metadata: marcaDeActivacion(),
+        }),
         usuarioAuth("auth-2"),
+        usuarioAuth("auth-6", { last_sign_in_at: "2026-09-02T18:00:00.000Z" }),
       ]) as never
     );
 
     const resumen = await InvitacionRepository.getResumen();
 
-    expect(resumen.total).toBe(5);
+    expect(resumen.total).toBe(6);
     expect(resumen.activados).toBe(1);
+    expect(resumen.sinContrasena).toBe(1);
     expect(resumen.enLimbo).toBe(1);
     expect(resumen.sinInvitar).toBe(1);
     expect(resumen.sinEmail).toBe(1);
     expect(resumen.huerfanos).toBe(1);
-    expect(resumen.invitados).toBe(3);
-    expect(resumen.cuentasAuth).toBe(2);
+    expect(resumen.invitados).toBe(4);
+    expect(resumen.cuentasAuth).toBe(3);
   });
 
-  it("cuenta como activado a quien confirmó el mail aunque nunca haya vuelto a entrar", async () => {
+  it("ACTIVADO es tener contraseña propia, no haber abierto el link", async () => {
+    mockFindMany.mockResolvedValue([profesional("K-9", { userId: "auth-9" })] as never);
+    mockListUsers.mockResolvedValue(
+      paginaAuth([
+        usuarioAuth("auth-9", {
+          last_sign_in_at: "2026-09-02T18:00:00.000Z",
+          user_metadata: marcaDeActivacion(),
+        }),
+      ]) as never
+    );
+
+    const resumen = await InvitacionRepository.getResumen();
+
+    expect(resumen.profesionales[0].estado).toBe("ACTIVADO");
+    expect(resumen.activados).toBe(1);
+    expect(resumen.sinContrasena).toBe(0);
+    expect(resumen.enLimbo).toBe(0);
+  });
+
+  /**
+   * El caso que motivó el change: hasta acá el panel lo contaba como ACTIVADO y
+   * el Círculo veía un número que no significaba nada. Esta persona no puede
+   * volver a entrar cuando se le venza la sesión del link.
+   */
+  it("quien confirmó el mail pero no guardó contraseña queda SIN_CONTRASENA, no ACTIVADO", async () => {
     mockFindMany.mockResolvedValue([profesional("K-9", { userId: "auth-9" })] as never);
     mockListUsers.mockResolvedValue(
       paginaAuth([
@@ -175,8 +244,55 @@ describe("InvitacionRepository.getResumen", () => {
 
     const resumen = await InvitacionRepository.getResumen();
 
-    expect(resumen.activados).toBe(1);
+    expect(resumen.profesionales[0].estado).toBe("SIN_CONTRASENA");
+    expect(resumen.activados).toBe(0);
+    expect(resumen.sinContrasena).toBe(1);
     expect(resumen.enLimbo).toBe(0);
+  });
+
+  it("quien nunca entró sigue siendo EN_LIMBO, que conserva su significado", async () => {
+    mockFindMany.mockResolvedValue([profesional("K-9", { userId: "auth-9" })] as never);
+    mockListUsers.mockResolvedValue(paginaAuth([usuarioAuth("auth-9")]) as never);
+
+    const resumen = await InvitacionRepository.getResumen();
+
+    expect(resumen.profesionales[0].estado).toBe("EN_LIMBO");
+    expect(resumen.enLimbo).toBe(1);
+    expect(resumen.sinContrasena).toBe(0);
+  });
+
+  /**
+   * Un huérfano no tiene cuenta que mirar: clasificarlo por activación sería
+   * inventarle un estado. Reenviar tampoco lo arregla.
+   */
+  it("el huérfano no se clasifica por activación", async () => {
+    mockFindMany.mockResolvedValue([
+      profesional("K-9", { userId: "auth-que-no-existe" }),
+    ] as never);
+    mockListUsers.mockResolvedValue(paginaAuth([]) as never);
+
+    const resumen = await InvitacionRepository.getResumen();
+
+    expect(resumen.profesionales[0].estado).toBe("HUERFANO");
+    expect(resumen.sinContrasena).toBe(0);
+    expect(resumen.activados).toBe(0);
+    expect(resumen.enLimbo).toBe(0);
+  });
+
+  it("una marca basura en user_metadata no alcanza para figurar activado", async () => {
+    mockFindMany.mockResolvedValue([profesional("K-9", { userId: "auth-9" })] as never);
+    mockListUsers.mockResolvedValue(
+      paginaAuth([
+        usuarioAuth("auth-9", {
+          last_sign_in_at: "2026-09-02T18:00:00.000Z",
+          user_metadata: { activacion_completada_en: "" },
+        }),
+      ]) as never
+    );
+
+    const resumen = await InvitacionRepository.getResumen();
+
+    expect(resumen.profesionales[0].estado).toBe("SIN_CONTRASENA");
   });
 
   it("propaga el error de Auth en lugar de devolver números incompletos", async () => {

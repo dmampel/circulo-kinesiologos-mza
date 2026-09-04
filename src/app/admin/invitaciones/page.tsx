@@ -7,6 +7,7 @@ import {
   MailQuestion,
   MailX,
   MailWarning,
+  KeyRound,
   Calendar,
 } from "lucide-react";
 import { cn } from "@/lib/utils";
@@ -32,7 +33,14 @@ const ESTADOS: Record<
   ACTIVADO: {
     etiqueta: "Activado",
     clases: "bg-emerald-100 text-emerald-700",
-    ayuda: "Recibió la invitación y ya entró a la web.",
+    ayuda: "Definió su contraseña: la cuenta ya es suya y puede volver a entrar cuando quiera.",
+  },
+  // Naranja: "necesita una acción del socio". Convive con el ámbar de EN_LIMBO
+  // sin chocar con el rojo de HUERFANO, que es un problema de datos, no de gente.
+  SIN_CONTRASENA: {
+    etiqueta: "Sin contraseña",
+    clases: "bg-orange-100 text-orange-700",
+    ayuda: "Entró por el link pero nunca guardó su contraseña. No va a poder volver a entrar.",
   },
   EN_LIMBO: {
     etiqueta: "En limbo",
@@ -110,6 +118,7 @@ export default async function InvitacionesAdminPage({
     { name: "Padrón", value: resumen.total, icon: Users, color: "text-slate-500", estado: null },
     { name: "Invitados", value: resumen.invitados, icon: Send, color: "text-blue-600", estado: null },
     { name: "Activados", value: resumen.activados, icon: UserCheck, color: "text-emerald-600", estado: "ACTIVADO" },
+    { name: "Sin contraseña", value: resumen.sinContrasena, icon: KeyRound, color: "text-orange-600", estado: "SIN_CONTRASENA" },
     { name: "En limbo", value: resumen.enLimbo, icon: Clock, color: "text-amber-600", estado: "EN_LIMBO" },
     { name: "Sin invitar", value: resumen.sinInvitar, icon: MailQuestion, color: "text-blue-500", estado: "SIN_INVITAR" },
     { name: "Sin email", value: resumen.sinEmail, icon: MailX, color: "text-slate-400", estado: "SIN_EMAIL" },
@@ -150,10 +159,14 @@ export default async function InvitacionesAdminPage({
             Estado de la activación
           </p>
           <p className="text-[10px] font-bold text-slate-300 uppercase tracking-widest">
-            {activacion}% de los invitados ya entró
+            {activacion}% de los invitados ya activó su cuenta
           </p>
         </div>
-        <div className="grid grid-cols-4 md:grid-cols-7 divide-x divide-slate-50">
+        {/* Con la tarjeta nueva son ocho: en el celular van de a dos (a cuatro,
+            el número y la etiqueta quedaban apretados contra el borde) y recién
+            en xl entran las ocho en una sola fila. Sin anchos fijos: la escala
+            de columnas hace todo el trabajo. */}
+        <div className="grid grid-cols-2 sm:grid-cols-4 xl:grid-cols-8 divide-x divide-slate-50">
           {metricas.map((metrica) => {
             const activo = filtro === metrica.estado && metrica.estado !== null;
             return (
@@ -193,7 +206,9 @@ export default async function InvitacionesAdminPage({
                 <tr className="border-b border-slate-50">
                   <th className="px-8 py-5 text-[10px] font-black text-slate-400 uppercase tracking-widest">Fecha</th>
                   <th className="px-8 py-5 text-[10px] font-black text-slate-400 uppercase tracking-widest">Invitados</th>
-                  <th className="px-8 py-5 text-[10px] font-black text-slate-400 uppercase tracking-widest">Entraron</th>
+                  {/* Antes decía "Entraron". Ahora la columna cuenta a los que
+                      definieron su contraseña, que es otra cosa. */}
+                  <th className="px-8 py-5 text-[10px] font-black text-slate-400 uppercase tracking-widest">Activaron</th>
                   <th className="px-8 py-5 text-[10px] font-black text-slate-400 uppercase tracking-widest">En limbo</th>
                   <th className="px-8 py-5 text-[10px] font-black text-slate-400 uppercase tracking-widest">Activación</th>
                 </tr>
@@ -311,7 +326,12 @@ export default async function InvitacionesAdminPage({
                         {formatearFecha(profesional.ultimoIngreso)}
                       </td>
                       <td className="px-8 py-5 text-right">
-                        {profesional.estado === "EN_LIMBO" ? (
+                        {/* `reenviarInvitacion` sirve igual para los dos: regenera
+                            el token de una identidad que ya existe, que es la
+                            situación tanto del que nunca entró como del que entró
+                            y no guardó contraseña. */}
+                        {profesional.estado === "EN_LIMBO" ||
+                        profesional.estado === "SIN_CONTRASENA" ? (
                           <BotonReenviar id={profesional.id} />
                         ) : (
                           <span className="text-xs font-bold text-slate-300 uppercase tracking-wider">—</span>

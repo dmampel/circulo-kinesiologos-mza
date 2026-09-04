@@ -6,6 +6,7 @@ import { CircularRepository } from "@/lib/repositories/CircularRepository";
 import { SorteoRepository } from "@/lib/repositories/SorteoRepository";
 import { CapacitacionRepository } from "@/lib/repositories/CapacitacionRepository";
 import { redirect } from "next/navigation";
+import { requiereActivacion } from "@/lib/activacion";
 
 export default async function PortalLayout({
   children,
@@ -18,6 +19,17 @@ export default async function PortalLayout({
 
   if (!user) {
     redirect("/login");
+  }
+
+  // Mismo guard que el middleware, repetido acá a propósito: la guía de Next es
+  // explícita en que el proxy/middleware es una optimización y no debe ser el
+  // único punto de control. Es una llamada a una función pura sobre el `user`
+  // que `getAuthUser()` ya trajo (deduplicado por el `cache` de React): cuesta
+  // cero requests. El modo de falla que evita —una ruta que por matcher o por
+  // deploy no pase por el middleware— es un socio sin contraseña navegando el
+  // portal. Va antes de cualquier consulta a repositorios.
+  if (requiereActivacion(user)) {
+    redirect("/auth/set-password");
   }
 
   const profesional = await ProfesionalRepository.findByUserId(user.id);
