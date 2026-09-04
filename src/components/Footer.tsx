@@ -1,6 +1,6 @@
 import Link from "next/link";
 import Image from "next/image";
-import { EMAIL_INSTITUCIONAL } from "@/lib/site";
+import { EmailInstitucional } from "@/components/EmailInstitucional";
 import { Mail, MapPin, Phone, ArrowUpRight } from "lucide-react";
 import FooterCard from "@/components/FooterCard";
 
@@ -111,9 +111,7 @@ export default function Footer() {
               </li>
               <li className="flex items-center gap-3">
                 <Mail className="h-4 w-4 text-blue-500 shrink-0" />
-                <a href={`mailto:${EMAIL_INSTITUCIONAL}`} className="hover:text-white transition-colors break-all">
-                  {EMAIL_INSTITUCIONAL}
-                </a>
+                <EmailInstitucional className="hover:text-white transition-colors" />
               </li>
             </ul>
           </div>
