@@ -27,4 +27,4 @@ export const SITE_URL = normalizarBaseUrl(process.env.NEXT_PUBLIC_SITE_URL);
  * — estaba escrita a mano en el footer y en la pagina institucional, en las dos
  * sin el `.ar`, asi que todo el que escribio desde el sitio recibio un rebote.
  */
-export const EMAIL_INSTITUCIONAL = "presidencia@kinesiologosmza.com.ar";
+export const EMAIL_INSTITUCIONAL = "administracion@kinesiologosmza.com.ar";
