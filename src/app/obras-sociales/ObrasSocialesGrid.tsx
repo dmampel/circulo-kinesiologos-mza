@@ -55,7 +55,7 @@ export default function ObrasSocialesGrid({ obrasSociales }: { obrasSociales: Ob
                   <ShieldCheck className="h-10 w-10 text-slate-300" />
                 )}
               </div>
-              <h3 className="text-lg font-bold text-slate-900 mb-2 flex-grow">
+              <h3 className="text-lg font-bold text-slate-900 mb-2 flex-grow uppercase">
                 {os.nombre}
               </h3>
               <div className="flex items-center text-[10px] font-black text-green-600 uppercase tracking-wider mb-6 mt-auto">

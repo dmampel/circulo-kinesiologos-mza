@@ -12,7 +12,7 @@ export default function ObrasSocialesMarquee({ items }: { items: ObraSocial[] })
   const Pill = ({ nombre }: { nombre: string }) => (
     <Link
       href="/obras-sociales"
-      className="shrink-0 px-4 py-2 rounded-xl border border-slate-200 bg-slate-50 text-slate-600 text-sm font-medium mx-1.5 hover:bg-slate-100 hover:text-slate-900 transition-colors cursor-pointer"
+      className="shrink-0 px-4 py-2 rounded-xl border border-slate-200 bg-slate-50 text-slate-600 text-sm font-medium uppercase tracking-wide mx-1.5 hover:bg-slate-100 hover:text-slate-900 transition-colors cursor-pointer"
     >
       {nombre}
     </Link>

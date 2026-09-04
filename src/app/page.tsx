@@ -211,7 +211,7 @@ export default async function Home() {
                   <StaggerItem key={os.id}>
                     <Link
                       href="/obras-sociales"
-                      className="block px-4 py-2 rounded-xl border border-slate-300 bg-slate-50 text-slate-600 text-sm font-medium hover:bg-slate-100 hover:text-blue-600 hover:border-blue-300 transition-colors"
+                      className="block px-4 py-2 rounded-xl border border-slate-300 bg-slate-50 text-slate-600 text-sm font-medium uppercase tracking-wide hover:bg-slate-100 hover:text-blue-600 hover:border-blue-300 transition-colors"
                     >
                       {os.nombre}
                     </Link>
