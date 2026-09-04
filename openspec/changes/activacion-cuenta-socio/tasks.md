@@ -26,7 +26,7 @@ modifica cuentas de Supabase hasta el grupo 6, y ese grupo empieza con un ensayo
 - [x] 3.3 Hacerlo idempotente: sólo escribe donde la marca está ausente. Una segunda pasada debe reportar cero cambios sobre las cuentas ya marcadas.
 - [x] 3.4 Que falle ruidosamente si la consulta no devuelve `encrypted_password` (columna interna de Supabase que podría cambiar), en vez de marcar cero cuentas en silencio.
 - [x] 3.5 Imprimir un resumen final: cuentas con contraseña, cuentas sin contraseña, marcas escritas, marcas ya presentes, errores por cuenta. Es lo que se compara contra la línea de base de 1.3.
-- [ ] 3.6 Commitear `scripts/listar-socios-en-limbo.ts` (ya reescrito sobre `encrypted_password`, hoy sin commitear). Verificar que sigue coincidiendo con lo que decide el backfill y **no reintroducir la heurística de delta**: está documentada como descartada dentro del propio script, dio 100% de falsos positivos.
+- [x] 3.6 Commitear `scripts/listar-socios-en-limbo.ts` (ya reescrito sobre `encrypted_password`, hoy sin commitear). Verificar que sigue coincidiendo con lo que decide el backfill y **no reintroducir la heurística de delta**: está documentada como descartada dentro del propio script, dio 100% de falsos positivos.
 
 ## 4. Backend — guard de acceso y estado real en el repositorio
 
@@ -51,11 +51,11 @@ modifica cuentas de Supabase hasta el grupo 6, y ese grupo empieza con un ensayo
 ## 6. Verificación y despliegue
 
 - [x] 6.1 Correr `npx vitest run` completo. Ningún test existente puede romperse; `src/app/auth/callback/route.test.ts` y `src/app/auth/set-password/page.test.tsx` deben seguir en verde sin cambios.
-- [ ] 6.2 Limpiar `console.log` de depuración (los del script de backfill son salida intencional y se quedan).
-- [ ] 6.3 **Puerta de calidad.** Correr `npx tsx scripts/backfill-activacion.ts --dry-run` contra producción y comparar contra la línea de base de 1.3: las cuentas a marcar deben coincidir **exactamente** con las que 1.3 contó ese mismo día (referencia del 2026-09-04: 49) y las que ingresaron sin contraseña deben ser **0**. No compares contra el número escrito en este documento: compará contra tu propia medición del día. **Si no cierra, parar el despliegue y reportar** — de menos significa que hay socios en funcionamiento que el backfill no va a cubrir, y esos son los que quedan trabados.
-- [ ] 6.4 Correr el backfill con escritura: `npx tsx scripts/backfill-activacion.ts --escribir`. El modo por defecto es el ensayo; la escritura exige el flag explícito.
-- [ ] 6.5 Desplegar.
-- [ ] 6.6 Correr el backfill una segunda vez, inmediatamente después del deploy, para cerrar la ventana entre 6.4 y 6.5 (design — Migration Plan).
+- [x] 6.2 Limpiar `console.log` de depuración (los del script de backfill son salida intencional y se quedan).
+- [x] 6.3 **Puerta de calidad.** Correr `npx tsx scripts/backfill-activacion.ts --dry-run` contra producción y comparar contra la línea de base de 1.3: las cuentas a marcar deben coincidir **exactamente** con las que 1.3 contó ese mismo día (referencia del 2026-09-04: 49) y las que ingresaron sin contraseña deben ser **0**. No compares contra el número escrito en este documento: compará contra tu propia medición del día. **Si no cierra, parar el despliegue y reportar** — de menos significa que hay socios en funcionamiento que el backfill no va a cubrir, y esos son los que quedan trabados.
+- [x] 6.4 Correr el backfill con escritura: `npx tsx scripts/backfill-activacion.ts --escribir`. El modo por defecto es el ensayo; la escritura exige el flag explícito.
+- [x] 6.5 Desplegar.
+- [x] 6.6 Correr el backfill una segunda vez, inmediatamente después del deploy, para cerrar la ventana entre 6.4 y 6.5 (design — Migration Plan). **Ejecutado el 2026-09-04**: primera pasada 49 marcas escritas / 0 errores; segunda pasada 49 con marca previa / 0 a marcar. Idempotencia confirmada contra producción.
 - [ ] 6.7 Verificar en `/admin/invitaciones` que activados **no bajó** respecto de antes del deploy (≈ 49 al 2026-09-04), que aparece la columna nueva en 0 y que el total de invitados no cambió. Si activados baja, el backfill dejó cuentas afuera: investigar antes de seguir. Avisarle al Círculo que aparece una métrica nueva.
 - [ ] 6.8 Probar el flujo completo end-to-end con una cuenta de prueba: invitar → abrir el link → **no** guardar contraseña → intentar `/mi-panel` → debe redirigir a `/auth/set-password` → guardar contraseña → debe entrar al portal → cerrar sesión → volver a entrar por `/login` con esa contraseña.
 - [ ] 6.9 Si el panel muestra alguna cuenta `SIN_CONTRASENA`, reenviarle el enlace desde el panel, una por una. Sin envíos masivos automáticos (design D6). Al 2026-09-04 no hay ninguna, así que lo más probable es que este paso sea un no-op.
