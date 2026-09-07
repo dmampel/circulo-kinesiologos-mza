@@ -20,6 +20,9 @@ export default function AdminSearch({ placeholder = "Buscar..." }: AdminSearchPr
     } else {
       params.delete("q");
     }
+    // La búsqueda cambia cuántos resultados hay: si te quedaste en la
+    // página 3 de "en limbo" y buscás algo, la 3 puede ni existir.
+    params.delete("pagina");
     router.replace(`${pathname}?${params.toString()}`);
   }, 300);
 

@@ -9,6 +9,8 @@ import {
   MailWarning,
   KeyRound,
   Calendar,
+  ChevronLeft,
+  ChevronRight,
 } from "lucide-react";
 import { cn } from "@/lib/utils";
 import {
@@ -100,9 +102,9 @@ function coincide(profesional: InvitacionProfesional, busqueda: string) {
 export default async function InvitacionesAdminPage({
   searchParams,
 }: {
-  searchParams: Promise<{ q?: string; estado?: string }>;
+  searchParams: Promise<{ q?: string; estado?: string; pagina?: string }>;
 }) {
-  const { q, estado } = await searchParams;
+  const { q, estado, pagina: paginaParam } = await searchParams;
   const busqueda = q?.trim() ?? "";
   const filtro = (estado && estado in ESTADOS ? estado : null) as EstadoInvitacion | null;
 
@@ -112,7 +114,14 @@ export default async function InvitacionesAdminPage({
     (profesional) =>
       (!filtro || profesional.estado === filtro) && coincide(profesional, busqueda)
   );
-  const visibles = filtradas.slice(0, MAXIMO_DE_FILAS);
+
+  // Con "En limbo" en 266 filas, un solo tope de 200 sin paginar deja gente
+  // afuera sin forma de verla. Paginado, cualquier categoría se recorre entera.
+  const totalPaginas = Math.max(1, Math.ceil(filtradas.length / MAXIMO_DE_FILAS));
+  const paginaSolicitada = Number(paginaParam) || 1;
+  const pagina = Math.min(Math.max(1, paginaSolicitada), totalPaginas);
+  const inicio = (pagina - 1) * MAXIMO_DE_FILAS;
+  const visibles = filtradas.slice(inicio, inicio + MAXIMO_DE_FILAS);
 
   const metricas = [
     { name: "Padrón", value: resumen.total, icon: Users, color: "text-slate-500", estado: null },
@@ -133,6 +142,15 @@ export default async function InvitacionesAdminPage({
     const params = new URLSearchParams();
     if (busqueda) params.set("q", busqueda);
     if (nuevoEstado) params.set("estado", nuevoEstado);
+    const query = params.toString();
+    return query ? `/admin/invitaciones?${query}` : "/admin/invitaciones";
+  };
+
+  const linkConPagina = (nuevaPagina: number) => {
+    const params = new URLSearchParams();
+    if (busqueda) params.set("q", busqueda);
+    if (filtro) params.set("estado", filtro);
+    if (nuevaPagina > 1) params.set("pagina", String(nuevaPagina));
     const query = params.toString();
     return query ? `/admin/invitaciones?${query}` : "/admin/invitaciones";
   };
@@ -342,11 +360,42 @@ export default async function InvitacionesAdminPage({
                 </tbody>
               </table>
             </div>
-            {filtradas.length > visibles.length && (
-              <div className="px-8 py-5 border-t border-slate-50 text-center">
+            {totalPaginas > 1 && (
+              <div className="px-8 py-5 border-t border-slate-50 flex items-center justify-between gap-4 flex-wrap">
                 <p className="text-xs font-bold text-slate-400">
-                  Mostrando {visibles.length} de {filtradas.length}. Afiná con el buscador o con un filtro.
+                  Mostrando {inicio + 1}–{inicio + visibles.length} de {filtradas.length}
                 </p>
+                <div className="flex items-center gap-2">
+                  <Link
+                    href={linkConPagina(pagina - 1)}
+                    aria-disabled={pagina <= 1}
+                    className={cn(
+                      "flex items-center gap-1 px-3 py-1.5 rounded-xl text-xs font-black uppercase tracking-widest transition-colors",
+                      pagina <= 1
+                        ? "text-slate-300 pointer-events-none"
+                        : "text-slate-500 hover:bg-slate-50 hover:text-blue-600"
+                    )}
+                  >
+                    <ChevronLeft className="h-3.5 w-3.5" />
+                    Anterior
+                  </Link>
+                  <span className="text-xs font-black text-slate-400 uppercase tracking-widest tabular-nums">
+                    Página {pagina} de {totalPaginas}
+                  </span>
+                  <Link
+                    href={linkConPagina(pagina + 1)}
+                    aria-disabled={pagina >= totalPaginas}
+                    className={cn(
+                      "flex items-center gap-1 px-3 py-1.5 rounded-xl text-xs font-black uppercase tracking-widest transition-colors",
+                      pagina >= totalPaginas
+                        ? "text-slate-300 pointer-events-none"
+                        : "text-slate-500 hover:bg-slate-50 hover:text-blue-600"
+                    )}
+                  >
+                    Siguiente
+                    <ChevronRight className="h-3.5 w-3.5" />
+                  </Link>
+                </div>
               </div>
             )}
           </>
