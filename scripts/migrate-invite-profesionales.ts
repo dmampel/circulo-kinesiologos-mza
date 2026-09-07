@@ -50,6 +50,12 @@ const DRY_RUN = process.env.DRY_RUN === "true";
  */
 const LIMITE = process.env.LIMITE ? Number(process.env.LIMITE) : undefined;
 
+// Matrículas a saltear en esta corrida (ej. casos con email sin confirmar).
+// No se descuentan del LIMITE: si se excluye una, entra la siguiente en orden.
+const EXCLUDE_MATRICULAS = process.env.EXCLUDE_MATRICULAS
+  ? process.env.EXCLUDE_MATRICULAS.split(",").map((m) => m.trim())
+  : [];
+
 // Pausa entre invitaciones para no saturar el rate limit de Supabase
 const DELAY_MS = 500;
 
@@ -98,6 +104,7 @@ async function main() {
       userId: null,
       email: { not: null },
       status: "ACTIVO",
+      ...(EXCLUDE_MATRICULAS.length ? { matricula: { notIn: EXCLUDE_MATRICULAS } } : {}),
     },
     select: {
       id: true,
