@@ -26,7 +26,7 @@ export default async function LoginPage({
               <Image src="/icon.png" alt="Círculo de Kinesiólogos de Mendoza" width={120} height={40} className="w-auto rounded-2xl" />
             </div>
             <div className="text-left">
-              <span className="block font-black text-xl tracking-tighter">Círculo Kinesiologos y Fisioterapeutas</span>
+              <span className="block font-black text-xl tracking-tighter">Círculo Kinesiólogos y Fisioterapeutas</span>
               <span className="block text-[10px] font-bold text-slate-400 uppercase tracking-widest">Panel de Acceso</span>
             </div>
           </Link>

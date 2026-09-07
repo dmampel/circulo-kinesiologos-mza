@@ -1,6 +1,7 @@
 import { updatePassword } from "@/app/auth/actions";
 import { mensajeDeErrorDeContrasena } from "@/lib/auth-errores";
 import { Lock, ArrowRight, ShieldCheck, AlertCircle } from "lucide-react";
+import Image from "next/image";
 import Link from "next/link";
 
 export default async function SetPasswordPage({
@@ -21,12 +22,12 @@ export default async function SetPasswordPage({
         {/* Logo / Brand */}
         <div className="text-center mb-10">
           <div className="inline-flex items-center space-x-2 text-slate-900">
-            <div className="h-12 w-12 bg-blue-600 rounded-2xl flex items-center justify-center text-white shadow-lg">
-              <span className="font-black text-xl">CK</span>
+            <div className="h-12 w-12 bg-blue-200 rounded-2xl flex items-center justify-center text-white shadow-lg shadow-blue-200">
+              <Image src="/icon.png" alt="Círculo de Kinesiólogos de Mendoza" width={120} height={40} className="w-auto rounded-2xl" />
             </div>
             <div className="text-left">
-              <span className="block font-black text-xl tracking-tighter uppercase leading-none">Activar Cuenta</span>
-              <span className="block text-[10px] font-bold text-slate-400 uppercase tracking-widest mt-1">Portal de Socios</span>
+              <span className="block font-black text-xl tracking-tighter">Círculo Kinesiólogos y Fisioterapeutas</span>
+              <span className="block text-[10px] font-bold text-slate-400 uppercase tracking-widest">Portal de Socios</span>
             </div>
           </div>
         </div>
