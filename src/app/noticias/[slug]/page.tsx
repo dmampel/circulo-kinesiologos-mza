@@ -1,7 +1,7 @@
 import Image from "next/image";
 import Link from "next/link";
 import { notFound } from "next/navigation";
-import { ArrowLeft, Newspaper } from "lucide-react";
+import { ArrowLeft, Newspaper, ExternalLink } from "lucide-react";
 import { NoticiaRepository } from "@/lib/repositories/NoticiaRepository";
 import { format } from "date-fns";
 import { es } from "date-fns/locale";
@@ -99,6 +99,19 @@ export default async function NoticiaDetallePage({ params }: Props) {
               <div className="prose prose-slate prose-base max-w-none [&>p:first-child::first-letter]:text-5xl [&>p:first-child::first-letter]:font-extrabold [&>p:first-child::first-letter]:float-left [&>p:first-child::first-letter]:mr-3 [&>p:first-child::first-letter]:leading-none [&>p:first-child::first-letter]:text-slate-900 [&>p:first-child::first-letter]:mt-1">
                 <ReactMarkdown>{noticia.contenido}</ReactMarkdown>
               </div>
+
+              {/* Enlace externo */}
+              {noticia.enlaceExterno && (
+                <a
+                  href={noticia.enlaceExterno}
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className="mt-8 inline-flex items-center gap-2 px-5 py-3 rounded-xl bg-gradient-to-tr from-amber-500 via-pink-600 to-purple-600 text-white text-sm font-black shadow-sm hover:shadow-md hover:-translate-y-0.5 transition-all"
+                >
+                  <ExternalLink className="h-4 w-4" />
+                  Ver en Instagram
+                </a>
+              )}
 
               {/* Footer del artículo */}
               <div className="mt-10 pt-6 border-t border-slate-100 flex items-center gap-3">
