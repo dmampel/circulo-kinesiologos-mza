@@ -90,6 +90,7 @@ model Noticia {
   imagen_url   String?   // cache derivado: imagenes[0].url (ver NoticiaImagen)
   publicada    Boolean   @default(false)
   publicada_en DateTime?
+  enlaceExterno String?  // link opcional a un recurso externo (ej. post de Instagram)
 
   // Relaciones
   categoriaId String?

@@ -93,13 +93,14 @@ export async function crearNoticia(formData: FormData) {
       categoriaId: (formData.get("categoriaId") as string) || null,
       publicada: formData.get("publicada") === "on",
       imagenes: parseImagenesField(formData),
+      enlaceExterno: (formData.get("enlaceExterno") as string) || null,
     });
 
     if (!parsed.success) {
       return { success: false, error: parsed.error.issues.map((issue) => issue.message).join(", ") };
     }
 
-    const { titulo, resumen, contenido, categoriaId, publicada, imagenes } = parsed.data;
+    const { titulo, resumen, contenido, categoriaId, publicada, imagenes, enlaceExterno } = parsed.data;
     const slug = generarSlug(titulo);
 
     const nuevaNoticia = await NoticiaRepository.create({
@@ -109,6 +110,7 @@ export async function crearNoticia(formData: FormData) {
       contenido,
       publicada,
       publicada_en: publicada ? new Date() : null,
+      enlaceExterno: enlaceExterno || null,
       ...(categoriaId ? { categoria: { connect: { id: categoriaId } } } : {}),
     });
 
@@ -138,13 +140,14 @@ export async function actualizarNoticia(id: string, formData: FormData) {
       categoriaId: (formData.get("categoriaId") as string) || null,
       publicada: formData.get("publicada") === "on",
       imagenes: parseImagenesField(formData),
+      enlaceExterno: (formData.get("enlaceExterno") as string) || null,
     });
 
     if (!parsed.success) {
       return { success: false, error: parsed.error.issues.map((issue) => issue.message).join(", ") };
     }
 
-    const { titulo, resumen, contenido, categoriaId, publicada, imagenes } = parsed.data;
+    const { titulo, resumen, contenido, categoriaId, publicada, imagenes, enlaceExterno } = parsed.data;
     const slug = generarSlug(titulo);
 
     const existing = await NoticiaRepository.getById(id);
@@ -163,6 +166,7 @@ export async function actualizarNoticia(id: string, formData: FormData) {
       publicada,
       publicada_en,
       categoriaId,
+      enlaceExterno: enlaceExterno || null,
     });
 
     await NoticiaRepository.replaceImagenes(id, imagenes);

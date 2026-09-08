@@ -29,6 +29,7 @@ export const noticiaSchema = z.object({
   categoriaId: z.string().optional().nullable(),
   publicada: z.boolean(),
   imagenes: imagenesNoticiaSchema,
+  enlaceExterno: z.union([z.url("URL inválida"), z.literal("")]).optional().nullable(),
 });
 
 export type ImagenNoticiaInput = z.infer<typeof imagenNoticiaSchema>;

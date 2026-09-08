@@ -9,6 +9,7 @@ import {
   Loader2,
   CheckCircle2,
   Tag,
+  Link2,
 } from "lucide-react";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
@@ -29,6 +30,7 @@ export default function NuevaNoticiaForm({ categorias }: Props) {
     contenido: "",
     publicada: false,
     categoriaId: "",
+    enlaceExterno: "",
   });
 
   const handleChange = (
@@ -72,10 +74,10 @@ export default function NuevaNoticiaForm({ categorias }: Props) {
       </div>
 
       <form onSubmit={handleSubmit} className="space-y-8">
-        <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
+        <div className="grid grid-cols-1 gap-8">
 
           {/* Columna Principal */}
-          <div className="lg:col-span-2 space-y-8">
+          <div className="space-y-8">
             <div className="bg-white rounded-[2.5rem] p-8 lg:p-10 border border-slate-100 shadow-sm space-y-6">
               <div className="space-y-2">
                 <label className="text-xs font-black text-slate-400 uppercase tracking-widest ml-1">
@@ -170,6 +172,26 @@ export default function NuevaNoticiaForm({ categorias }: Props) {
                   Imágenes de Portada
                 </label>
                 <GaleriaImagenesInput name="imagenes" defaultValue={[]} />
+              </div>
+
+              <hr className="border-slate-100" />
+
+              {/* Enlace externo */}
+              <div className="space-y-2">
+                <label className="text-xs font-black text-slate-400 uppercase tracking-widest">
+                  Enlace externo (opcional)
+                </label>
+                <div className="relative">
+                  <Link2 className="absolute left-4 top-1/2 -translate-y-1/2 h-4 w-4 text-slate-300" />
+                  <input
+                    type="url"
+                    name="enlaceExterno"
+                    value={formData.enlaceExterno}
+                    onChange={handleChange}
+                    className="w-full pl-10 pr-4 py-3 rounded-xl bg-slate-50 border-transparent focus:bg-white focus:border-blue-600 focus:ring-4 focus:ring-blue-100 transition-all text-sm font-medium"
+                    placeholder="https://instagram.com/p/..."
+                  />
+                </div>
               </div>
 
               <hr className="border-slate-50" />
