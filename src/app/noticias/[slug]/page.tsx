@@ -100,28 +100,29 @@ export default async function NoticiaDetallePage({ params }: Props) {
                 <ReactMarkdown>{noticia.contenido}</ReactMarkdown>
               </div>
 
-              {/* Enlace externo */}
-              {noticia.enlaceExterno && (
-                <a
-                  href={noticia.enlaceExterno}
-                  target="_blank"
-                  rel="noopener noreferrer"
-                  className="mt-8 inline-flex items-center gap-2 px-5 py-3 rounded-xl bg-gradient-to-tr from-amber-500 via-pink-600 to-purple-600 text-white text-sm font-black shadow-sm hover:shadow-md hover:-translate-y-0.5 transition-all"
-                >
-                  <ExternalLink className="h-4 w-4" />
-                  Ver en Instagram
-                </a>
-              )}
-
               {/* Footer del artículo */}
-              <div className="mt-10 pt-6 border-t border-slate-100 flex items-center gap-3">
-                <div className="w-8 h-8 bg-slate-100 rounded-full flex items-center justify-center">
-                  <Newspaper className="h-4 w-4 text-slate-400" />
+              <div className="mt-10 pt-6 border-t border-slate-100 flex items-center justify-between gap-3">
+                <div className="flex items-center gap-3">
+                  <div className="w-8 h-8 bg-slate-100 rounded-full flex items-center justify-center">
+                    <Newspaper className="h-4 w-4 text-slate-400" />
+                  </div>
+                  <div>
+                    <p className="text-xs font-black uppercase tracking-widest text-slate-400">CKFM</p>
+                    <p className="text-[10px] text-slate-300">Círculo de Kinesiólogos y Fisioterapeutas de Mendoza</p>
+                  </div>
                 </div>
-                <div>
-                  <p className="text-xs font-black uppercase tracking-widest text-slate-400">CKFM</p>
-                  <p className="text-[10px] text-slate-300">Círculo de Kinesiólogos y Fisioterapeutas de Mendoza</p>
-                </div>
+
+                {noticia.enlaceExterno && (
+                  <a
+                    href={noticia.enlaceExterno}
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    className="shrink-0 inline-flex items-center gap-1.5 px-3 py-2 rounded-lg bg-gradient-to-tr from-amber-500 via-pink-600 to-purple-600 text-white text-xs font-black shadow-sm hover:shadow-md transition-all"
+                  >
+                    <ExternalLink className="h-3.5 w-3.5" />
+                    Ver en Instagram
+                  </a>
+                )}
               </div>
             </div>
           </article>
