@@ -87,16 +87,29 @@ model Noticia {
   titulo       String
   resumen      String?
   contenido    String // Contenido en Markdown
-  imagen_url   String?
+  imagen_url   String?   // cache derivado: imagenes[0].url (ver NoticiaImagen)
   publicada    Boolean   @default(false)
   publicada_en DateTime?
 
   // Relaciones
   categoriaId String?
   categoria   CategoriaNoticia? @relation(fields: [categoriaId], references: [id])
+  imagenes    NoticiaImagen[]
 
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
+}
+
+model NoticiaImagen {
+  id        String   @id @default(cuid())
+  noticiaId String
+  noticia   Noticia  @relation(fields: [noticiaId], references: [id], onDelete: Cascade)
+  url       String
+  alt       String?
+  orden     Int      @default(0)
+  createdAt DateTime @default(now())
+
+  @@index([noticiaId, orden])
 }
 
 model Circular {

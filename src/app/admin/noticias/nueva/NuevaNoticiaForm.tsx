@@ -4,7 +4,6 @@ import { useState } from "react";
 import {
   ArrowLeft,
   Save,
-  Image as ImageIcon,
   Eye,
   Type,
   Loader2,
@@ -14,6 +13,7 @@ import {
 import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { crearNoticia } from "../actions";
+import GaleriaImagenesInput from "../GaleriaImagenesInput";
 import type { CategoriaNoticia } from "@prisma/client";
 
 interface Props {
@@ -27,7 +27,6 @@ export default function NuevaNoticiaForm({ categorias }: Props) {
     titulo: "",
     resumen: "",
     contenido: "",
-    imagen_url: "",
     publicada: false,
     categoriaId: "",
   });
@@ -165,31 +164,12 @@ export default function NuevaNoticiaForm({ categorias }: Props) {
 
               <hr className="border-slate-100" />
 
-              {/* Imagen */}
+              {/* Galería de imágenes */}
               <div className="space-y-4">
                 <label className="text-xs font-black text-slate-400 uppercase tracking-widest">
-                  Imagen de Portada (URL)
+                  Imágenes de Portada
                 </label>
-                <div className="space-y-4">
-                  <input
-                    type="url"
-                    name="imagen_url"
-                    value={formData.imagen_url}
-                    onChange={handleChange}
-                    className="w-full px-4 py-3 rounded-xl bg-slate-50 border-transparent focus:bg-white focus:border-blue-600 focus:ring-4 focus:ring-blue-100 transition-all text-xs font-bold"
-                    placeholder="https://images.unsplash.com/..."
-                  />
-                  <div className="relative group aspect-video rounded-3xl bg-slate-50 border-2 border-dashed border-slate-200 overflow-hidden flex items-center justify-center transition-all hover:border-blue-400">
-                    {formData.imagen_url ? (
-                      <img src={formData.imagen_url} alt="Preview" className="h-full w-full object-cover" />
-                    ) : (
-                      <div className="flex flex-col items-center text-slate-300">
-                        <ImageIcon className="h-10 w-10 mb-2" />
-                        <span className="text-[10px] font-black uppercase tracking-widest">Vista Previa</span>
-                      </div>
-                    )}
-                  </div>
-                </div>
+                <GaleriaImagenesInput name="imagenes" defaultValue={[]} />
               </div>
 
               <hr className="border-slate-50" />
@@ -238,6 +218,9 @@ export default function NuevaNoticiaForm({ categorias }: Props) {
                 </li>
                 <li className="flex items-start">
                   <CheckCircle2 className="h-3 w-3 mr-2 text-blue-500 mt-0.5" /> Imágenes horizontales (16:9) recomendadas.
+                </li>
+                <li className="flex items-start">
+                  <CheckCircle2 className="h-3 w-3 mr-2 text-blue-500 mt-0.5" /> La primera imagen de la galería es la portada: se usa en los listados y al compartir.
                 </li>
               </ul>
             </div>

@@ -1,4 +1,6 @@
 import prisma from "@/lib/prisma";
+import type { Prisma } from "@prisma/client";
+import { derivarImagenPortada, renumerarOrden } from "@/lib/validations/noticia";
 
 export class NoticiaRepository {
   static async getLatest() {
@@ -11,7 +13,7 @@ export class NoticiaRepository {
   static async getById(id: string) {
     return prisma.noticia.findUnique({
       where: { id },
-      include: { categoria: true },
+      include: { categoria: true, imagenes: { orderBy: { orden: "asc" } } },
     });
   }
 
@@ -56,7 +58,7 @@ export class NoticiaRepository {
   static async getBySlug(slug: string) {
     return prisma.noticia.findUnique({
       where: { slug },
-      include: { categoria: true },
+      include: { categoria: true, imagenes: { orderBy: { orden: "asc" } } },
     });
   }
 
@@ -81,5 +83,39 @@ export class NoticiaRepository {
 
   static async update(id: string, data: Parameters<typeof prisma.noticia.update>[0]["data"]) {
     return prisma.noticia.update({ where: { id }, data });
+  }
+
+  static async create(data: Prisma.NoticiaCreateInput) {
+    return prisma.noticia.create({ data });
+  }
+
+  static async delete(id: string) {
+    return prisma.noticia.delete({ where: { id } });
+  }
+
+  // Único punto de escritura de `imagen_url` (cache derivado de la primera
+  // imagen de la galería). Reemplazo total: borra las filas viejas, crea las
+  // nuevas con `orden` = índice del array recibido, y sincroniza `imagen_url`
+  // dentro de la misma transacción — así nunca puede driftear.
+  static async replaceImagenes(
+    noticiaId: string,
+    imagenes: { url: string; alt?: string | null }[]
+  ) {
+    const renumeradas = renumerarOrden(imagenes);
+    return prisma.$transaction([
+      prisma.noticiaImagen.deleteMany({ where: { noticiaId } }),
+      prisma.noticiaImagen.createMany({
+        data: renumeradas.map((imagen) => ({
+          noticiaId,
+          url: imagen.url,
+          alt: imagen.alt ?? null,
+          orden: imagen.orden,
+        })),
+      }),
+      prisma.noticia.update({
+        where: { id: noticiaId },
+        data: { imagen_url: derivarImagenPortada(imagenes) },
+      }),
+    ]);
   }
 }

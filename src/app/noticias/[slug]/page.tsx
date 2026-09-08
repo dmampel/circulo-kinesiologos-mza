@@ -8,6 +8,7 @@ import { es } from "date-fns/locale";
 import { Metadata } from "next";
 import ReactMarkdown from "react-markdown";
 import ShareButton from "./ShareButton";
+import CarruselNoticia from "./CarruselNoticia";
 
 export const revalidate = 3600;
 
@@ -61,21 +62,8 @@ export default async function NoticiaDetallePage({ params }: Props) {
           {/* ── ARTÍCULO PRINCIPAL ── */}
           <article className="flex-1 min-w-0 bg-white rounded-2xl overflow-hidden shadow-sm border border-slate-200/60">
 
-            {/* Imagen hero */}
-            {noticia.imagen_url ? (
-              <div className="relative aspect-video overflow-hidden bg-slate-100">
-                <Image
-                  src={noticia.imagen_url}
-                  alt={noticia.titulo}
-                  fill
-                  className="object-cover"
-                />
-              </div>
-            ) : (
-              <div className="aspect-video bg-slate-100 flex items-center justify-center">
-                <Newspaper className="h-12 w-12 text-slate-300" />
-              </div>
-            )}
+            {/* Portada: imagen única o carrusel según la cantidad de imágenes */}
+            <CarruselNoticia imagenes={noticia.imagenes} titulo={noticia.titulo} />
 
             <div className="px-8 py-8">
               {/* Metadata */}

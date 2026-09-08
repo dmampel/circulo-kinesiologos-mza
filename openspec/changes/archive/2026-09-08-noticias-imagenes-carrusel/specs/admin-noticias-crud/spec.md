@@ -1,57 +1,6 @@
-# Admin Noticias CRUD Specification
+# Delta for admin-noticias-crud
 
-## Purpose
-
-Define el comportamiento del CRUD completo de noticias en el panel de administración: edición de noticias existentes y eliminación funcional.
-
-## Requirements
-
-### Requirement: Edición de Noticia
-
-The system MUST allow an admin to edit an existing news article via the route `/admin/noticias/editar/[id]`.
-
-#### Scenario: Carga del formulario de edición
-
-- GIVEN an admin navigates to `/admin/noticias/editar/[id]`
-- AND the `id` exists in the database
-- WHEN the page loads
-- THEN the system MUST fetch the article using `NoticiaRepository.getById(id)` incluyendo `imagenes`
-- AND the system MUST pre-fill all form fields with the existing data (titulo, resumen, contenido, categoriaId, publicada)
-- AND the system MUST render la galería con las `imagenes` existentes ordenadas por `orden`.
-
-#### Scenario: Noticia no encontrada al editar
-
-- GIVEN an admin navigates to `/admin/noticias/editar/[id]`
-- AND the `id` does NOT exist in the database
-- WHEN the page loads
-- THEN the system MUST invoke Next.js `notFound()`.
-
-#### Scenario: Guardar cambios exitosamente
-
-- GIVEN an admin has edited one or more fields in the edit form
-- WHEN the admin submits the form
-- THEN the system MUST call `actualizarNoticia(id, formData)`
-- AND the system MUST update all fields in the database via `NoticiaRepository`
-- AND the system MUST reconciliar la galería y derivar `imagen_url` de la primera imagen
-- AND the system MUST regenerate the slug from the updated titulo
-- AND if `publicada` changes from false to true, MUST set `publicada_en` to the current timestamp
-- AND if `publicada` was already true, MUST preserve the original `publicada_en`
-- AND the system MUST revalidate paths `/admin/noticias`, `/noticias`, and `/`
-- AND the system MUST redirect to `/admin/noticias` on success.
-
-### Requirement: Eliminación de Noticia
-
-The system MUST allow an admin to delete a news article from the list page.
-
-#### Scenario: Eliminar noticia
-
-- GIVEN the admin clicks the delete button for a noticia in the list
-- WHEN the form is submitted
-- THEN the system MUST call `eliminarNoticia(id)`
-- AND the system MUST delete the record via `NoticiaRepository.delete(id)` (sin `prisma` directo)
-- AND las filas de `NoticiaImagen` MUST borrarse en cascada
-- AND los archivos de esa noticia en el bucket `noticias-imagenes` MUST borrarse best-effort
-- AND the system MUST revalidate `/admin/noticias`.
+## ADDED Requirements
 
 ### Requirement: Galería de imágenes de portada en el admin
 
@@ -118,14 +67,55 @@ siempre `{ success: boolean, error?: string }`.
 - THEN la action DEBE devolver `{ success: false, error }` con el mensaje de Zod
 - AND NO DEBE escribir en la base de datos.
 
-### Requirement: Eliminación de Beneficio
+## MODIFIED Requirements
 
-The system MUST allow an admin to delete a beneficio from the list page.
+### Requirement: Edición de Noticia
 
-#### Scenario: Eliminar beneficio
+The system MUST allow an admin to edit an existing news article via the route
+`/admin/noticias/editar/[id]`.
 
-- GIVEN the admin clicks the delete button for a beneficio in the list
+El campo único "Imagen de Portada (URL)" queda **reemplazado** por la galería de imágenes:
+`imagen_url` ya no se edita a mano, se deriva de la primera imagen de la galería.
+
+#### Scenario: Carga del formulario de edición
+
+- GIVEN an admin navigates to `/admin/noticias/editar/[id]`
+- AND the `id` exists in the database
+- WHEN the page loads
+- THEN the system MUST fetch the article using `NoticiaRepository.getById(id)` incluyendo `imagenes`
+- AND the system MUST pre-fill all form fields with the existing data (titulo, resumen, contenido, categoriaId, publicada)
+- AND the system MUST render la galería con las `imagenes` existentes ordenadas por `orden`.
+
+#### Scenario: Noticia no encontrada al editar
+
+- GIVEN an admin navigates to `/admin/noticias/editar/[id]`
+- AND the `id` does NOT exist in the database
+- WHEN the page loads
+- THEN the system MUST invoke Next.js `notFound()`.
+
+#### Scenario: Guardar cambios exitosamente
+
+- GIVEN an admin has edited one or more fields in the edit form
+- WHEN the admin submits the form
+- THEN the system MUST call `actualizarNoticia(id, formData)`
+- AND the system MUST update all fields in the database via `NoticiaRepository`
+- AND the system MUST reconciliar la galería y derivar `imagen_url` de la primera imagen
+- AND the system MUST regenerate the slug from the updated titulo
+- AND if `publicada` changes from false to true, MUST set `publicada_en` to the current timestamp
+- AND if `publicada` was already true, MUST preserve the original `publicada_en`
+- AND the system MUST revalidate paths `/admin/noticias`, `/noticias`, and `/`
+- AND the system MUST redirect to `/admin/noticias` on success.
+
+### Requirement: Eliminación de Noticia
+
+The system MUST allow an admin to delete a news article from the list page.
+
+#### Scenario: Eliminar noticia
+
+- GIVEN the admin clicks the delete button for a noticia in the list
 - WHEN the form is submitted
-- THEN the system MUST call `eliminarBeneficio(id)`
-- AND the system MUST delete the record from the database
-- AND the system MUST revalidate `/admin/beneficios`.
+- THEN the system MUST call `eliminarNoticia(id)`
+- AND the system MUST delete the record via `NoticiaRepository.delete(id)` (sin `prisma` directo)
+- AND las filas de `NoticiaImagen` MUST borrarse en cascada
+- AND los archivos de esa noticia en el bucket `noticias-imagenes` MUST borrarse best-effort
+- AND the system MUST revalidate `/admin/noticias`.
