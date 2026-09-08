@@ -119,7 +119,7 @@ export default async function NoticiaDetallePage({ params }: Props) {
                   <Newspaper className="h-4 w-4 text-slate-400" />
                 </div>
                 <div>
-                  <p className="text-xs font-black uppercase tracking-widest text-slate-400">CKFM de Mendoza</p>
+                  <p className="text-xs font-black uppercase tracking-widest text-slate-400">CKFM</p>
                   <p className="text-[10px] text-slate-300">Círculo de Kinesiólogos y Fisioterapeutas de Mendoza</p>
                 </div>
               </div>
