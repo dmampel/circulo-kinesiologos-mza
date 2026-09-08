@@ -13,18 +13,27 @@ vi.mock('@/lib/prisma', () => ({
     especialidad: {
       findMany: vi.fn(),
     },
-  },
-}));
-
-vi.mock('@/lib/supabase/admin', () => ({
-  supabaseAdmin: {
-    auth: {
-      admin: {
-        inviteUserByEmail: vi.fn(),
-      },
+    localidad: {
+      findUnique: vi.fn(),
     },
   },
 }));
+
+vi.mock('@/lib/supabase/admin', () => {
+  const storageFrom = { createSignedUrls: vi.fn() };
+  return {
+    supabaseAdmin: {
+      auth: {
+        admin: {
+          inviteUserByEmail: vi.fn(),
+        },
+      },
+      storage: {
+        from: vi.fn(() => storageFrom),
+      },
+    },
+  };
+});
 
 vi.mock('@/lib/repositories/ProfesionalRepository', () => ({
   ProfesionalRepository: {
@@ -39,27 +48,36 @@ vi.mock('@/utils/supabase/require-admin', () => ({
 
 vi.mock('next/cache', () => ({ revalidatePath: vi.fn() }));
 
+const mockSend = vi.fn();
+
 vi.mock('@/lib/resend', () => ({
-  getResend: vi.fn(() => ({ emails: { send: vi.fn() } })),
+  getResend: vi.fn(() => ({ emails: { send: mockSend } })),
   canSendEmails: vi.fn(() => false),
   FROM_EMAIL: 'noreply@test.com',
+  INSTITUTIONAL_EMAIL: 'institucional@test.com',
 }));
 
 import prisma from '@/lib/prisma';
 import { supabaseAdmin } from '@/lib/supabase/admin';
 import { ProfesionalRepository } from '@/lib/repositories/ProfesionalRepository';
 import { requireAdmin } from '@/utils/supabase/require-admin';
-import { gestionarSolicitud } from './actions';
+import { canSendEmails } from '@/lib/resend';
+import { gestionarSolicitud, reenviarAvisoInstitucional } from './actions';
 
 const mockSolicitudFindUnique = vi.mocked(prisma.solicitud.findUnique);
 const mockSolicitudUpdate = vi.mocked(prisma.solicitud.update);
 const mockProfesionalCreate = vi.mocked(prisma.profesional.create);
 const mockProfesionalUpdate = vi.mocked(prisma.profesional.update);
 const mockEspecialidadFindMany = vi.mocked(prisma.especialidad.findMany);
+const mockLocalidadFindUnique = vi.mocked(prisma.localidad.findUnique);
 const mockInvite = vi.mocked(supabaseAdmin.auth.admin.inviteUserByEmail);
 const mockFindByEmail = vi.mocked(ProfesionalRepository.findByEmail);
 const mockFindByMatricula = vi.mocked(ProfesionalRepository.findByMatricula);
 const mockRequireAdmin = vi.mocked(requireAdmin);
+const mockCanSendEmails = vi.mocked(canSendEmails);
+
+const storageFromResult = supabaseAdmin.storage.from('solicitudes');
+const mockCreateSignedUrls = vi.mocked(storageFromResult.createSignedUrls);
 
 const solicitudBase = {
   id: 'sol-1',
@@ -84,6 +102,11 @@ const solicitudBase = {
 beforeEach(() => {
   vi.clearAllMocks();
   mockEspecialidadFindMany.mockResolvedValue([]);
+  mockLocalidadFindUnique.mockResolvedValue(null);
+  mockCreateSignedUrls.mockResolvedValue({ data: [], error: null } as any);
+  mockCanSendEmails.mockReturnValue(false);
+  mockRequireAdmin.mockResolvedValue(undefined as any);
+  mockSend.mockResolvedValue({ data: { id: 'mail-1' }, error: null } as any);
 });
 
 describe('gestionarSolicitud — RECHAZAR', () => {
@@ -267,5 +290,130 @@ describe('gestionarSolicitud — especialidades', () => {
     const data = mockProfesionalUpdate.mock.calls[0]![0].data;
     expect(data.especialidades).toEqual({ connect: [{ id: 'esp-2' }] });
     expect(JSON.stringify(data.especialidades)).not.toContain('set');
+  });
+});
+
+describe('reenviarAvisoInstitucional', () => {
+  function prepararEnvioOk(overrides: Record<string, unknown> = {}) {
+    mockSolicitudFindUnique.mockResolvedValue({ ...solicitudBase, ...overrides } as any);
+    mockCanSendEmails.mockReturnValue(true);
+    mockEspecialidadFindMany.mockResolvedValue([{ nombre: 'NEURO' }] as any);
+    mockLocalidadFindUnique.mockResolvedValue({ nombre: 'Godoy Cruz' } as any);
+    mockCreateSignedUrls.mockResolvedValue({
+      data: [{ path: 'p1', signedUrl: 'https://storage/firmada-p1', error: null }],
+      error: null,
+    } as any);
+  }
+
+  it('reenvío exitoso devuelve { success: true } y llama a resend.emails.send una sola vez, con to: [INSTITUTIONAL_EMAIL]', async () => {
+    prepararEnvioOk();
+
+    const result = await reenviarAvisoInstitucional('sol-1');
+
+    expect(result).toEqual({ success: true });
+    expect(mockSend).toHaveBeenCalledTimes(1);
+    expect(mockSend.mock.calls[0][0].to).toEqual(['institucional@test.com']);
+  });
+
+  it('el HTML enviado contiene matrícula, DNI, teléfono, dirección, localidad y especialidades resueltas, y el href de wa.me', async () => {
+    prepararEnvioOk();
+
+    await reenviarAvisoInstitucional('sol-1');
+
+    const html = mockSend.mock.calls[0][0].html;
+    expect(html).toContain(solicitudBase.matricula);
+    expect(html).toContain(solicitudBase.datos.dni);
+    expect(html).toContain(solicitudBase.datos.telefono);
+    expect(html).toContain(solicitudBase.datos.direccion);
+    expect(html).toContain('Godoy Cruz');
+    expect(html).toContain('NEURO');
+    expect(html).toContain('https://wa.me/5492616937588?text=');
+  });
+
+  it('createSignedUrls se invoca con la vigencia de mail (604800), no con la de 1 hora', async () => {
+    prepararEnvioOk({ datos: { ...solicitudBase.datos, archivos: { dni: 'p1' } } });
+
+    await reenviarAvisoInstitucional('sol-1');
+
+    expect(mockCreateSignedUrls).toHaveBeenCalledWith(expect.any(Array), 604800);
+  });
+
+  it('solicitud inexistente devuelve { success: false } y no llama a resend.emails.send', async () => {
+    mockSolicitudFindUnique.mockResolvedValue(null);
+
+    const result = await reenviarAvisoInstitucional('inexistente');
+
+    expect(result).toEqual({ success: false, error: 'Solicitud no encontrada.' });
+    expect(mockSend).not.toHaveBeenCalled();
+  });
+
+  it.each(['APROBADA', 'RECHAZADA'] as const)(
+    'reenvío sobre una solicitud %s devuelve { success: true }',
+    async (status) => {
+      prepararEnvioOk({ status });
+
+      const result = await reenviarAvisoInstitucional('sol-1');
+
+      expect(result).toEqual({ success: true });
+    }
+  );
+
+  it('no muta: tras un reenvío exitoso no se llamó a prisma.solicitud.update', async () => {
+    prepararEnvioOk();
+
+    await reenviarAvisoInstitucional('sol-1');
+
+    expect(mockSolicitudUpdate).not.toHaveBeenCalled();
+  });
+
+  it('canSendEmails() en false devuelve { success: false } con mensaje de configuración, sin envío', async () => {
+    mockSolicitudFindUnique.mockResolvedValue(solicitudBase as any);
+    mockCanSendEmails.mockReturnValue(false);
+
+    const result = await reenviarAvisoInstitucional('sol-1');
+
+    expect(result).toEqual({ success: false, error: 'El envío de mails no está configurado.' });
+    expect(mockSend).not.toHaveBeenCalled();
+  });
+
+  it('resend.emails.send rechaza devuelve { success: false, error }, sin excepción propagada', async () => {
+    prepararEnvioOk();
+    mockSend.mockRejectedValue(new Error('Resend down'));
+
+    const result = await reenviarAvisoInstitucional('sol-1');
+
+    expect(result).toEqual({ success: false, error: 'Resend down' });
+  });
+
+  it('si Storage falla al firmar, el mail se manda igual y devuelve { success: true }, con los documentos marcados como no disponibles', async () => {
+    prepararEnvioOk({ datos: { ...solicitudBase.datos, archivos: { dni: 'p1' } } });
+    mockCreateSignedUrls.mockResolvedValue({ data: null, error: { message: 'boom' } } as any);
+
+    const result = await reenviarAvisoInstitucional('sol-1');
+
+    expect(result).toEqual({ success: true });
+    const html = mockSend.mock.calls[0][0].html;
+    expect(html).toContain('no disponible');
+  });
+
+  it('solicitud vieja con datos incompleto (sin teléfono, sin dirección) manda el mail con esos campos como no especificados', async () => {
+    prepararEnvioOk({ datos: { localidadId: 'loc-1', especialidades: ['esp-1'], archivos: {} } });
+
+    const result = await reenviarAvisoInstitucional('sol-1');
+
+    expect(result).toEqual({ success: true });
+    const html = mockSend.mock.calls[0][0].html;
+    expect(html).toContain('No especificado');
+    expect(html).not.toMatch(/<strong>Tel[eé]fono:<\/strong>\s*<\/p>/);
+  });
+
+  it('requireAdmin() lanza (sin sesión / sin rol admin) devuelve { success: false } y no llama a resend.emails.send', async () => {
+    mockRequireAdmin.mockRejectedValue(new Error('Unauthorized'));
+
+    const result = await reenviarAvisoInstitucional('sol-1');
+
+    expect(result.success).toBe(false);
+    expect(mockSend).not.toHaveBeenCalled();
+    expect(mockSolicitudFindUnique).not.toHaveBeenCalled();
   });
 });

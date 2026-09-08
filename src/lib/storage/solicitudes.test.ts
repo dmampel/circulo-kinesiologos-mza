@@ -9,7 +9,7 @@ vi.mock('@/lib/supabase/admin', () => ({
 }));
 
 import { supabaseAdmin } from '@/lib/supabase/admin';
-import { firmarUrlsDocumentos, SIGNED_URL_TTL_SEGUNDOS } from './solicitudes';
+import { firmarUrlsDocumentos, SIGNED_URL_TTL_SEGUNDOS, SIGNED_URL_TTL_EMAIL_SEGUNDOS } from './solicitudes';
 
 const mockCreateSignedUrls = vi.fn();
 const mockFrom = vi.mocked(supabaseAdmin.storage.from);
@@ -68,5 +68,31 @@ describe('firmarUrlsDocumentos', () => {
     mockCreateSignedUrls.mockResolvedValue({ data: null, error: { message: 'boom' } });
 
     await expect(firmarUrlsDocumentos(['5678-dni-111.pdf'])).resolves.toEqual({});
+  });
+
+  it('sin segundo argumento firma con la vigencia del panel (SIGNED_URL_TTL_SEGUNDOS)', async () => {
+    mockCreateSignedUrls.mockResolvedValue({ data: [], error: null });
+
+    await firmarUrlsDocumentos(['5678-dni-111.pdf']);
+
+    expect(mockCreateSignedUrls).toHaveBeenCalledWith(['5678-dni-111.pdf'], SIGNED_URL_TTL_SEGUNDOS);
+  });
+
+  it('con SIGNED_URL_TTL_EMAIL_SEGUNDOS firma con 604800 (vigencia de mail)', async () => {
+    mockCreateSignedUrls.mockResolvedValue({ data: [], error: null });
+
+    expect(SIGNED_URL_TTL_EMAIL_SEGUNDOS).toBe(604800);
+
+    await firmarUrlsDocumentos(['5678-dni-111.pdf'], SIGNED_URL_TTL_EMAIL_SEGUNDOS);
+
+    expect(mockCreateSignedUrls).toHaveBeenCalledWith(['5678-dni-111.pdf'], 604800);
+  });
+
+  it('si Storage devuelve error con la vigencia de mail, igual devuelve {} sin lanzar', async () => {
+    mockCreateSignedUrls.mockResolvedValue({ data: null, error: { message: 'boom' } });
+
+    await expect(
+      firmarUrlsDocumentos(['5678-dni-111.pdf'], SIGNED_URL_TTL_EMAIL_SEGUNDOS)
+    ).resolves.toEqual({});
   });
 });

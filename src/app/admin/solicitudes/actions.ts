@@ -4,11 +4,16 @@ import prisma from "@/lib/prisma";
 import { supabaseAdmin } from "@/lib/supabase/admin";
 import { revalidatePath } from "next/cache";
 import { ProfesionalRepository } from "@/lib/repositories/ProfesionalRepository";
-import { getResend, canSendEmails, FROM_EMAIL } from "@/lib/resend";
+import { getResend, canSendEmails, FROM_EMAIL, INSTITUTIONAL_EMAIL } from "@/lib/resend";
 import { EMAIL_INSTITUCIONAL } from "@/lib/site";
 import { requireAdmin } from "@/utils/supabase/require-admin";
 import { construirUrlAbsoluta } from "@/lib/site";
 import { normalizarEspecialidadesSolicitud, esIdGenerado } from "@/lib/especialidades";
+import { firmarUrlsDocumentos, SIGNED_URL_TTL_EMAIL_SEGUNDOS } from "@/lib/storage/solicitudes";
+import { DOCUMENTOS_SOLICITUD } from "@/lib/solicitudes/ficha";
+import { construirAvisoInstitucional } from "@/lib/emails/solicitud-institucional";
+import { WHATSAPP_ADMINISTRACION, construirLinkWhatsApp, mensajeNuevaSolicitud } from "@/lib/whatsapp";
+import { resolverNombresSolicitud } from "@/lib/solicitudes/nombres";
 
 /**
  * Traduce las especialidades declaradas en `Solicitud.datos` al payload de relación
@@ -237,5 +242,104 @@ export async function gestionarSolicitud(id: string, accion: "APROBAR" | "RECHAZ
   } finally {
     revalidatePath("/admin/solicitudes");
     revalidatePath("/profesionales");
+  }
+}
+
+/**
+ * Devuelve `valor` como string si tiene contenido; si no, `fallback`. Evita el
+ * `as any` que usa `gestionarSolicitud` para leer `Solicitud.datos` — acá el
+ * caso de uso real (solicitudes viejas con snapshot incompleto) es justamente
+ * el que un `as any` esconde en vez de manejar.
+ */
+function texto(valor: unknown, fallback = "No especificado"): string {
+  return typeof valor === "string" && valor.trim().length > 0 ? valor.trim() : fallback;
+}
+
+/** Lee `datos.archivos` con guard de tipo. Nunca lanza; sin resultado, `{}`. */
+function archivosDe(datos: unknown): Record<string, string> {
+  const archivos = (datos as { archivos?: unknown } | null | undefined)?.archivos;
+  if (!archivos || typeof archivos !== "object") return {};
+
+  const resultado: Record<string, string> = {};
+  for (const [key, value] of Object.entries(archivos as Record<string, unknown>)) {
+    if (typeof value === "string") resultado[key] = value;
+  }
+  return resultado;
+}
+
+/**
+ * Reenvía el aviso institucional completo de una solicitud ya persistida a
+ * `INSTITUTIONAL_EMAIL`. Disponible para cualquier `status` — a diferencia de
+ * `gestionarSolicitud`, esta acción no muta la solicitud ni notifica al
+ * solicitante, así que el guard de `PENDIENTE` no aplica acá (D4 del design).
+ *
+ * A diferencia del aviso automático de `crearSolicitud` (best-effort,
+ * silencioso), el reenvío es una acción deliberada de un admin que espera
+ * confirmación: cualquier fallo de configuración, Storage o del proveedor de
+ * mail se devuelve como `{ success: false, error }` (D5 del design). No hay
+ * `revalidatePath`: el reenvío es de sólo lectura, nada cambió en la base.
+ */
+export async function reenviarAvisoInstitucional(id: string): Promise<{ success: boolean; error?: string }> {
+  try {
+    await requireAdmin();
+
+    const solicitud = await prisma.solicitud.findUnique({ where: { id } });
+    if (!solicitud) {
+      return { success: false, error: "Solicitud no encontrada." };
+    }
+
+    // Deliberadamente SIN guard de status (D4): el reenvío es informativo, no
+    // muta la solicitud, y el caso de uso real —recuperar el aviso de una
+    // solicitud vieja— aplica tanto a pendientes como a ya resueltas. No
+    // copiar acá el guard `status !== "PENDIENTE"` de gestionarSolicitud.
+
+    if (!canSendEmails()) {
+      return { success: false, error: "El envío de mails no está configurado." };
+    }
+
+    const datos = solicitud.datos;
+    const { localidad, especialidades } = await resolverNombresSolicitud(datos);
+
+    const archivos = archivosDe(datos);
+    const paths = DOCUMENTOS_SOLICITUD.map((doc) => archivos[doc.id]).filter(
+      (path): path is string => Boolean(path)
+    );
+    const urls = await firmarUrlsDocumentos(paths, SIGNED_URL_TTL_EMAIL_SEGUNDOS);
+    const documentos = DOCUMENTOS_SOLICITUD.filter((doc) => Boolean(archivos[doc.id])).map((doc) => ({
+      label: doc.label,
+      url: urls[archivos[doc.id]],
+    }));
+
+    const whatsappUrl = construirLinkWhatsApp(
+      WHATSAPP_ADMINISTRACION,
+      mensajeNuevaSolicitud(solicitud.nombre, solicitud.apellido, solicitud.matricula)
+    );
+
+    const { subject, html } = construirAvisoInstitucional({
+      nombre: solicitud.nombre,
+      apellido: solicitud.apellido,
+      matricula: solicitud.matricula,
+      email: solicitud.email,
+      dni: texto((datos as { dni?: unknown } | null)?.dni),
+      telefono: texto((datos as { telefono?: unknown } | null)?.telefono),
+      direccion: texto((datos as { direccion?: unknown } | null)?.direccion),
+      localidad,
+      especialidades,
+      documentos,
+      whatsappUrl,
+    });
+
+    const resend = getResend();
+    await resend.emails.send({
+      from: `Círculo Kinesiólogos <${FROM_EMAIL}>`,
+      to: [INSTITUTIONAL_EMAIL],
+      subject,
+      html,
+    });
+
+    return { success: true };
+  } catch (error) {
+    const message = error instanceof Error ? error.message : "No se pudo reenviar el aviso institucional.";
+    return { success: false, error: message };
   }
 }

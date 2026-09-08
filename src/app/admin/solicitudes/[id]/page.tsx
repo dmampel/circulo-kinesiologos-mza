@@ -19,6 +19,7 @@ import Link from "next/link";
 import { notFound } from "next/navigation";
 import { cn } from "@/lib/utils";
 import BotonesSolicitud from "../BotonesSolicitud";
+import BotonReenviarAviso from "./BotonReenviarAviso";
 import { firmarUrlsDocumentos } from "@/lib/storage/solicitudes";
 import { normalizarEspecialidadesSolicitud } from "@/lib/especialidades";
 import { DOCUMENTOS_SOLICITUD } from "@/lib/solicitudes/ficha";
@@ -111,6 +112,7 @@ export default async function DetalleSolicitudPage({ params }: Props) {
           >
             <FileDown className="h-4 w-4" /> Ficha
           </Link>
+          <BotonReenviarAviso id={solicitud.id} />
           <BotonesSolicitud id={solicitud.id} />
         </div>
       </div>

@@ -9,12 +9,16 @@ vi.mock("@/lib/prisma", () => ({
     especialidad: {
       findMany: vi.fn(),
     },
+    localidad: {
+      findUnique: vi.fn(),
+    },
   },
 }));
 
 vi.mock("@/lib/supabase/admin", () => {
   const storageFrom = {
     createSignedUploadUrl: vi.fn(),
+    createSignedUrls: vi.fn(),
     list: vi.fn(),
     remove: vi.fn(),
   };
@@ -29,8 +33,10 @@ vi.mock("@/lib/supabase/admin", () => {
 
 vi.mock("next/cache", () => ({ revalidatePath: vi.fn() }));
 
+const mockSend = vi.fn();
+
 vi.mock("@/lib/resend", () => ({
-  getResend: vi.fn(() => ({ emails: { send: vi.fn() } } )),
+  getResend: vi.fn(() => ({ emails: { send: mockSend } })),
   canSendEmails: vi.fn(() => false),
   FROM_EMAIL: "noreply@test.com",
   INSTITUTIONAL_EMAIL: "institucional@test.com",
@@ -38,6 +44,7 @@ vi.mock("@/lib/resend", () => ({
 
 import prisma from "@/lib/prisma";
 import { supabaseAdmin } from "@/lib/supabase/admin";
+import { canSendEmails } from "@/lib/resend";
 import {
   crearSolicitud,
   cancelarSubidaSolicitud,
@@ -51,18 +58,25 @@ import {
   manifiestoArchivoSchema,
   prepararSubidaSchema,
 } from "@/lib/validations/solicitud";
+import { SIGNED_URL_TTL_SEGUNDOS, SIGNED_URL_TTL_EMAIL_SEGUNDOS } from "@/lib/storage/solicitudes";
 
 const mockSolicitudFindFirst = vi.mocked(prisma.solicitud.findFirst);
 const mockSolicitudCreate = vi.mocked(prisma.solicitud.create);
 const mockEspecialidadFindMany = vi.mocked(prisma.especialidad.findMany);
+const mockLocalidadFindUnique = vi.mocked(prisma.localidad.findUnique);
+const mockCanSendEmails = vi.mocked(canSendEmails);
 
 const storageFromResult = supabaseAdmin.storage.from("solicitudes");
 const mockCreateSignedUploadUrl = vi.mocked(storageFromResult.createSignedUploadUrl);
+const mockCreateSignedUrls = vi.mocked(storageFromResult.createSignedUrls);
 const mockList = vi.mocked(storageFromResult.list);
 const mockRemove = vi.mocked(storageFromResult.remove);
 
 beforeEach(() => {
   vi.clearAllMocks();
+  mockLocalidadFindUnique.mockResolvedValue(null);
+  mockCreateSignedUrls.mockResolvedValue({ data: [], error: null });
+  mockCanSendEmails.mockReturnValue(false);
 });
 
 const campoTextoBase = {
@@ -408,5 +422,107 @@ describe("crearSolicitud — especialidades múltiples", () => {
 
     expect(resultado.success).toBe(false);
     expect(mockSolicitudCreate).not.toHaveBeenCalled();
+  });
+});
+
+// ---------------------------------------------------------------------------
+// crearSolicitud — aviso institucional (mail completo, enlaces firmados, WhatsApp)
+// ---------------------------------------------------------------------------
+
+describe("crearSolicitud — aviso institucional", () => {
+  function prepararStorageOk() {
+    mockSolicitudFindFirst.mockResolvedValue(null);
+    mockList.mockResolvedValue({
+      data: Object.values(crearSolicitudInputBase.archivos).map((name) => ({ name })),
+      error: null,
+    } as any);
+    mockEspecialidadFindMany.mockResolvedValue([{ nombre: "NEURO" }] as any);
+    mockLocalidadFindUnique.mockResolvedValue({ nombre: "Godoy Cruz" } as any);
+    mockSolicitudCreate.mockResolvedValue({ id: "sol-1" } as any);
+    mockCreateSignedUrls.mockResolvedValue({
+      data: Object.values(crearSolicitudInputBase.archivos).map((path) => ({
+        path,
+        signedUrl: `https://storage/firmada-${path}`,
+        error: null,
+      })),
+      error: null,
+    } as any);
+  }
+
+  it("con canSendEmails() en true, envía dos mails y el primero va a INSTITUTIONAL_EMAIL con matrícula, DNI, teléfono, dirección y localidad", async () => {
+    prepararStorageOk();
+    mockCanSendEmails.mockReturnValue(true);
+
+    const resultado = await crearSolicitud(crearSolicitudInputBase);
+
+    expect(resultado).toEqual({ success: true });
+    expect(mockSend).toHaveBeenCalledTimes(2);
+
+    const primerEnvio = mockSend.mock.calls[0][0];
+    expect(primerEnvio.to).toEqual(["institucional@test.com"]);
+    expect(primerEnvio.html).toContain(crearSolicitudInputBase.matricula);
+    expect(primerEnvio.html).toContain(crearSolicitudInputBase.dni);
+    expect(primerEnvio.html).toContain(crearSolicitudInputBase.telefono);
+    expect(primerEnvio.html).toContain(crearSolicitudInputBase.direccion);
+    expect(primerEnvio.html).toContain("Godoy Cruz");
+  });
+
+  it("el HTML institucional contiene el href de wa.me con el número correcto", async () => {
+    prepararStorageOk();
+    mockCanSendEmails.mockReturnValue(true);
+
+    await crearSolicitud(crearSolicitudInputBase);
+
+    const primerEnvio = mockSend.mock.calls[0][0];
+    expect(primerEnvio.html).toContain("https://wa.me/5492616937588?text=");
+  });
+
+  it("firmarUrlsDocumentos se invoca con la vigencia de mail (604800), no con la de 1 hora", async () => {
+    prepararStorageOk();
+    mockCanSendEmails.mockReturnValue(true);
+
+    await crearSolicitud(crearSolicitudInputBase);
+
+    expect(SIGNED_URL_TTL_EMAIL_SEGUNDOS).toBe(604800);
+    expect(mockCreateSignedUrls).toHaveBeenCalledWith(
+      expect.any(Array),
+      SIGNED_URL_TTL_EMAIL_SEGUNDOS
+    );
+    expect(mockCreateSignedUrls).not.toHaveBeenCalledWith(expect.any(Array), SIGNED_URL_TTL_SEGUNDOS);
+  });
+
+  it("si createSignedUrls falla, crearSolicitud igual devuelve { success: true } y el mail al solicitante se manda igual", async () => {
+    prepararStorageOk();
+    mockCanSendEmails.mockReturnValue(true);
+    mockCreateSignedUrls.mockResolvedValue({ data: null, error: { message: "boom" } } as any);
+
+    const resultado = await crearSolicitud(crearSolicitudInputBase);
+
+    expect(resultado).toEqual({ success: true });
+    expect(mockSend).toHaveBeenCalledTimes(2);
+    const segundoEnvio = mockSend.mock.calls[1][0];
+    expect(segundoEnvio.to).toEqual([crearSolicitudInputBase.email]);
+  });
+
+  it("si prisma.localidad.findUnique rechaza, el mail se manda con la localidad como no especificada y la solicitud se crea igual", async () => {
+    prepararStorageOk();
+    mockCanSendEmails.mockReturnValue(true);
+    mockLocalidadFindUnique.mockRejectedValue(new Error("boom"));
+
+    const resultado = await crearSolicitud(crearSolicitudInputBase);
+
+    expect(resultado).toEqual({ success: true });
+    const primerEnvio = mockSend.mock.calls[0][0];
+    expect(primerEnvio.html).toContain("No especificada");
+  });
+
+  it("con canSendEmails() en false no se envía ningún mail y la solicitud se crea igual (regresión)", async () => {
+    prepararStorageOk();
+    mockCanSendEmails.mockReturnValue(false);
+
+    const resultado = await crearSolicitud(crearSolicitudInputBase);
+
+    expect(resultado).toEqual({ success: true });
+    expect(mockSend).not.toHaveBeenCalled();
   });
 });

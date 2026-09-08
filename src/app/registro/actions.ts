@@ -10,8 +10,12 @@ import {
   crearSolicitudSchema,
   prepararSubidaSchema,
 } from "@/lib/validations/solicitud";
-import { SITE_URL } from "@/lib/site";
 import { EMAIL_INSTITUCIONAL } from "@/lib/site";
+import { firmarUrlsDocumentos, SIGNED_URL_TTL_EMAIL_SEGUNDOS } from "@/lib/storage/solicitudes";
+import { DOCUMENTOS_SOLICITUD } from "@/lib/solicitudes/ficha";
+import { construirAvisoInstitucional } from "@/lib/emails/solicitud-institucional";
+import { WHATSAPP_ADMINISTRACION, construirLinkWhatsApp, mensajeNuevaSolicitud } from "@/lib/whatsapp";
+import { resolverNombresSolicitud } from "@/lib/solicitudes/nombres";
 
 const BUCKET_SOLICITUDES = "solicitudes";
 
@@ -182,19 +186,13 @@ export async function crearSolicitud(input: CrearSolicitudInput): Promise<{ succ
     }
   }
 
-  // Sólo para los mails: los IDs no le dicen nada a nadie. Si la consulta falla,
-  // se cae a los valores recibidos en vez de bloquear la solicitud.
-  let especialidadNombre = especialidades.join(", ");
-  try {
-    const registros = await prisma.especialidad.findMany({
-      where: { id: { in: especialidades } },
-      select: { nombre: true },
-      orderBy: { nombre: "asc" },
-    });
-    if (registros.length > 0) especialidadNombre = registros.map((e) => e.nombre).join(", ");
-  } catch {
-    // best-effort: si no se pueden resolver los nombres, se usan los valores recibidos
-  }
+  // Sólo para los mails: los IDs no le dicen nada a nadie. Helper compartido
+  // con el reenvío institucional (ver src/lib/solicitudes/nombres.ts) — nunca
+  // lanza, nunca devuelve un identificador.
+  const { localidad: localidadNombre, especialidades: especialidadNombre } = await resolverNombresSolicitud({
+    localidadId,
+    especialidades,
+  });
 
   try {
     await prisma.solicitud.create({
@@ -218,38 +216,43 @@ export async function crearSolicitud(input: CrearSolicitudInput): Promise<{ succ
 
     if (canSendEmails()) {
       const resend = getResend();
-      const siteUrl = SITE_URL;
 
       // Aviso institucional
       try {
+        const pathsDocumentos = DOCUMENTOS_SOLICITUD.map((doc) => archivos[doc.id]).filter(
+          (path): path is string => Boolean(path)
+        );
+        const urlsFirmadas = await firmarUrlsDocumentos(pathsDocumentos, SIGNED_URL_TTL_EMAIL_SEGUNDOS);
+
+        const documentos = DOCUMENTOS_SOLICITUD.filter((doc) => Boolean(archivos[doc.id])).map((doc) => ({
+          label: doc.label,
+          url: urlsFirmadas[archivos[doc.id]],
+        }));
+
+        const whatsappUrl = construirLinkWhatsApp(
+          WHATSAPP_ADMINISTRACION,
+          mensajeNuevaSolicitud(nombre, apellido, matricula)
+        );
+
+        const { subject, html } = construirAvisoInstitucional({
+          nombre,
+          apellido,
+          matricula,
+          email,
+          dni,
+          telefono,
+          direccion,
+          localidad: localidadNombre,
+          especialidades: especialidadNombre,
+          documentos,
+          whatsappUrl,
+        });
+
         await resend.emails.send({
           from: `Círculo Kinesiólogos <${FROM_EMAIL}>`,
           to: [INSTITUTIONAL_EMAIL],
-          subject: `Nueva Solicitud de Asociación: ${nombre} ${apellido}`,
-          html: `
-            <div style="font-family: sans-serif; max-width: 600px; margin: 0 auto; border: 1px solid #eee; border-radius: 10px; overflow: hidden;">
-              <div style="background: #0f172a; padding: 20px; color: white; text-align: center;">
-                <h1 style="margin: 0;">Nueva Solicitud</h1>
-              </div>
-              <div style="padding: 30px;">
-                <p>Se ha recibido una nueva solicitud de ingreso al Círculo:</p>
-                <hr style="border: 0; border-top: 1px solid #eee; margin: 20px 0;" />
-                <p><strong>Profesional:</strong> ${nombre} ${apellido}</p>
-                <p><strong>Matrícula:</strong> ${matricula}</p>
-                <p><strong>Email:</strong> ${email}</p>
-                <p><strong>Especialidad:</strong> ${especialidadNombre}</p>
-                <hr style="border: 0; border-top: 1px solid #eee; margin: 20px 0;" />
-                <p>Podés revisar la documentación y aprobar la solicitud desde el panel administrativo:</p>
-                <a href="${siteUrl}/admin/solicitudes"
-                   style="display: inline-block; background: #2563eb; color: white; padding: 12px 24px; border-radius: 6px; text-decoration: none; font-weight: bold; margin-top: 10px;">
-                  Ir al Panel de Control
-                </a>
-              </div>
-              <div style="background: #f8fafc; padding: 20px; text-align: center; color: #64748b; font-size: 12px;">
-                Este es un mensaje automático del sistema de gestión de Círculo Kinesiólogos.
-              </div>
-            </div>
-          `,
+          subject,
+          html,
         });
       } catch {
         // no bloquear si falla el aviso institucional
