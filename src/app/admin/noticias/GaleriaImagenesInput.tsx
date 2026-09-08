@@ -177,34 +177,33 @@ export default function GaleriaImagenesInput({ name, defaultValue = [] }: Galeri
       </div>
 
       {/* Agregar por URL: compatibilidad con noticias que usan imágenes externas */}
-      <div className="flex items-center gap-2">
-        <div className="relative flex-1">
-          <LinkIcon className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-slate-300" />
-          <input
-            type="url"
-            value={urlInput}
-            onChange={(e) => setUrlInput(e.target.value)}
-            placeholder="O pegá una URL (Unsplash, etc.)"
-            className="w-full pl-9 pr-3 py-2.5 rounded-xl bg-slate-50 border-transparent focus:bg-white focus:border-blue-600 focus:ring-4 focus:ring-blue-100 transition-all text-xs font-bold"
-          />
-        </div>
+      <div className="relative">
+        <LinkIcon className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-slate-300" />
+        <input
+          type="url"
+          value={urlInput}
+          onChange={(e) => setUrlInput(e.target.value)}
+          onKeyDown={(e) => {
+            if (e.key === "Enter") {
+              e.preventDefault();
+              agregarPorUrl();
+            }
+          }}
+          placeholder="O pegá una URL"
+          className="w-full pl-9 pr-20 py-2.5 rounded-xl bg-slate-50 border-transparent focus:bg-white focus:border-blue-600 focus:ring-4 focus:ring-blue-100 transition-all text-xs font-bold"
+        />
         <button
           type="button"
           onClick={agregarPorUrl}
           disabled={!urlInput.trim() || items.length >= MAX_IMAGENES}
-          className="px-4 py-2.5 rounded-xl bg-slate-900 text-white text-xs font-black uppercase tracking-widest disabled:opacity-40 transition-all hover:bg-slate-700"
+          className="absolute right-1.5 top-1/2 -translate-y-1/2 px-3 py-1.5 rounded-lg bg-slate-900 text-white text-[10px] font-black uppercase tracking-widest disabled:opacity-30 transition-all hover:bg-slate-700"
         >
           Agregar
         </button>
       </div>
 
       {/* Galería */}
-      {items.length === 0 ? (
-        <div className="aspect-video rounded-3xl bg-slate-50 border-2 border-dashed border-slate-200 flex flex-col items-center justify-center text-slate-300">
-          <ImagePlus className="h-10 w-10 mb-2" />
-          <span className="text-[10px] font-black uppercase tracking-widest">Sin imágenes todavía</span>
-        </div>
-      ) : (
+      {items.length === 0 ? null : (
         <Reorder.Group axis="y" values={items} onReorder={setItems} className="grid grid-cols-2 gap-3">
           {items.map((item, index) => (
             <Reorder.Item
