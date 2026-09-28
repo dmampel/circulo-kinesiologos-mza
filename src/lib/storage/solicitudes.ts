@@ -1,4 +1,4 @@
-import { supabaseAdmin } from "@/lib/supabase/admin";
+import { firmarUrls } from "./firmar";
 
 const BUCKET_SOLICITUDES = "solicitudes";
 
@@ -32,23 +32,5 @@ export async function firmarUrlsDocumentos(
   paths: string[],
   ttlSegundos: number = SIGNED_URL_TTL_SEGUNDOS,
 ): Promise<Record<string, string>> {
-  if (!paths.length) return {};
-
-  try {
-    const { data, error } = await supabaseAdmin.storage
-      .from(BUCKET_SOLICITUDES)
-      .createSignedUrls(paths, ttlSegundos);
-
-    if (error || !data) return {};
-
-    const urls: Record<string, string> = {};
-    for (const item of data) {
-      if (item.signedUrl && !item.error) {
-        urls[item.path ?? ""] = item.signedUrl;
-      }
-    }
-    return urls;
-  } catch {
-    return {};
-  }
+  return firmarUrls(BUCKET_SOLICITUDES, paths, ttlSegundos);
 }

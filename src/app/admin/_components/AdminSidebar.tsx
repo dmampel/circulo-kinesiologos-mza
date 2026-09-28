@@ -18,6 +18,7 @@ import {
   Megaphone,
   Monitor,
   Gift,
+  ClipboardList,
 } from "lucide-react";
 import { cn } from "@/lib/utils";
 import { createClient } from "@/utils/supabase/client";
@@ -40,6 +41,7 @@ const SIDEBAR_LINKS: {
   { name: "Circulares", href: "/admin/circulares", icon: Megaphone },
   { name: "Capacitaciones", href: "/admin/capacitaciones", icon: BookOpen },
   { name: "Sorteos", href: "/admin/sorteos", icon: Gift },
+  { name: "Bolsa de Trabajo", href: "/admin/bolsa-de-trabajo", icon: ClipboardList },
 ];
 
 export default function AdminSidebar() {

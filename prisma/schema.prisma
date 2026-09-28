@@ -72,6 +72,9 @@ model Localidad {
   nombre        String        @unique
   profesionales Profesional[]
   createdAt     DateTime      @default(now())
+
+  avisosBuscoTrabajo     AvisoBuscoTrabajo[]
+  avisosBuscoKinesiologo AvisoBuscoKinesiologo[]
 }
 
 model Especialidad {
@@ -79,6 +82,8 @@ model Especialidad {
   nombre        String        @unique
   profesionales Profesional[]
   createdAt     DateTime      @default(now())
+
+  avisosBuscoTrabajo AvisoBuscoTrabajo[]
 }
 
 model Noticia {
@@ -344,4 +349,73 @@ model InscripcionSorteo {
   createdAt     DateTime    @default(now())
 
   @@unique([sorteoId, profesionalId])
+}
+
+enum EstadoAviso {
+  PENDIENTE
+  PUBLICADO
+  RECHAZADO
+  ARCHIVADO
+}
+
+model AvisoBuscoTrabajo {
+  id        String @id @default(cuid())
+  nombre    String
+  apellido  String
+  matricula String // declarada, NO verificada contra el padrón
+
+  // --- Contacto: NUNCA se selecciona en consultas públicas (ver design.md — D2) ---
+  telefono String
+  email    String
+  cvPath   String? // path dentro del bucket privado `bolsa-trabajo-cv`
+  // ----------------------------------------------------------------------------
+
+  especialidadId String
+  especialidad   Especialidad @relation(fields: [especialidadId], references: [id])
+  localidadId    String
+  localidad      Localidad    @relation(fields: [localidadId], references: [id])
+  zona           String? // texto libre complementario ("zona oeste", "Gran Mendoza")
+
+  disponibilidad String
+  presentacion   String
+
+  aceptaDifusion Boolean  // siempre true: el form no envía sin tildarlo
+  aceptadoEn     DateTime // registro del consentimiento
+
+  estado    EstadoAviso @default(PENDIENTE) // ver design.md — D6
+  createdAt DateTime    @default(now())
+  updatedAt DateTime    @updatedAt
+
+  @@index([estado, createdAt])
+}
+
+model AvisoBuscoKinesiologo {
+  id          String @id @default(cuid())
+  institucion String // institución / consultorio / profesional
+
+  localidadId String
+  localidad   Localidad @relation(fields: [localidadId], references: [id])
+  zona        String?
+
+  area         String // área de trabajo (texto libre: no es la taxonomía de Especialidad)
+  tipoPuesto   String
+  diasHorarios String
+  requisitos   String
+  modalidad    String // modalidad de contratación
+  propuesta    String // información sobre la propuesta
+
+  // --- Contacto: NUNCA se selecciona en consultas públicas (ver design.md — D2) ---
+  medioContacto String
+  // ----------------------------------------------------------------------------
+
+  fechaLimite DateTime? // fecha límite para postularse. Ver design.md — D7
+
+  aceptaDifusion Boolean  // consentimiento explícito, igual que en AvisoBuscoTrabajo (confirmado, por simetría)
+  aceptadoEn     DateTime
+
+  estado    EstadoAviso @default(PENDIENTE)
+  createdAt DateTime    @default(now())
+  updatedAt DateTime    @updatedAt
+
+  @@index([estado, fechaLimite])
 }

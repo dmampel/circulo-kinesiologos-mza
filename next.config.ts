@@ -15,7 +15,11 @@ const securityHeaders = [
 const nextConfig: NextConfig = {
   experimental: {
     serverActions: {
-      bodySizeLimit: "4mb",
+      // 6mb: el máximo declarado para un CV en la bolsa de trabajo es 5 MB
+      // (openspec/changes/bolsa-de-trabajo — design.md D4 / tasks.md 2.5), y el
+      // multipart de la Server Action agrega overhead de encoding + los demás
+      // campos de texto del formulario. 4mb se quedaba corto para ese caso.
+      bodySizeLimit: "6mb",
     },
   },
   images: {

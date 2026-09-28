@@ -13,6 +13,7 @@ const NAV_LINKS = [
   { name: "Padron de Profesionales", href: "/profesionales" },
   { name: "Obras Sociales", href: "/obras-sociales" },
   { name: "KineClub", href: "/kineclub" },
+  { name: "Bolsa de Trabajo", href: "/bolsa-de-trabajo" },
   { name: "Noticias", href: "/noticias" },
   { name: "Institucional", href: "/institucional" },
 ];

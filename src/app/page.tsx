@@ -14,6 +14,7 @@ import {
   CreditCard,
   CalendarDays,
   UserCircle,
+  Briefcase,
 } from "lucide-react";
 import ObrasSocialesMarquee from "@/components/ObrasSocialesMarquee";
 import HeroCard from "@/components/HeroCard";
@@ -312,6 +313,36 @@ export default async function Home() {
           </div>
         </section>
       )}
+
+      {/* ── BOLSA DE TRABAJO ──────────────────────────────────── */}
+      <section className="py-16 md:py-24 bg-slate-50">
+        <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
+          <ScrollReveal>
+            <div className="relative overflow-hidden rounded-3xl bg-gradient-to-br from-blue-600 to-blue-800 px-6 py-10 md:px-14 md:py-14 shadow-xl shadow-blue-900/20">
+              <div className="absolute top-0 right-0 w-72 h-72 bg-blue-400/20 rounded-full blur-3xl -mr-24 -mt-24 pointer-events-none" />
+              <div className="relative z-10 flex flex-col md:flex-row md:items-center md:justify-between gap-8">
+                <div className="max-w-xl">
+                  <span className="inline-flex items-center gap-2 text-xs font-black uppercase tracking-widest text-blue-200 mb-4">
+                    <Briefcase className="h-4 w-4" /> Bolsa de Trabajo
+                  </span>
+                  <h2 className="text-3xl md:text-4xl font-black text-white tracking-tight leading-tight mb-4">
+                    Conectá con oportunidades laborales
+                  </h2>
+                  <p className="text-blue-100 leading-relaxed">
+                    Encontrá ofertas de trabajo para kinesiólogos o publicá una búsqueda y dale a tu equipo el profesional que necesita.
+                  </p>
+                </div>
+                <Link
+                  href="/bolsa-de-trabajo"
+                  className="inline-flex items-center justify-center shrink-0 px-8 py-4 rounded-full bg-white text-blue-900 font-black shadow-md hover:bg-blue-50 transition-all"
+                >
+                  Ver Bolsa de Trabajo <ArrowRight className="ml-2 h-4 w-4" />
+                </Link>
+              </div>
+            </div>
+          </ScrollReveal>
+        </div>
+      </section>
 
       {/* ── NOTICIAS + AGENDA ────────────────────────────────── */}
       {(ultimasNoticias.length > 0 || proximasCapacitaciones.length > 0) && (
