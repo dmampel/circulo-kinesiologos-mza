@@ -13,7 +13,7 @@ interface PerfilFormProps {
     apellido: string;
     matricula: string;
     email: string;
-    especialidades: string;
+    especialidadIds: string[];
     telefono: string | null;
     whatsapp: string | null;
     direccion: string | null;
@@ -22,6 +22,7 @@ interface PerfilFormProps {
     localidadId: string;
   };
   localidades: { id: string; nombre: string }[];
+  especialidades: { id: string; nombre: string }[];
 }
 
 function Feedback({ state }: { state: ActionResult }) {
@@ -42,7 +43,7 @@ function Feedback({ state }: { state: ActionResult }) {
   );
 }
 
-export default function PerfilForm({ profesional, localidades }: PerfilFormProps) {
+export default function PerfilForm({ profesional, localidades, especialidades }: PerfilFormProps) {
   const [contactState, contactAction, contactPending] = useActionState(
     updateDatosContacto,
     null
@@ -54,6 +55,15 @@ export default function PerfilForm({ profesional, localidades }: PerfilFormProps
 
   const fileInputRef = useRef<HTMLInputElement>(null);
   const [previewUrl, setPreviewUrl] = useState<string | null>(profesional.foto_url);
+  const [selectedEspecialidades, setSelectedEspecialidades] = useState<string[]>(
+    profesional.especialidadIds
+  );
+
+  const toggleEspecialidad = (id: string) => {
+    setSelectedEspecialidades((prev) =>
+      prev.includes(id) ? prev.filter((e) => e !== id) : [...prev, id]
+    );
+  };
 
   const handleFileChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const file = e.target.files?.[0];
@@ -70,13 +80,7 @@ export default function PerfilForm({ profesional, localidades }: PerfilFormProps
           Datos Institucionales
         </p>
         <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-4">
-          {[
-            { icon: User, label: "Nombre", value: profesional.nombre },
-            { icon: User, label: "Apellido", value: profesional.apellido },
-            { icon: Mail, label: "Email", value: profesional.email },
-            { icon: CreditCard, label: "Matrícula", value: `M.P. ${profesional.matricula}` },
-            { icon: Stethoscope, label: "Especialidad", value: profesional.especialidades },
-          ].map(({ icon: Icon, label, value }) => (
+          {[{ icon: Mail, label: "Email", value: profesional.email }].map(({ icon: Icon, label, value }) => (
             <div key={label} className="flex items-center gap-3">
               <div className="h-9 w-9 bg-white border border-slate-100 rounded-xl flex items-center justify-center text-slate-400 shrink-0">
                 <Icon className="h-4 w-4" />
@@ -89,7 +93,7 @@ export default function PerfilForm({ profesional, localidades }: PerfilFormProps
           ))}
         </div>
         <p className="text-[10px] text-slate-400 mt-4 italic">
-          Para modificar datos institucionales, contactá a administración.
+          Para modificar tu email, contactá a administración.
         </p>
       </section>
 
@@ -159,8 +163,78 @@ export default function PerfilForm({ profesional, localidades }: PerfilFormProps
 
       {/* ── Datos de contacto ── */}
       <section>
-        <h2 className="text-xl font-bold text-slate-900 tracking-tight mb-6">Datos de Contacto</h2>
+        <h2 className="text-xl font-bold text-slate-900 tracking-tight mb-6">Datos Profesionales y de Contacto</h2>
         <form action={contactAction} className="space-y-5">
+          <div className="grid grid-cols-1 sm:grid-cols-2 gap-5">
+            {[
+              { name: "nombre", label: "Nombre", icon: User, placeholder: "Nombre", defaultValue: profesional.nombre },
+              { name: "apellido", label: "Apellido", icon: User, placeholder: "Apellido", defaultValue: profesional.apellido },
+            ].map(({ name, label, icon: Icon, placeholder, defaultValue }) => (
+              <div key={name} className="space-y-1.5">
+                <label htmlFor={name} className="flex items-center gap-2 text-[10px] font-black text-slate-500 uppercase tracking-widest">
+                  <Icon className="h-3.5 w-3.5" />
+                  {label}
+                </label>
+                <input
+                  id={name}
+                  name={name}
+                  type="text"
+                  required
+                  placeholder={placeholder}
+                  defaultValue={defaultValue ?? ""}
+                  className="w-full px-4 py-3 rounded-xl border border-slate-200 text-sm font-medium text-slate-800 placeholder-slate-300 bg-white focus:outline-none focus:ring-2 focus:ring-blue-500/20 focus:border-blue-400 transition-all"
+                />
+              </div>
+            ))}
+          </div>
+
+          <div className="space-y-1.5">
+            <label htmlFor="matricula" className="flex items-center gap-2 text-[10px] font-black text-slate-500 uppercase tracking-widest">
+              <CreditCard className="h-3.5 w-3.5" />
+              Matrícula (M.P.)
+            </label>
+            <input
+              id="matricula"
+              name="matricula"
+              type="text"
+              required
+              defaultValue={profesional.matricula}
+              className="w-full px-4 py-3 rounded-xl border border-slate-200 text-sm font-medium text-slate-800 placeholder-slate-300 bg-white focus:outline-none focus:ring-2 focus:ring-blue-500/20 focus:border-blue-400 transition-all"
+            />
+          </div>
+
+          <div className="space-y-2">
+            <p className="flex items-center gap-2 text-[10px] font-black text-slate-500 uppercase tracking-widest">
+              <Stethoscope className="h-3.5 w-3.5" />
+              Especialidades
+            </p>
+            <div className="flex flex-wrap gap-2">
+              {especialidades.map((esp) => {
+                const isSelected = selectedEspecialidades.includes(esp.id);
+                return (
+                  <button
+                    key={esp.id}
+                    type="button"
+                    onClick={() => toggleEspecialidad(esp.id)}
+                    className={`px-3 py-1.5 rounded-lg text-xs font-bold border transition-all ${
+                      isSelected
+                        ? "bg-blue-600 border-blue-600 text-white"
+                        : "bg-white border-slate-200 text-slate-600 hover:border-blue-200"
+                    }`}
+                  >
+                    {esp.nombre}
+                  </button>
+                );
+              })}
+            </div>
+            {/* Marca que el widget de especialidades formó parte del submit, incluso
+                si no queda ningún input "especialidadIds" por no haber selección. */}
+            <input type="hidden" name="especialidadesEnviadas" value="1" />
+            {selectedEspecialidades.map((id) => (
+              <input key={id} type="hidden" name="especialidadIds" value={id} />
+            ))}
+          </div>
+
           <div className="grid grid-cols-1 sm:grid-cols-2 gap-5">
             {[
               { name: "telefono", label: "Teléfono", icon: Phone, placeholder: "Ej: 261 4000000", defaultValue: profesional.telefono },

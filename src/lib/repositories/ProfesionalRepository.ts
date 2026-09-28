@@ -15,12 +15,16 @@ export interface PaginatedResult<T> {
 }
 
 export interface UpdateProfesionalData {
+  nombre?: string;
+  apellido?: string;
+  matricula?: string;
   telefono?: string;
   whatsapp?: string;
   direccion?: string;
   horarios?: string;
   foto_url?: string;
   localidadId?: string;
+  especialidadIds?: string[];
 }
 
 export class ProfesionalRepository {
@@ -136,9 +140,13 @@ export class ProfesionalRepository {
   }
 
   static async update(userId: string, data: UpdateProfesionalData) {
+    const { especialidadIds, ...rest } = data;
     return prisma.profesional.update({
       where: { userId },
-      data,
+      data: {
+        ...rest,
+        ...(especialidadIds ? { especialidades: { set: especialidadIds.map((id) => ({ id })) } } : {}),
+      },
     });
   }
 }

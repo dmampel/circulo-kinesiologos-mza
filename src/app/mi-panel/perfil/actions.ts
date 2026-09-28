@@ -5,6 +5,7 @@ import { revalidatePath } from "next/cache";
 import { redirect } from "next/navigation";
 import { ProfesionalRepository, type UpdateProfesionalData } from "@/lib/repositories/ProfesionalRepository";
 import { LocalidadRepository } from "@/lib/repositories/LocalidadRepository";
+import { EspecialidadRepository } from "@/lib/repositories/EspecialidadRepository";
 import { supabaseAdmin } from "@/lib/supabase/admin";
 
 type ActionResult = { success: true } | { success: false; error: string };
@@ -31,6 +32,48 @@ export async function updateDatosContacto(
     direccion: (formData.get("direccion") as string) || undefined,
     horarios: (formData.get("horarios") as string) || undefined,
   };
+
+  if (formData.has("nombre")) {
+    const nombre = ((formData.get("nombre") as string) || "").trim();
+    if (!nombre) return { success: false, error: "El nombre es obligatorio." };
+    data.nombre = nombre;
+  }
+
+  if (formData.has("apellido")) {
+    const apellido = ((formData.get("apellido") as string) || "").trim();
+    if (!apellido) return { success: false, error: "El apellido es obligatorio." };
+    data.apellido = apellido;
+  }
+
+  // La matrícula es única en toda la base: se valida formato y colisión con
+  // otro profesional antes de guardar, igual que la localidad más abajo.
+  if (formData.has("matricula")) {
+    const matricula = ((formData.get("matricula") as string) || "").trim();
+    if (!matricula) return { success: false, error: "La matrícula es obligatoria." };
+    if (!/^[a-zA-Z0-9_-]+$/.test(matricula)) {
+      return { success: false, error: "La matrícula contiene caracteres no permitidos." };
+    }
+    const existente = await ProfesionalRepository.findByMatricula(matricula);
+    if (existente && existente.userId !== user.id) {
+      return { success: false, error: "Esa matrícula ya está registrada por otro profesional." };
+    }
+    data.matricula = matricula;
+  }
+
+  // Las especialidades son una relación M:N: mismo motivo que la localidad,
+  // se valida contra el catálogo real antes de pasarlas a Prisma.
+  if (formData.has("especialidadesEnviadas")) {
+    const especialidadIds = formData.getAll("especialidadIds").map(String);
+    if (especialidadIds.length === 0) {
+      return { success: false, error: "Tenés que elegir al menos una especialidad." };
+    }
+    const especialidades = await EspecialidadRepository.getAll();
+    const validas = new Set(especialidades.map((e) => e.id));
+    if (!especialidadIds.every((id) => validas.has(id))) {
+      return { success: false, error: "Una de las especialidades seleccionadas no es válida." };
+    }
+    data.especialidadIds = especialidadIds;
+  }
 
   // La localidad es una FK: no se confía en el value que llega del <select>.
   // Sin esta validación un id inventado explota como error de FK en Prisma y

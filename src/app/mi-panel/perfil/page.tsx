@@ -1,6 +1,7 @@
 import { createClient } from "@/utils/supabase/server";
 import { ProfesionalRepository } from "@/lib/repositories/ProfesionalRepository";
 import { LocalidadRepository } from "@/lib/repositories/LocalidadRepository";
+import { EspecialidadRepository } from "@/lib/repositories/EspecialidadRepository";
 import { redirect } from "next/navigation";
 import { AlertCircle } from "lucide-react";
 import PerfilForm from "@/components/socio/PerfilForm";
@@ -22,9 +23,10 @@ export default async function PerfilPage() {
     redirect("/login");
   }
 
-  const [profesional, localidades] = await Promise.all([
+  const [profesional, localidades, especialidades] = await Promise.all([
     ProfesionalRepository.findByUserId(user.id),
     LocalidadRepository.getAll(),
+    EspecialidadRepository.getAll(),
   ]);
 
   if (!profesional) {
@@ -50,7 +52,7 @@ export default async function PerfilPage() {
         <p className="text-[10px] font-black text-blue-600 uppercase tracking-[0.3em]">Panel Profesional · CKFM</p>
         <h1 className="text-3xl font-black text-slate-900 tracking-tight leading-none">Mi Perfil</h1>
         <p className="text-sm text-slate-500 font-medium pt-1">
-          Actualizá tus datos de contacto y foto. Los cambios se reflejan automáticamente en el Padrón Público.
+          Actualizá tus datos profesionales, de contacto y foto. Los cambios se reflejan automáticamente en el Padrón Público.
         </p>
       </div>
 
@@ -61,7 +63,7 @@ export default async function PerfilPage() {
           apellido: profesional.apellido,
           matricula: profesional.matricula,
           email: profesional.email ?? "",
-          especialidades: profesional.especialidades.map((e) => e.nombre).join(", ") || "Sin especialidad",
+          especialidadIds: profesional.especialidades.map((e) => e.id),
           telefono: profesional.telefono ?? null,
           whatsapp: profesional.whatsapp ?? null,
           direccion: profesional.direccion ?? null,
@@ -70,6 +72,7 @@ export default async function PerfilPage() {
           localidadId: profesional.localidadId,
         }}
         localidades={localidades.map((l) => ({ id: l.id, nombre: l.nombre }))}
+        especialidades={especialidades.map((e) => ({ id: e.id, nombre: e.nombre }))}
       />
     </div>
   );
