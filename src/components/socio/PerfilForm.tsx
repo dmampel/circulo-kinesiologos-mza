@@ -73,61 +73,35 @@ export default function PerfilForm({ profesional, localidades, especialidades }:
   };
 
   return (
-    <div className="space-y-10">
-      {/* ── Datos de solo lectura ── */}
+    <div className="space-y-8">
+      {/* ── Foto + datos institucionales, una sola card ── */}
       <section className="p-6 bg-slate-50 border border-slate-100 rounded-[1.5rem]">
-        <p className="text-[10px] font-black text-slate-400 uppercase tracking-[0.25em] mb-4">
-          Datos Institucionales
-        </p>
-        <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-4">
-          {[{ icon: Mail, label: "Email", value: profesional.email }].map(({ icon: Icon, label, value }) => (
-            <div key={label} className="flex items-center gap-3">
-              <div className="h-9 w-9 bg-white border border-slate-100 rounded-xl flex items-center justify-center text-slate-400 shrink-0">
-                <Icon className="h-4 w-4" />
-              </div>
-              <div>
-                <p className="text-[9px] font-black text-slate-400 uppercase tracking-widest">{label}</p>
-                <p className="text-sm font-bold text-slate-800">{value}</p>
+        <div className="flex flex-col sm:flex-row items-start gap-6">
+          {/* Foto */}
+          <form action={fotoAction} className="flex flex-col items-center gap-3 shrink-0">
+            <div
+              className="relative h-24 w-24 rounded-[1.25rem] overflow-hidden bg-slate-100 border border-slate-200 cursor-pointer group shrink-0"
+              onClick={() => fileInputRef.current?.click()}
+            >
+              {previewUrl ? (
+                <Image
+                  src={previewUrl}
+                  alt="Foto de perfil"
+                  fill
+                  className="object-cover"
+                  unoptimized
+                />
+              ) : (
+                <div className="h-full w-full flex items-center justify-center text-slate-300">
+                  <span className="text-3xl font-black">
+                    {profesional.nombre[0]}{profesional.apellido[0]}
+                  </span>
+                </div>
+              )}
+              <div className="absolute inset-0 bg-black/40 opacity-0 group-hover:opacity-100 transition-opacity flex items-center justify-center">
+                <Camera className="h-5 w-5 text-white" />
               </div>
             </div>
-          ))}
-        </div>
-        <p className="text-[10px] text-slate-400 mt-4 italic">
-          Para modificar tu email, contactá a administración.
-        </p>
-      </section>
-
-      {/* ── Foto de perfil ── */}
-      <section>
-        <h2 className="text-xl font-bold text-slate-900 tracking-tight mb-6">Foto de Perfil</h2>
-        <form action={fotoAction} className="flex flex-col sm:flex-row items-start gap-6">
-          {/* Preview */}
-          <div
-            className="relative h-28 w-28 rounded-[1.5rem] overflow-hidden bg-slate-100 border border-slate-200 cursor-pointer group shrink-0"
-            onClick={() => fileInputRef.current?.click()}
-          >
-            {previewUrl ? (
-              <Image
-                src={previewUrl}
-                alt="Foto de perfil"
-                fill
-                className="object-cover"
-                unoptimized
-              />
-            ) : (
-              <div className="h-full w-full flex items-center justify-center text-slate-300">
-                <span className="text-4xl font-black">
-                  {profesional.nombre[0]}{profesional.apellido[0]}
-                </span>
-              </div>
-            )}
-            <div className="absolute inset-0 bg-black/40 opacity-0 group-hover:opacity-100 transition-opacity flex items-center justify-center">
-              <Camera className="h-6 w-6 text-white" />
-            </div>
-          </div>
-
-          {/* Upload controls */}
-          <div className="flex-1 space-y-3">
             <input
               ref={fileInputRef}
               type="file"
@@ -139,176 +113,198 @@ export default function PerfilForm({ profesional, localidades, especialidades }:
             <button
               type="button"
               onClick={() => fileInputRef.current?.click()}
-              className="flex items-center gap-2 px-4 py-2.5 border border-slate-200 rounded-xl text-sm font-bold text-slate-700 hover:border-blue-200 hover:text-blue-600 hover:bg-blue-50 transition-all"
+              className="text-xs font-bold text-blue-600 hover:text-blue-700 transition-all"
             >
-              <Camera className="h-4 w-4" />
-              Elegir imagen
+              Cambiar foto
             </button>
-            <p className="text-[10px] text-slate-400">
-              JPG, PNG o WebP · Máximo 2 MB
-            </p>
-            <Feedback state={fotoState} />
             <button
               type="submit"
               disabled={fotoPending}
-              className="px-6 py-3 bg-blue-600 text-white rounded-xl text-sm font-bold hover:bg-blue-700 disabled:opacity-50 disabled:cursor-not-allowed transition-all"
+              className="px-4 py-2 bg-blue-600 text-white rounded-xl text-xs font-bold hover:bg-blue-700 disabled:opacity-50 disabled:cursor-not-allowed transition-all"
             >
               {fotoPending ? "Subiendo…" : "Guardar foto"}
             </button>
+            <Feedback state={fotoState} />
+          </form>
+
+          {/* Datos institucionales */}
+          <div className="flex-1 space-y-3 pt-1">
+            <p className="text-[10px] font-black text-slate-400 uppercase tracking-[0.25em]">
+              Datos Institucionales
+            </p>
+            <div className="flex items-center gap-3">
+              <div className="h-9 w-9 bg-white border border-slate-100 rounded-xl flex items-center justify-center text-slate-400 shrink-0">
+                <Mail className="h-4 w-4" />
+              </div>
+              <div>
+                <p className="text-[9px] font-black text-slate-400 uppercase tracking-widest">Email</p>
+                <p className="text-sm font-bold text-slate-800">{profesional.email}</p>
+              </div>
+            </div>
+            <p className="text-[10px] text-slate-400 italic">
+              Para modificar tu email, contactá a administración. JPG, PNG o WebP · Máximo 2 MB para la foto.
+            </p>
           </div>
-        </form>
+        </div>
       </section>
 
-      <div className="border-t border-slate-100" />
-
-      {/* ── Datos de contacto ── */}
+      {/* ── Datos profesionales y de contacto ── */}
       <section>
-        <h2 className="text-xl font-bold text-slate-900 tracking-tight mb-6">Datos Profesionales y de Contacto</h2>
-        <form action={contactAction} className="space-y-5">
-          <div className="grid grid-cols-1 sm:grid-cols-2 gap-5">
-            {[
-              { name: "nombre", label: "Nombre", icon: User, placeholder: "Nombre", defaultValue: profesional.nombre },
-              { name: "apellido", label: "Apellido", icon: User, placeholder: "Apellido", defaultValue: profesional.apellido },
-            ].map(({ name, label, icon: Icon, placeholder, defaultValue }) => (
-              <div key={name} className="space-y-1.5">
-                <label htmlFor={name} className="flex items-center gap-2 text-[10px] font-black text-slate-500 uppercase tracking-widest">
-                  <Icon className="h-3.5 w-3.5" />
-                  {label}
+        <form action={contactAction} className="space-y-6">
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+            {/* Panel: Datos Profesionales */}
+            <div className="p-6 bg-white border border-slate-100 rounded-[1.5rem] space-y-5">
+              <h2 className="text-lg font-black text-slate-900 tracking-tight">Datos Profesionales</h2>
+
+              <div className="space-y-5">
+                {[
+                  { name: "nombre", label: "Nombre", icon: User, placeholder: "Nombre", defaultValue: profesional.nombre },
+                  { name: "apellido", label: "Apellido", icon: User, placeholder: "Apellido", defaultValue: profesional.apellido },
+                ].map(({ name, label, icon: Icon, placeholder, defaultValue }) => (
+                  <div key={name} className="space-y-1.5">
+                    <label htmlFor={name} className="flex items-center gap-2 text-[10px] font-black text-slate-500 uppercase tracking-widest">
+                      <Icon className="h-3.5 w-3.5" />
+                      {label}
+                    </label>
+                    <input
+                      id={name}
+                      name={name}
+                      type="text"
+                      required
+                      placeholder={placeholder}
+                      defaultValue={defaultValue ?? ""}
+                      className="w-full px-4 py-3 rounded-xl border border-slate-200 text-sm font-medium text-slate-800 placeholder-slate-300 bg-white focus:outline-none focus:ring-2 focus:ring-blue-500/20 focus:border-blue-400 transition-all"
+                    />
+                  </div>
+                ))}
+              </div>
+
+              <div className="space-y-1.5">
+                <label htmlFor="matricula" className="flex items-center gap-2 text-[10px] font-black text-slate-500 uppercase tracking-widest">
+                  <CreditCard className="h-3.5 w-3.5" />
+                  Matrícula (M.P.)
                 </label>
                 <input
-                  id={name}
-                  name={name}
+                  id="matricula"
+                  name="matricula"
                   type="text"
                   required
-                  placeholder={placeholder}
-                  defaultValue={defaultValue ?? ""}
+                  defaultValue={profesional.matricula}
                   className="w-full px-4 py-3 rounded-xl border border-slate-200 text-sm font-medium text-slate-800 placeholder-slate-300 bg-white focus:outline-none focus:ring-2 focus:ring-blue-500/20 focus:border-blue-400 transition-all"
                 />
               </div>
-            ))}
-          </div>
 
-          <div className="space-y-1.5">
-            <label htmlFor="matricula" className="flex items-center gap-2 text-[10px] font-black text-slate-500 uppercase tracking-widest">
-              <CreditCard className="h-3.5 w-3.5" />
-              Matrícula (M.P.)
-            </label>
-            <input
-              id="matricula"
-              name="matricula"
-              type="text"
-              required
-              defaultValue={profesional.matricula}
-              className="w-full px-4 py-3 rounded-xl border border-slate-200 text-sm font-medium text-slate-800 placeholder-slate-300 bg-white focus:outline-none focus:ring-2 focus:ring-blue-500/20 focus:border-blue-400 transition-all"
-            />
-          </div>
-
-          <div className="space-y-2">
-            <p className="flex items-center gap-2 text-[10px] font-black text-slate-500 uppercase tracking-widest">
-              <Stethoscope className="h-3.5 w-3.5" />
-              Especialidades
-            </p>
-            <div className="flex flex-wrap gap-2">
-              {especialidades.map((esp) => {
-                const isSelected = selectedEspecialidades.includes(esp.id);
-                return (
-                  <button
-                    key={esp.id}
-                    type="button"
-                    onClick={() => toggleEspecialidad(esp.id)}
-                    className={`px-3 py-1.5 rounded-lg text-xs font-bold border transition-all ${
-                      isSelected
-                        ? "bg-blue-600 border-blue-600 text-white"
-                        : "bg-white border-slate-200 text-slate-600 hover:border-blue-200"
-                    }`}
-                  >
-                    {esp.nombre}
-                  </button>
-                );
-              })}
+              <div className="p-4 bg-slate-50 border border-slate-100 rounded-xl space-y-3">
+                <p className="flex items-center gap-2 text-[10px] font-black text-slate-500 uppercase tracking-widest">
+                  <Stethoscope className="h-3.5 w-3.5" />
+                  Especialidades
+                </p>
+                <div className="flex flex-wrap gap-2">
+                  {especialidades.map((esp) => {
+                    const isSelected = selectedEspecialidades.includes(esp.id);
+                    return (
+                      <button
+                        key={esp.id}
+                        type="button"
+                        onClick={() => toggleEspecialidad(esp.id)}
+                        className={`px-3 py-1.5 rounded-lg text-xs font-bold border transition-all ${
+                          isSelected
+                            ? "bg-blue-600 border-blue-600 text-white"
+                            : "bg-white border-slate-200 text-slate-600 hover:border-blue-200"
+                        }`}
+                      >
+                        {esp.nombre}
+                      </button>
+                    );
+                  })}
+                </div>
+                {/* Marca que el widget de especialidades formó parte del submit, incluso
+                    si no queda ningún input "especialidadIds" por no haber selección. */}
+                <input type="hidden" name="especialidadesEnviadas" value="1" />
+                {selectedEspecialidades.map((id) => (
+                  <input key={id} type="hidden" name="especialidadIds" value={id} />
+                ))}
+              </div>
             </div>
-            {/* Marca que el widget de especialidades formó parte del submit, incluso
-                si no queda ningún input "especialidadIds" por no haber selección. */}
-            <input type="hidden" name="especialidadesEnviadas" value="1" />
-            {selectedEspecialidades.map((id) => (
-              <input key={id} type="hidden" name="especialidadIds" value={id} />
-            ))}
-          </div>
 
-          <div className="grid grid-cols-1 sm:grid-cols-2 gap-5">
-            {[
-              { name: "telefono", label: "Teléfono", icon: Phone, placeholder: "Ej: 261 4000000", defaultValue: profesional.telefono },
-              { name: "whatsapp", label: "WhatsApp", icon: MessageCircle, placeholder: "Ej: 261 4000000", defaultValue: profesional.whatsapp },
-            ].map(({ name, label, icon: Icon, placeholder, defaultValue }) => (
-              <div key={name} className="space-y-1.5">
-                <label htmlFor={name} className="flex items-center gap-2 text-[10px] font-black text-slate-500 uppercase tracking-widest">
-                  <Icon className="h-3.5 w-3.5" />
-                  {label}
+            {/* Panel: Datos de Contacto */}
+            <div className="p-6 bg-white border border-slate-100 rounded-[1.5rem] space-y-5">
+              <h2 className="text-lg font-black text-slate-900 tracking-tight">Datos de Contacto</h2>
+
+              <div className="space-y-5">
+                {[
+                  { name: "telefono", label: "Teléfono", icon: Phone, placeholder: "Ej: 261 4000000", defaultValue: profesional.telefono },
+                  { name: "whatsapp", label: "WhatsApp", icon: MessageCircle, placeholder: "Ej: 261 4000000", defaultValue: profesional.whatsapp },
+                ].map(({ name, label, icon: Icon, placeholder, defaultValue }) => (
+                  <div key={name} className="space-y-1.5">
+                    <label htmlFor={name} className="flex items-center gap-2 text-[10px] font-black text-slate-500 uppercase tracking-widest">
+                      <Icon className="h-3.5 w-3.5" />
+                      {label}
+                    </label>
+                    <input
+                      id={name}
+                      name={name}
+                      type="text"
+                      placeholder={placeholder}
+                      defaultValue={defaultValue ?? ""}
+                      className="w-full px-4 py-3 rounded-xl border border-slate-200 text-sm font-medium text-slate-800 placeholder-slate-300 bg-white focus:outline-none focus:ring-2 focus:ring-blue-500/20 focus:border-blue-400 transition-all"
+                    />
+                  </div>
+                ))}
+              </div>
+
+              <div className="space-y-1.5">
+                <label htmlFor="direccion" className="flex items-center gap-2 text-[10px] font-black text-slate-500 uppercase tracking-widest">
+                  <MapPin className="h-3.5 w-3.5" />
+                  Dirección del Consultorio
                 </label>
                 <input
-                  id={name}
-                  name={name}
+                  id="direccion"
+                  name="direccion"
                   type="text"
-                  placeholder={placeholder}
-                  defaultValue={defaultValue ?? ""}
+                  placeholder="Ej: Av. San Martín 1234"
+                  defaultValue={profesional.direccion ?? ""}
                   className="w-full px-4 py-3 rounded-xl border border-slate-200 text-sm font-medium text-slate-800 placeholder-slate-300 bg-white focus:outline-none focus:ring-2 focus:ring-blue-500/20 focus:border-blue-400 transition-all"
                 />
               </div>
-            ))}
-          </div>
 
-          <div className="grid grid-cols-1 sm:grid-cols-2 gap-5">
-            <div className="space-y-1.5">
-              <label htmlFor="direccion" className="flex items-center gap-2 text-[10px] font-black text-slate-500 uppercase tracking-widest">
-                <MapPin className="h-3.5 w-3.5" />
-                Dirección del Consultorio
-              </label>
-              <input
-                id="direccion"
-                name="direccion"
-                type="text"
-                placeholder="Ej: Av. San Martín 1234"
-                defaultValue={profesional.direccion ?? ""}
-                className="w-full px-4 py-3 rounded-xl border border-slate-200 text-sm font-medium text-slate-800 placeholder-slate-300 bg-white focus:outline-none focus:ring-2 focus:ring-blue-500/20 focus:border-blue-400 transition-all"
-              />
+              <div className="space-y-1.5">
+                <label htmlFor="localidadId" className="flex items-center gap-2 text-[10px] font-black text-slate-500 uppercase tracking-widest">
+                  <Building2 className="h-3.5 w-3.5" />
+                  Localidad
+                </label>
+                <select
+                  id="localidadId"
+                  name="localidadId"
+                  defaultValue={profesional.localidadId}
+                  className="w-full px-4 py-3 rounded-xl border border-slate-200 text-sm font-medium text-slate-800 bg-white focus:outline-none focus:ring-2 focus:ring-blue-500/20 focus:border-blue-400 transition-all"
+                >
+                  {localidades.map((localidad) => (
+                    <option key={localidad.id} value={localidad.id}>
+                      {localidad.nombre}
+                    </option>
+                  ))}
+                </select>
+                <p className="text-[10px] text-slate-400">
+                  Define en qué localidad aparecés en el Padrón Público.
+                </p>
+              </div>
+
+              <div className="space-y-1.5">
+                <label htmlFor="horarios" className="flex items-center gap-2 text-[10px] font-black text-slate-500 uppercase tracking-widest">
+                  <Clock className="h-3.5 w-3.5" />
+                  Horarios de Atención
+                </label>
+                <textarea
+                  id="horarios"
+                  name="horarios"
+                  rows={3}
+                  placeholder="Ej: Lun a Vie 9:00 – 18:00"
+                  defaultValue={profesional.horarios ?? ""}
+                  className="w-full px-4 py-3 rounded-xl border border-slate-200 text-sm font-medium text-slate-800 placeholder-slate-300 bg-white focus:outline-none focus:ring-2 focus:ring-blue-500/20 focus:border-blue-400 transition-all resize-none"
+                />
+              </div>
             </div>
-
-            <div className="space-y-1.5">
-              <label htmlFor="localidadId" className="flex items-center gap-2 text-[10px] font-black text-slate-500 uppercase tracking-widest">
-                <Building2 className="h-3.5 w-3.5" />
-                Localidad
-              </label>
-              <select
-                id="localidadId"
-                name="localidadId"
-                defaultValue={profesional.localidadId}
-                className="w-full px-4 py-3 rounded-xl border border-slate-200 text-sm font-medium text-slate-800 bg-white focus:outline-none focus:ring-2 focus:ring-blue-500/20 focus:border-blue-400 transition-all"
-              >
-                {localidades.map((localidad) => (
-                  <option key={localidad.id} value={localidad.id}>
-                    {localidad.nombre}
-                  </option>
-                ))}
-              </select>
-              <p className="text-[10px] text-slate-400">
-                Define en qué localidad aparecés en el Padrón Público.
-              </p>
-            </div>
-          </div>
-
-          <div className="space-y-1.5">
-            <label htmlFor="horarios" className="flex items-center gap-2 text-[10px] font-black text-slate-500 uppercase tracking-widest">
-              <Clock className="h-3.5 w-3.5" />
-              Horarios de Atención
-            </label>
-            <textarea
-              id="horarios"
-              name="horarios"
-              rows={3}
-              placeholder="Ej: Lun a Vie 9:00 – 18:00"
-              defaultValue={profesional.horarios ?? ""}
-              className="w-full px-4 py-3 rounded-xl border border-slate-200 text-sm font-medium text-slate-800 placeholder-slate-300 bg-white focus:outline-none focus:ring-2 focus:ring-blue-500/20 focus:border-blue-400 transition-all resize-none"
-            />
           </div>
 
           <Feedback state={contactState} />
