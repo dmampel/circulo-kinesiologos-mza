@@ -309,13 +309,15 @@ export default function PerfilForm({ profesional, localidades, especialidades }:
 
           <Feedback state={contactState} />
 
-          <button
-            type="submit"
-            disabled={contactPending}
-            className="px-6 py-3 bg-blue-600 text-white rounded-xl text-sm font-bold hover:bg-blue-700 disabled:opacity-50 disabled:cursor-not-allowed transition-all"
-          >
-            {contactPending ? "Guardando…" : "Guardar cambios"}
-          </button>
+          <div className="flex justify-end">
+            <button
+              type="submit"
+              disabled={contactPending}
+              className="px-6 py-3 bg-blue-600 text-white rounded-xl text-sm font-bold hover:bg-blue-700 disabled:opacity-50 disabled:cursor-not-allowed transition-all"
+            >
+              {contactPending ? "Guardando…" : "Guardar cambios"}
+            </button>
+          </div>
         </form>
       </section>
     </div>

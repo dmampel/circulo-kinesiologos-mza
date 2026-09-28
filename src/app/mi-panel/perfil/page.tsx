@@ -46,7 +46,7 @@ export default async function PerfilPage() {
   }
 
   return (
-    <div className="max-w-3xl mx-auto space-y-10 pb-10 animate-in fade-in duration-500">
+    <div className="max-w-7xl mx-auto space-y-10 pb-10 animate-in fade-in duration-500">
       {/* Header */}
       <div className="space-y-1">
         <p className="text-[10px] font-black text-blue-600 uppercase tracking-[0.3em]">Panel Profesional · CKFM</p>
