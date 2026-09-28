@@ -6,14 +6,8 @@ export async function middleware(request: NextRequest) {
 }
 
 export const config = {
-  matcher: [
-    /*
-     * Match all request paths except for the ones starting with:
-     * - _next/static (static files)
-     * - _next/image (image optimization files)
-     * - favicon.ico (favicon file)
-     * Feel free to modify this pattern to include more paths.
-     */
-    "/((?!_next/static|_next/image|favicon.ico|.*\\.(?:svg|png|jpg|jpeg|gif|webp)$).*)",
-  ],
+  // Solo las rutas que chequean sesión adentro de updateSession(). El resto
+  // del sitio es público y no necesita pagar un getUser() contra Supabase en
+  // cada visita (esto es lo que se comía el Fluid Active CPU del free tier).
+  matcher: ["/admin/:path*", "/mi-panel/:path*"],
 };
