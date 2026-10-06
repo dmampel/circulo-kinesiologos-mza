@@ -1,4 +1,5 @@
 import prisma from "@/lib/prisma";
+import type { Prisma } from "@prisma/client";
 
 export class BeneficioRepository {
   static async getAll(category?: string) {
@@ -34,5 +35,21 @@ export class BeneficioRepository {
       [todos[i], todos[j]] = [todos[j], todos[i]];
     }
     return todos.slice(0, limit);
+  }
+
+  static async getById(id: string) {
+    return prisma.beneficioKineClub.findUnique({ where: { id } });
+  }
+
+  static async create(data: Prisma.BeneficioKineClubUncheckedCreateInput) {
+    return prisma.beneficioKineClub.create({ data });
+  }
+
+  static async update(id: string, data: Prisma.BeneficioKineClubUncheckedUpdateInput) {
+    return prisma.beneficioKineClub.update({ where: { id }, data });
+  }
+
+  static async delete(id: string) {
+    return prisma.beneficioKineClub.delete({ where: { id } });
   }
 }

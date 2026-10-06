@@ -5,7 +5,7 @@ vi.mock("@/lib/supabase/admin", () => ({
 }));
 
 import { supabaseAdmin } from "@/lib/supabase/admin";
-import { borrarImagenesDeStorage, extraerPathDelBucket } from "./noticias";
+import { borrarImagenesDeStorage } from "./noticias";
 
 const mockRemove = vi.fn();
 const mockFrom = vi.mocked(supabaseAdmin.storage.from);
@@ -16,20 +16,6 @@ const URL_EXTERNA = "https://images.unsplash.com/photo-123";
 beforeEach(() => {
   vi.clearAllMocks();
   mockFrom.mockReturnValue({ remove: mockRemove } as any);
-});
-
-describe("extraerPathDelBucket", () => {
-  it("extrae el path relativo al bucket de una URL propia", () => {
-    expect(extraerPathDelBucket(URL_BUCKET)).toBe("1780-abc.jpg");
-  });
-
-  it("devuelve null para una URL externa que no pertenece al bucket", () => {
-    expect(extraerPathDelBucket(URL_EXTERNA)).toBeNull();
-  });
-
-  it("devuelve null para una URL inválida", () => {
-    expect(extraerPathDelBucket("no-es-una-url")).toBeNull();
-  });
 });
 
 describe("borrarImagenesDeStorage", () => {

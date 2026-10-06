@@ -15,6 +15,7 @@ import { cn } from "@/lib/utils";
 import { motion } from "framer-motion";
 import { useRouter } from "next/navigation";
 import Link from "next/link";
+import SafeLogoImage from "@/components/atoms/SafeLogoImage";
 
 const ICON_MAP: Record<string, any> = {
   Sparkles,
@@ -151,8 +152,12 @@ export default function KineClubClient({ beneficios, currentCat, categorias }: P
                   <div className="flex items-start justify-between mb-8">
                     <div className="h-16 w-16 bg-slate-50 rounded-2xl flex items-center justify-center text-slate-300 group-hover:bg-blue-600 group-hover:text-white transition-colors overflow-hidden">
                       {b.logo_url ? (
-                        // eslint-disable-next-line @next/next/no-img-element
-                        <img src={b.logo_url} alt={b.empresa} className="h-full w-full object-cover" />
+                        <SafeLogoImage
+                          src={b.logo_url}
+                          alt={b.empresa}
+                          className="h-full w-full object-cover"
+                          fallback={<ShoppingBag className="h-8 w-8" />}
+                        />
                       ) : (
                         <ShoppingBag className="h-8 w-8" />
                       )}

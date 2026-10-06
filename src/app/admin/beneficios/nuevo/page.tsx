@@ -4,7 +4,6 @@ import { useState, useEffect } from "react";
 import { 
   ArrowLeft, 
   Save, 
-  Image as ImageIcon, 
   ShoppingBag, 
   Tag,
   Link as LinkIcon,
@@ -13,13 +12,13 @@ import {
 import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { crearBeneficio } from "../actions";
+import LogoBeneficioInput from "../LogoBeneficioInput";
 
 export const dynamic = "force-dynamic";
 
 export default function NuevoBeneficioPage() {
   const router = useRouter();
   const [isPending, setIsPending] = useState(false);
-  const [logoUrl, setLogoUrl] = useState("");
   const [categorias, setCategorias] = useState<{id: string, nombre: string}[]>([]);
 
   useEffect(() => {
@@ -128,28 +127,8 @@ export default function NuevoBeneficioPage() {
             />
           </div>
 
-          <div className="col-span-full space-y-4">
-            <label className="text-xs font-black text-slate-400 uppercase tracking-widest ml-1">Logo de la Empresa (URL)</label>
-            <div className="space-y-4">
-              <input 
-                name="logo_url"
-                type="url"
-                value={logoUrl}
-                onChange={(e) => setLogoUrl(e.target.value)}
-                className="w-full px-6 py-4 rounded-2xl bg-slate-50 border-transparent focus:bg-white focus:border-blue-600 focus:ring-4 focus:ring-blue-100 transition-all text-sm font-bold" 
-                placeholder="https://..."
-              />
-              <div className="relative group h-40 rounded-3xl bg-slate-50 border-2 border-dashed border-slate-200 overflow-hidden flex items-center justify-center transition-all hover:border-blue-400">
-                {logoUrl ? (
-                  <img src={logoUrl} alt="Preview" className="h-full w-full object-contain p-4" />
-                ) : (
-                  <div className="flex flex-col items-center text-slate-300">
-                    <ImageIcon className="h-10 w-10 mb-2" />
-                    <span className="text-[10px] font-black uppercase tracking-widest">Vista Previa</span>
-                  </div>
-                )}
-              </div>
-            </div>
+          <div className="col-span-full">
+            <LogoBeneficioInput />
           </div>
         </div>
 

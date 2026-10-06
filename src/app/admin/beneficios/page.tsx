@@ -12,7 +12,7 @@ import CategoriaSidebar from "./CategoriaSidebar";
 import CategoriaFilter from "./CategoriaFilter";
 import { CategoriaRepository } from "@/lib/repositories/CategoriaRepository";
 import AdminSearch from "../_components/AdminSearch";
-import SafeLogoImage from "../_components/SafeLogoImage";
+import SafeLogoImage from "@/components/atoms/SafeLogoImage";
 import { eliminarBeneficioAction } from "./actions";
 
 export const dynamic = "force-dynamic";

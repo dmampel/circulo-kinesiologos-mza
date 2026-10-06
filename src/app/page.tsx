@@ -29,6 +29,7 @@ import { ObraSocialRepository } from "@/lib/repositories/ObraSocialRepository";
 import { BeneficioRepository } from "@/lib/repositories/BeneficioRepository";
 import { NoticiaRepository } from "@/lib/repositories/NoticiaRepository";
 import { CapacitacionRepository } from "@/lib/repositories/CapacitacionRepository";
+import SafeLogoImage from "@/components/atoms/SafeLogoImage";
 
 export const revalidate = 300;
 
@@ -281,11 +282,15 @@ export default async function Home() {
                 >
                   <div className="flex items-start gap-4 mb-4">
                     {b.logo_url ? (
-                      // eslint-disable-next-line @next/next/no-img-element
-                      <img
+                      <SafeLogoImage
                         src={b.logo_url}
                         alt={b.empresa}
                         className="h-12 w-12 rounded-xl object-contain bg-white p-1 shrink-0"
+                        fallback={
+                          <div className="h-12 w-12 rounded-xl bg-blue-800 flex items-center justify-center shrink-0">
+                        <Award className="h-5 w-5 text-blue-300" />
+                      </div>
+                        }
                       />
                     ) : (
                       <div className="h-12 w-12 rounded-xl bg-blue-800 flex items-center justify-center shrink-0">

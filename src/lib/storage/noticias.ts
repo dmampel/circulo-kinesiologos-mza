@@ -1,7 +1,7 @@
 import { supabaseAdmin } from "@/lib/supabase/admin";
+import { extraerPathDelBucket } from "./bucketPath";
 
 const BUCKET_NOTICIAS_IMAGENES = "noticias-imagenes";
-const MARCADOR = `/${BUCKET_NOTICIAS_IMAGENES}/`;
 
 /**
  * Borra del bucket `noticias-imagenes` las imágenes cuya URL pertenece al
@@ -13,7 +13,7 @@ const MARCADOR = `/${BUCKET_NOTICIAS_IMAGENES}/`;
 export async function borrarImagenesDeStorage(urls: string[]): Promise<void> {
   const paths = urls
     .filter((url) => url.includes(BUCKET_NOTICIAS_IMAGENES))
-    .map((url) => extraerPathDelBucket(url))
+    .map((url) => extraerPathDelBucket(url, BUCKET_NOTICIAS_IMAGENES))
     .filter((path): path is string => !!path);
 
   if (paths.length === 0) return;
@@ -22,18 +22,5 @@ export async function borrarImagenesDeStorage(urls: string[]): Promise<void> {
     await supabaseAdmin.storage.from(BUCKET_NOTICIAS_IMAGENES).remove(paths);
   } catch {
     // Best-effort: se traga el error, no debe abortar el guardado de la noticia.
-  }
-}
-
-/** Extrae el path relativo al bucket de una URL pública. `null` si no matchea. */
-export function extraerPathDelBucket(url: string): string | null {
-  try {
-    const parsed = new URL(url);
-    const idx = parsed.pathname.indexOf(MARCADOR);
-    if (idx === -1) return null;
-    const path = parsed.pathname.slice(idx + MARCADOR.length);
-    return path || null;
-  } catch {
-    return null;
   }
 }
