@@ -1,9 +1,9 @@
 "use client";
 
-import { useState } from "react";
+import { useRef, useState } from "react";
 import Image from "next/image";
 import { AnimatePresence, motion, type PanInfo } from "framer-motion";
-import { ChevronLeft, ChevronRight, Newspaper } from "lucide-react";
+import { ChevronLeft, ChevronRight, Newspaper, X } from "lucide-react";
 
 interface ImagenNoticia {
   url: string;
@@ -21,6 +21,34 @@ const SWIPE_OFFSET_THRESHOLD = 60;
 export default function CarruselNoticia({ imagenes, titulo }: CarruselNoticiaProps) {
   const [index, setIndex] = useState(0);
   const [direction, setDirection] = useState(0);
+  const dialogRef = useRef<HTMLDialogElement>(null);
+  // Un swipe del carrusel no debe abrir la imagen ampliada
+  const arrastrando = useRef(false);
+
+  const ampliar = () => {
+    if (arrastrando.current) return;
+    dialogRef.current?.showModal();
+  };
+
+  // Imagen entera a pantalla completa. <dialog> nativo: Esc cierra solo.
+  const lightbox = (imagen: ImagenNoticia) => (
+    <dialog
+      ref={dialogRef}
+      onClick={() => dialogRef.current?.close()}
+      className="m-0 h-dvh w-screen max-h-none max-w-none bg-transparent p-0 backdrop:bg-slate-950/90"
+    >
+      <div className="relative h-full w-full">
+        <Image src={imagen.url} alt={imagen.alt || titulo} fill sizes="100vw" className="object-contain p-4" />
+      </div>
+      <button
+        type="button"
+        aria-label="Cerrar imagen"
+        className="absolute top-4 right-4 h-10 w-10 rounded-full bg-white/80 backdrop-blur-md flex items-center justify-center text-slate-700"
+      >
+        <X className="h-5 w-5" />
+      </button>
+    </dialog>
+  );
 
   // Placeholder: sin imágenes (comportamiento actual conservado)
   if (imagenes.length === 0) {
@@ -36,13 +64,16 @@ export default function CarruselNoticia({ imagenes, titulo }: CarruselNoticiaPro
     const imagen = imagenes[0];
     return (
       <div className="relative aspect-video overflow-hidden bg-slate-100">
-        <Image
-          src={imagen.url}
-          alt={imagen.alt || titulo}
-          fill
-          priority
-          className="object-cover"
-        />
+        <button type="button" onClick={ampliar} aria-label="Ver imagen completa" className="absolute inset-0 cursor-zoom-in">
+          <Image
+            src={imagen.url}
+            alt={imagen.alt || titulo}
+            fill
+            priority
+            className="object-cover"
+          />
+        </button>
+        {lightbox(imagen)}
       </div>
     );
   }
@@ -71,6 +102,9 @@ export default function CarruselNoticia({ imagenes, titulo }: CarruselNoticiaPro
     } else if (e.key === "ArrowRight") {
       e.preventDefault();
       siguiente();
+    } else if (e.key === "Enter") {
+      e.preventDefault();
+      ampliar();
     }
   };
 
@@ -108,8 +142,13 @@ export default function CarruselNoticia({ imagenes, titulo }: CarruselNoticiaPro
           drag="x"
           dragConstraints={{ left: 0, right: 0 }}
           dragElastic={0.2}
-          onDragEnd={handleDragEnd}
-          className="absolute inset-0"
+          onDragStart={() => { arrastrando.current = true; }}
+          onDragEnd={(e, info) => {
+            handleDragEnd(e, info);
+            setTimeout(() => { arrastrando.current = false; }, 0);
+          }}
+          onClick={ampliar}
+          className="absolute inset-0 cursor-zoom-in"
         >
           <Image
             src={actual.url}
@@ -120,6 +159,7 @@ export default function CarruselNoticia({ imagenes, titulo }: CarruselNoticiaPro
           />
         </motion.div>
       </AnimatePresence>
+      {lightbox(actual)}
 
       {/* Flechas prev/next — glassmorphism */}
       <button

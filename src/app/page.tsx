@@ -375,20 +375,23 @@ export default async function Home() {
                       <ScrollReveal>
                         <Link
                           href={`/noticias?noticia=${ultimasNoticias[0].slug}`}
-                          className="group relative flex flex-col justify-end h-full min-h-[480px] rounded-3xl overflow-hidden bg-slate-900"
+                          className="group relative flex flex-col justify-end h-full min-h-80 lg:min-h-[480px] rounded-3xl overflow-hidden bg-slate-900"
                         >
+                          {/* En mobile la placa se ve entera arriba y el texto va abajo; desde lg el texto va sobre la imagen */}
                           {ultimasNoticias[0].imagen_url ? (
-                            <Image
-                              src={ultimasNoticias[0].imagen_url}
-                              alt={ultimasNoticias[0].titulo}
-                              fill
-                              className="object-cover group-hover:scale-105 transition-transform duration-700"
-                            />
+                            <div className="relative aspect-[4/5] lg:absolute lg:inset-0 lg:aspect-auto overflow-hidden">
+                              <Image
+                                src={ultimasNoticias[0].imagen_url}
+                                alt={ultimasNoticias[0].titulo}
+                                fill
+                                className="object-contain lg:object-cover group-hover:scale-105 transition-transform duration-700"
+                              />
+                            </div>
                           ) : (
                             <div className="absolute inset-0 bg-gradient-to-br from-slate-800 to-blue-950" />
                           )}
                           {/* Gradient overlay */}
-                          <div className="absolute inset-0 bg-gradient-to-t from-slate-950 via-slate-950/40 to-transparent" />
+                          <div className="absolute inset-0 hidden lg:block bg-gradient-to-t from-slate-950 via-slate-950/40 to-transparent" />
                           {/* Content */}
                           <div className="relative z-10 p-8">
                             <span className="inline-block text-xs font-black uppercase tracking-widest text-blue-400 mb-4">Destacada</span>
