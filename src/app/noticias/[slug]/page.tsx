@@ -57,7 +57,7 @@ export default async function NoticiaDetallePage({ params }: Props) {
           Volver a noticias
         </Link>
 
-        <div className="flex gap-10 items-start">
+        <div className="flex flex-col lg:flex-row gap-10 items-stretch lg:items-start">
 
           {/* ── ARTÍCULO PRINCIPAL ── */}
           <article className="flex-1 min-w-0 bg-white rounded-2xl overflow-hidden shadow-sm border border-slate-200/60">
@@ -65,7 +65,7 @@ export default async function NoticiaDetallePage({ params }: Props) {
             {/* Portada: imagen única o carrusel según la cantidad de imágenes */}
             <CarruselNoticia imagenes={noticia.imagenes} titulo={noticia.titulo} />
 
-            <div className="px-8 py-8">
+            <div className="px-6 py-6 md:px-8 md:py-8">
               {/* Metadata */}
               <div className="flex items-center justify-between gap-4 mb-4">
                 <div className="flex items-center gap-3 flex-wrap">
@@ -128,7 +128,7 @@ export default async function NoticiaDetallePage({ params }: Props) {
           </article>
 
           {/* ── SIDEBAR RELACIONADAS ── */}
-          <aside className="w-72 shrink-0 sticky top-6 flex flex-col gap-4">
+          <aside className="w-full lg:w-72 shrink-0 lg:sticky lg:top-6 flex flex-col gap-4">
             <p className="text-[10px] font-black uppercase tracking-widest text-slate-400 px-1">
               {noticia.categoria ? `Más de ${noticia.categoria.nombre}` : "Más noticias"}
             </p>
