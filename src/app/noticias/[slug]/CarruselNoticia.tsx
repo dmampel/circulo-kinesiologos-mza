@@ -30,25 +30,106 @@ export default function CarruselNoticia({ imagenes, titulo }: CarruselNoticiaPro
     dialogRef.current?.showModal();
   };
 
-  // Imagen entera a pantalla completa. <dialog> nativo: Esc cierra solo.
-  const lightbox = (imagen: ImagenNoticia) => (
-    <dialog
-      ref={dialogRef}
-      onClick={() => dialogRef.current?.close()}
-      className="m-0 h-dvh w-screen max-h-none max-w-none bg-transparent p-0 backdrop:bg-slate-950/90"
-    >
-      <div className="relative h-full w-full">
-        <Image src={imagen.url} alt={imagen.alt || titulo} fill sizes="100vw" className="object-contain p-4" />
-      </div>
-      <button
-        type="button"
-        aria-label="Cerrar imagen"
-        className="absolute top-4 right-4 h-10 w-10 rounded-full bg-white/80 backdrop-blur-md flex items-center justify-center text-slate-700"
+  const total = imagenes.length;
+  const irA = (nuevoIndex: number) => {
+    if (nuevoIndex === index) return;
+    setDirection(nuevoIndex > index ? 1 : -1);
+    setIndex(nuevoIndex);
+  };
+
+  const anterior = () => {
+    if (index === 0) return;
+    irA(index - 1);
+  };
+
+  const siguiente = () => {
+    if (index === total - 1) return;
+    irA(index + 1);
+  };
+
+  const handleDragEnd = (
+    _e: MouseEvent | TouchEvent | PointerEvent,
+    info: PanInfo
+  ) => {
+    const { offset, velocity } = info;
+    if (offset.x > SWIPE_OFFSET_THRESHOLD || velocity.x > SWIPE_VELOCITY_THRESHOLD) {
+      anterior();
+    } else if (offset.x < -SWIPE_OFFSET_THRESHOLD || velocity.x < -SWIPE_VELOCITY_THRESHOLD) {
+      siguiente();
+    }
+  };
+
+  // Imagen entera a pantalla completa, navegable si hay varias.
+  // <dialog> nativo: Esc cierra solo; las flechas del teclado llegan por
+  // bubbling al onKeyDown del carrusel.
+  const cerrar = () => {
+    if (arrastrando.current) return;
+    dialogRef.current?.close();
+  };
+  const sinCerrar = (accion: () => void) => (e: React.MouseEvent) => {
+    e.stopPropagation();
+    accion();
+  };
+
+  const lightbox = () => {
+    const imagen = imagenes[index];
+    return (
+      <dialog
+        ref={dialogRef}
+        onClick={cerrar}
+        className="m-0 h-dvh w-screen max-h-none max-w-none bg-transparent p-0 backdrop:bg-slate-950/90"
       >
-        <X className="h-5 w-5" />
-      </button>
-    </dialog>
-  );
+        <motion.div
+          key={index}
+          drag={total > 1 ? "x" : false}
+          dragConstraints={{ left: 0, right: 0 }}
+          dragElastic={0.2}
+          onDragStart={() => { arrastrando.current = true; }}
+          onDragEnd={(e, info) => {
+            handleDragEnd(e, info);
+            setTimeout(() => { arrastrando.current = false; }, 0);
+          }}
+          initial={{ opacity: 0 }}
+          animate={{ opacity: 1 }}
+          className="relative h-full w-full"
+        >
+          <Image src={imagen.url} alt={imagen.alt || titulo} fill sizes="100vw" className="object-contain p-4 pointer-events-none" />
+        </motion.div>
+        <button
+          type="button"
+          aria-label="Cerrar imagen"
+          className="absolute top-4 right-4 h-10 w-10 rounded-full bg-white/80 backdrop-blur-md flex items-center justify-center text-slate-700"
+        >
+          <X className="h-5 w-5" />
+        </button>
+        {total > 1 && (
+          <>
+            <div className="absolute top-4 left-4 rounded-full bg-white/80 backdrop-blur-md px-3 py-1 text-xs font-black text-slate-700">
+              {index + 1} / {total}
+            </div>
+            <button
+              type="button"
+              onClick={sinCerrar(anterior)}
+              disabled={index === 0}
+              aria-label="Imagen anterior"
+              className="absolute left-4 top-1/2 -translate-y-1/2 h-11 w-11 rounded-full bg-white/80 backdrop-blur-md flex items-center justify-center text-slate-700 disabled:opacity-0 disabled:pointer-events-none transition-opacity"
+            >
+              <ChevronLeft className="h-6 w-6" />
+            </button>
+            <button
+              type="button"
+              onClick={sinCerrar(siguiente)}
+              disabled={index === total - 1}
+              aria-label="Imagen siguiente"
+              className="absolute right-4 top-1/2 -translate-y-1/2 h-11 w-11 rounded-full bg-white/80 backdrop-blur-md flex items-center justify-center text-slate-700 disabled:opacity-0 disabled:pointer-events-none transition-opacity"
+            >
+              <ChevronRight className="h-6 w-6" />
+            </button>
+          </>
+        )}
+      </dialog>
+    );
+  };
 
   // Placeholder: sin imágenes (comportamiento actual conservado)
   if (imagenes.length === 0) {
@@ -73,27 +154,10 @@ export default function CarruselNoticia({ imagenes, titulo }: CarruselNoticiaPro
             className="object-cover"
           />
         </button>
-        {lightbox(imagen)}
+        {lightbox()}
       </div>
     );
   }
-
-  const total = imagenes.length;
-  const irA = (nuevoIndex: number) => {
-    if (nuevoIndex === index) return;
-    setDirection(nuevoIndex > index ? 1 : -1);
-    setIndex(nuevoIndex);
-  };
-
-  const anterior = () => {
-    if (index === 0) return;
-    irA(index - 1);
-  };
-
-  const siguiente = () => {
-    if (index === total - 1) return;
-    irA(index + 1);
-  };
 
   const handleKeyDown = (e: React.KeyboardEvent<HTMLDivElement>) => {
     if (e.key === "ArrowLeft") {
@@ -105,18 +169,6 @@ export default function CarruselNoticia({ imagenes, titulo }: CarruselNoticiaPro
     } else if (e.key === "Enter") {
       e.preventDefault();
       ampliar();
-    }
-  };
-
-  const handleDragEnd = (
-    _e: MouseEvent | TouchEvent | PointerEvent,
-    info: PanInfo
-  ) => {
-    const { offset, velocity } = info;
-    if (offset.x > SWIPE_OFFSET_THRESHOLD || velocity.x > SWIPE_VELOCITY_THRESHOLD) {
-      anterior();
-    } else if (offset.x < -SWIPE_OFFSET_THRESHOLD || velocity.x < -SWIPE_VELOCITY_THRESHOLD) {
-      siguiente();
     }
   };
 
@@ -159,7 +211,7 @@ export default function CarruselNoticia({ imagenes, titulo }: CarruselNoticiaPro
           />
         </motion.div>
       </AnimatePresence>
-      {lightbox(actual)}
+      {lightbox()}
 
       {/* Flechas prev/next — glassmorphism */}
       <button
