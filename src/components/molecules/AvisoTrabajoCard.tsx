@@ -1,6 +1,7 @@
 import { MapPin, Award, Clock } from "lucide-react";
 import type { AvisoTrabajoPublico } from "@/lib/repositories/AvisoRepository";
 import BotonContactar from "./BotonContactar";
+import TextoExpandible from "./TextoExpandible";
 
 /**
  * Tarjeta del kinesiólogo que busca trabajo (`design.md — D8`). El tipo
@@ -33,7 +34,7 @@ export default function AvisoTrabajoCard({ aviso }: { aviso: AvisoTrabajoPublico
         </span>
       </div>
 
-      <p className="text-sm text-slate-500 leading-relaxed line-clamp-3 mb-4 flex-grow">{aviso.presentacion}</p>
+      <TextoExpandible id={aviso.id} texto={aviso.presentacion} className="mb-4 flex-grow" />
 
       <div className="flex items-center text-xs text-slate-400 font-medium mb-5">
         <Clock className="h-3.5 w-3.5 mr-1.5 shrink-0" />

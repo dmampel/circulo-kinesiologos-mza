@@ -1,6 +1,7 @@
 import { MapPin, Briefcase, CalendarClock } from "lucide-react";
 import type { AvisoKinesiologoPublico } from "@/lib/repositories/AvisoRepository";
 import BotonContactar from "./BotonContactar";
+import TextoExpandible from "./TextoExpandible";
 
 /**
  * Tarjeta de la institución que busca kinesiólogo (`design.md — D8`). El tipo
@@ -31,7 +32,7 @@ export default function AvisoKinesiologoCard({ aviso }: { aviso: AvisoKinesiolog
         </span>
       </div>
 
-      <p className="text-sm text-slate-500 leading-relaxed line-clamp-3 mb-2 flex-grow">{aviso.propuesta}</p>
+      <TextoExpandible id={aviso.id} texto={aviso.propuesta} className="mb-2 flex-grow" />
       <p className="text-xs text-slate-400 leading-relaxed mb-4">{aviso.modalidad} · {aviso.diasHorarios}</p>
 
       {fechaLimite && (
