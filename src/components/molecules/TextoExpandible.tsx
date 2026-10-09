@@ -14,13 +14,13 @@ export default function TextoExpandible({ id, texto, className = "" }: { id: str
 
   const inputId = `ver-mas-${id}`;
   const boton =
-    "cursor-pointer text-xs font-bold text-blue-600 hover:text-blue-700 mt-1 inline-block rounded peer-focus-visible:ring-2 peer-focus-visible:ring-blue-500";
+    "cursor-pointer text-xs font-bold text-blue-600 hover:text-blue-700 mt-1 rounded peer-focus-visible:ring-2 peer-focus-visible:ring-blue-500";
 
   return (
     <div className={className}>
       <input type="checkbox" id={inputId} className="peer sr-only" />
       <p className={`${parrafo} line-clamp-3 peer-checked:line-clamp-none`}>{texto}</p>
-      <label htmlFor={inputId} className={`${boton} peer-checked:hidden`}>Ver más</label>
+      <label htmlFor={inputId} className={`${boton} inline-block peer-checked:hidden`}>Ver más</label>
       <label htmlFor={inputId} className={`${boton} hidden peer-checked:inline-block`}>Ver menos</label>
     </div>
   );
