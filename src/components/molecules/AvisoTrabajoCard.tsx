@@ -34,7 +34,7 @@ export default function AvisoTrabajoCard({ aviso }: { aviso: AvisoTrabajoPublico
         </span>
       </div>
 
-      <TextoExpandible id={aviso.id} texto={aviso.presentacion} className="mb-4 flex-grow" />
+      <TextoExpandible texto={aviso.presentacion} className="mb-4 flex-grow" />
 
       <div className="flex items-center text-xs text-slate-400 font-medium mb-5">
         <Clock className="h-3.5 w-3.5 mr-1.5 shrink-0" />

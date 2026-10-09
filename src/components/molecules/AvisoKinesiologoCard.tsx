@@ -32,7 +32,7 @@ export default function AvisoKinesiologoCard({ aviso }: { aviso: AvisoKinesiolog
         </span>
       </div>
 
-      <TextoExpandible id={aviso.id} texto={aviso.propuesta} className="mb-2 flex-grow" />
+      <TextoExpandible texto={aviso.propuesta} className="mb-2 flex-grow" />
       <p className="text-xs text-slate-400 leading-relaxed mb-4">{aviso.modalidad} · {aviso.diasHorarios}</p>
 
       {fechaLimite && (
