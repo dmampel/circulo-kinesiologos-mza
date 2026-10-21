@@ -305,6 +305,12 @@ export default async function InstitucionalPage() {
               >
                 +54 9 261 3619468
               </a>
+              <a
+                href="tel:+542614298915"
+                className="block mt-2 text-lg md:text-xl xl:text-2xl 2xl:text-3xl font-black text-slate-900 hover:text-blue-600 transition-colors duration-200 tracking-tighter"
+              >
+                0261 429-8915
+              </a>
             </div>
           </div>
         </div>

@@ -255,12 +255,13 @@ export class AvisoRepository {
     pageSize: number,
   ): Promise<PaginatedResult<AvisoKinesiologoPublico>> {
     const { localidadId, tipoPuesto } = filtros;
-    const hoy = new Date();
 
     const condiciones: Prisma.Sql[] = [
       Prisma.sql`a.estado = 'PUBLICADO'::"EstadoAviso"`,
       // Vencimiento (design.md — D7): sin cron, un filtro más en la consulta.
-      Prisma.sql`(a."fechaLimite" IS NULL OR a."fechaLimite" >= ${hoy})`,
+      // fechaLimite es medianoche UTC del día elegido: se compara contra la fecha
+      // de hoy en Mendoza para que el aviso siga visible todo el día límite.
+      Prisma.sql`(a."fechaLimite" IS NULL OR a."fechaLimite" >= (now() AT TIME ZONE 'America/Argentina/Mendoza')::date)`,
     ];
     if (localidadId) condiciones.push(Prisma.sql`a."localidadId" = ${localidadId}`);
     if (tipoPuesto) {

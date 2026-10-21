@@ -79,6 +79,16 @@ describe("AvisoRepository.findBuscoKinesiologoPublicados — vencimiento (design
     expect(sql).toContain('"fechaLimite" >=');
   });
 
+  it("compara contra el día de hoy en Mendoza, no contra el instante actual", async () => {
+    // fechaLimite se guarda a medianoche UTC: contra `now()` el aviso vencía
+    // el día anterior a las 21 hs de Mendoza.
+    await AvisoRepository.findBuscoKinesiologoPublicados({}, 1, 12);
+
+    expect(sqlDeLaUltimaLlamada()).toContain(
+      `"fechaLimite" >= (now() AT TIME ZONE 'America/Argentina/Mendoza')::date`,
+    );
+  });
+
   it("aplica el filtro de localidad y tipoPuesto cuando vienen en los filtros", async () => {
     await AvisoRepository.findBuscoKinesiologoPublicados({ localidadId: "loc-1", tipoPuesto: "planta" }, 1, 12);
 
