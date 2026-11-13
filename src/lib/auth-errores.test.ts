@@ -130,3 +130,10 @@ describe("mensajeInformativoDeAuth", () => {
     ).toBeNull();
   });
 });
+
+describe("sin_cuenta", () => {
+  it("explica que está en el padrón y que pida la invitación a Administración", () => {
+    expect(mensajeDeErrorDeAuth("sin_cuenta")).toMatch(/padrón/);
+    expect(mensajeDeErrorDeAuth("sin_cuenta")).toMatch(/Administración/);
+  });
+});

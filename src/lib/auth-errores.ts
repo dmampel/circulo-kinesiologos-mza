@@ -96,6 +96,8 @@ export function mensajeDeErrorDeContrasena(
 const ERRORES_AUTH: Record<string, string> = {
   credenciales_invalidas:
     "El email o la contraseña no son correctos. Revisalos e intentá de nuevo.",
+  sin_cuenta:
+    "Tu email está en el padrón, pero todavía no tenés una cuenta. Solicitá a Administración que te envíen la invitación.",
   registro_fallido:
     "No pudimos crear la cuenta. Revisá los datos e intentá de nuevo.",
   enlace_invalido:

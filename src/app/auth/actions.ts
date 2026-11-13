@@ -1,6 +1,7 @@
 "use server";
 
 import { createClient } from "@/utils/supabase/server";
+import prisma from "@/lib/prisma";
 import { construirUrlAbsoluta } from "@/lib/site";
 import { codigoDeErrorDeContrasena } from "@/lib/auth-errores";
 import {
@@ -10,6 +11,22 @@ import {
 } from "@/lib/activacion";
 import { revalidatePath } from "next/cache";
 import { redirect } from "next/navigation";
+
+/**
+ * Supabase responde igual para "no existe" y "clave mal". Si el email está en
+ * el padrón pero sin cuenta (userId null), el socio nunca activó la invitación:
+ * se lo decimos en vez del genérico. Si la consulta falla, cae al genérico.
+ */
+async function motivoDeLoginFallido(email: string) {
+  try {
+    const socio = await prisma.profesional.findFirst({
+      where: { email: { equals: email.trim(), mode: "insensitive" } },
+      select: { userId: true },
+    });
+    if (socio && !socio.userId) return "sin_cuenta";
+  } catch {}
+  return "credenciales_invalidas";
+}
 
 export async function login(formData: FormData) {
   const supabase = await createClient();
@@ -22,7 +39,7 @@ export async function login(formData: FormData) {
   const { data: { user }, error } = await supabase.auth.signInWithPassword(data);
 
   if (error || !user) {
-    redirect("/login?error=credenciales_invalidas");
+    redirect(`/login?error=${await motivoDeLoginFallido(data.email)}`);
   }
 
   revalidatePath("/", "layout");

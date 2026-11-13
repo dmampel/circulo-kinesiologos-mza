@@ -17,6 +17,11 @@ vi.mock("@/utils/supabase/server", () => ({
   })),
 }));
 
+const mockFindFirst = vi.hoisted(() => vi.fn());
+vi.mock("@/lib/prisma", () => ({
+  default: { profesional: { findFirst: mockFindFirst } },
+}));
+
 vi.mock("next/cache", () => ({ revalidatePath: vi.fn() }));
 /**
  * En Next el `redirect` real corta el flujo tirando una excepcion. Un mock que
@@ -208,11 +213,49 @@ describe("códigos de aviso que viajan por la URL", () => {
   beforeEach(() => {
     vi.clearAllMocks();
     mockSignInWithPassword.mockResolvedValue({ data: { user: null }, error: { message: "Invalid login credentials" } });
+    mockFindFirst.mockResolvedValue(null);
     mockSignUp.mockResolvedValue({ error: null });
     mockResetPasswordForEmail.mockResolvedValue({ error: null });
   });
 
   it("login fallido manda un código, no el texto de Supabase", async () => {
+    const fd = new FormData();
+    fd.set("email", "socio@ejemplo.com");
+    fd.set("password", "mal");
+
+    await correr(login(fd));
+
+    expect(destino()).toBe("/login?error=credenciales_invalidas");
+  });
+
+  it("login fallido de alguien del padrón sin cuenta manda sin_cuenta", async () => {
+    mockFindFirst.mockResolvedValue({ userId: null });
+    const fd = new FormData();
+    fd.set("email", " Socio@Ejemplo.com ");
+    fd.set("password", "x");
+
+    await correr(login(fd));
+
+    expect(destino()).toBe("/login?error=sin_cuenta");
+    expect(mockFindFirst.mock.calls[0][0].where.email).toEqual({
+      equals: "Socio@Ejemplo.com",
+      mode: "insensitive",
+    });
+  });
+
+  it("login fallido de alguien del padrón CON cuenta sigue siendo credenciales_invalidas", async () => {
+    mockFindFirst.mockResolvedValue({ userId: "auth-9" });
+    const fd = new FormData();
+    fd.set("email", "socio@ejemplo.com");
+    fd.set("password", "mal");
+
+    await correr(login(fd));
+
+    expect(destino()).toBe("/login?error=credenciales_invalidas");
+  });
+
+  it("si la consulta al padrón falla, cae a credenciales_invalidas", async () => {
+    mockFindFirst.mockRejectedValue(new Error("db caída"));
     const fd = new FormData();
     fd.set("email", "socio@ejemplo.com");
     fd.set("password", "mal");
