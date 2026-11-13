@@ -21,6 +21,7 @@ import {
 import AdminSearch from "../_components/AdminSearch";
 import BotonReenviar from "./BotonReenviar";
 import BotonActualizar from "./BotonActualizar";
+import { coincide } from "./coincide";
 
 // El resumen se cruza en vivo contra Supabase Auth: nunca se cachea.
 export const dynamic = "force-dynamic";
@@ -87,17 +88,6 @@ const formatearDia = (dia: string) => {
   const [anio, mes, day] = dia.split("-");
   return `${day}/${mes}/${anio}`;
 };
-
-function coincide(profesional: InvitacionProfesional, busqueda: string) {
-  if (!busqueda) return true;
-  const termino = busqueda.toLowerCase();
-  return [
-    profesional.apellido,
-    profesional.nombre,
-    profesional.matricula,
-    profesional.email ?? "",
-  ].some((campo) => campo.toLowerCase().includes(termino));
-}
 
 export default async function InvitacionesAdminPage({
   searchParams,
