@@ -293,6 +293,8 @@ export default function PerfilForm({ profesional, localidades, especialidades }:
               </div>
 
               <DomiciliosAdicionalesField
+                // remonta al cambiar lo guardado: las filas nuevas pasan a ser "iniciales"
+                key={JSON.stringify(profesional.domiciliosAdicionales)}
                 localidades={localidades}
                 defaultValue={profesional.domiciliosAdicionales}
               />
