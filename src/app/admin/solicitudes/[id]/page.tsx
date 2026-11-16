@@ -57,6 +57,17 @@ export default async function DetalleSolicitudPage({ params }: Props) {
   const especialidadNombre =
     especialidadesEncontradas.map((esp) => esp.nombre).join(", ") || "Sin especialidad";
   
+  const adicionales: { direccion: string; localidadId: string }[] = Array.isArray(datos?.domiciliosAdicionales)
+    ? datos.domiciliosAdicionales
+    : [];
+  const localidadesAdicionales = adicionales.length
+    ? await prisma.localidad.findMany({
+        where: { id: { in: adicionales.map((d) => d.localidadId) } },
+        select: { id: true, nombre: true },
+      })
+    : [];
+  const nombreLocalidad = (lid: string) => localidadesAdicionales.find((l) => l.id === lid)?.nombre ?? "Localidad desconocida";
+
   // Catálogo compartido con la ficha exportable: una sola fuente de verdad para
   // el orden y las etiquetas de la documentación.
   const DOCS = DOCUMENTOS_SOLICITUD.map((doc) => ({
@@ -157,6 +168,16 @@ export default async function DetalleSolicitudPage({ params }: Props) {
                   <MapPin className="h-4 w-4 mr-2 text-slate-400" /> {datos?.direccion || "No especificada"}
                 </div>
               </div>
+              {adicionales.length > 0 && (
+                <div className="col-span-full space-y-1">
+                  <p className="text-[10px] font-black text-slate-400 uppercase tracking-widest">Otros domicilios</p>
+                  {adicionales.map((d, i) => (
+                    <div key={i} className="flex items-center text-slate-900 font-bold">
+                      <MapPin className="h-4 w-4 mr-2 text-slate-400" /> {d.direccion} — {nombreLocalidad(d.localidadId)}
+                    </div>
+                  ))}
+                </div>
+              )}
             </div>
           </section>
 

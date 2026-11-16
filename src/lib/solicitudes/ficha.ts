@@ -47,6 +47,8 @@ export type FichaSolicitud = {
   telefono: string;
   direccion: string;
   localidad: string;
+  /** Líneas "dirección — localidad". */
+  domiciliosAdicionales: string[];
   especialidades: string;
   estado: string;
   creadaEn: Date;
@@ -75,6 +77,8 @@ type NombresResueltos = {
   localidad: string;
   /** Nombres de especialidades ya resueltos desde `datos.especialidades`. */
   especialidades: string[];
+  /** Líneas "dirección — localidad" ya resueltas. */
+  domiciliosAdicionales?: string[];
 };
 
 /** Devuelve el string si tiene contenido; si no, el marcador de dato ausente. */
@@ -84,7 +88,7 @@ function oSinDato(valor: unknown): string {
 
 export function construirFicha(
   solicitud: SolicitudFicha,
-  { localidad, especialidades }: NombresResueltos
+  { localidad, especialidades, domiciliosAdicionales = [] }: NombresResueltos
 ): FichaSolicitud {
   const datos = (solicitud.datos ?? {}) as Record<string, unknown>;
   const archivos = (datos.archivos ?? {}) as Record<string, unknown>;
@@ -109,6 +113,7 @@ export function construirFicha(
     telefono: oSinDato(datos.telefono),
     direccion: oSinDato(datos.direccion),
     localidad: oSinDato(localidad),
+    domiciliosAdicionales,
     especialidades: especialidades.length > 0 ? especialidades.join(", ") : "Sin especialidad",
     estado: solicitud.status,
     creadaEn: solicitud.creada_en,

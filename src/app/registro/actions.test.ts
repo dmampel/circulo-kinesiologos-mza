@@ -526,3 +526,39 @@ describe("crearSolicitud — aviso institucional", () => {
     expect(mockSend).not.toHaveBeenCalled();
   });
 });
+
+describe("crearSolicitud — domicilios adicionales", () => {
+  beforeEach(() => {
+    mockSolicitudFindFirst.mockResolvedValue(null);
+    mockList.mockResolvedValue({
+      data: Object.values(crearSolicitudInputBase.archivos).map((name) => ({ name })),
+      error: null,
+    } as any);
+    mockSolicitudCreate.mockResolvedValue({} as any);
+  });
+
+  it("guarda los domicilios adicionales dentro de datos", async () => {
+    const extra = [{ direccion: "San Martín 45", localidadId: "loc-2" }];
+    const r = await crearSolicitud({ ...crearSolicitudInputBase, domiciliosAdicionales: extra });
+    expect(r.success).toBe(true);
+    expect(mockSolicitudCreate).toHaveBeenCalledWith(
+      expect.objectContaining({ data: expect.objectContaining({ datos: expect.objectContaining({ domiciliosAdicionales: extra }) }) })
+    );
+  });
+
+  it("guarda lista vacía si no se envían", async () => {
+    await crearSolicitud(crearSolicitudInputBase);
+    expect(mockSolicitudCreate).toHaveBeenCalledWith(
+      expect.objectContaining({ data: expect.objectContaining({ datos: expect.objectContaining({ domiciliosAdicionales: [] }) }) })
+    );
+  });
+
+  it("rechaza un domicilio adicional sin dirección", async () => {
+    const r = await crearSolicitud({
+      ...crearSolicitudInputBase,
+      domiciliosAdicionales: [{ direccion: "", localidadId: "loc-2" }],
+    });
+    expect(r.success).toBe(false);
+    expect(mockSolicitudCreate).not.toHaveBeenCalled();
+  });
+});

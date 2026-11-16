@@ -1,6 +1,7 @@
 import prisma from "@/lib/prisma";
 import { Prisma } from "@prisma/client";
 import { cache } from "react";
+import type { DomicilioAdicionalInput } from "@/lib/domicilios";
 
 export interface ProfesionalFilters {
   query?: string;
@@ -50,7 +51,9 @@ export class ProfesionalRepository {
             }
           : {},
         char ? { apellido: { startsWith: char, mode: "insensitive" } } : {},
-        localidadId ? { localidadId } : {},
+        localidadId
+          ? { OR: [{ localidadId }, { domiciliosAdicionales: { some: { localidadId } } }] }
+          : {},
         especialidadId ? { especialidades: { some: { id: especialidadId } } } : {},
       ],
     };
@@ -62,6 +65,7 @@ export class ProfesionalRepository {
         include: {
           localidad: true,
           especialidades: true,
+          domiciliosAdicionales: { include: { localidad: true } },
         },
         orderBy: { apellido: "asc" },
         skip: (page - 1) * pageSize,
@@ -81,6 +85,7 @@ export class ProfesionalRepository {
       include: {
         localidad: true,
         especialidades: true,
+        domiciliosAdicionales: { include: { localidad: true } },
       },
     });
   }
@@ -97,6 +102,7 @@ export class ProfesionalRepository {
       include: {
         localidad: true,
         especialidades: true,
+        domiciliosAdicionales: true,
       },
     });
   });
@@ -148,5 +154,15 @@ export class ProfesionalRepository {
         ...(especialidadIds ? { especialidades: { set: especialidadIds.map((id) => ({ id })) } } : {}),
       },
     });
+  }
+
+  /** Reemplaza todos los domicilios adicionales del profesional. */
+  static async setDomiciliosAdicionales(profesionalId: string, items: DomicilioAdicionalInput[]) {
+    return prisma.$transaction([
+      prisma.domicilioAdicional.deleteMany({ where: { profesionalId } }),
+      prisma.domicilioAdicional.createMany({
+        data: items.map((i) => ({ profesionalId, ...i })),
+      }),
+    ]);
   }
 }

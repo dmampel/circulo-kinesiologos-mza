@@ -15,6 +15,7 @@ import {
   AlertCircle
 } from "lucide-react";
 import { cn } from "@/lib/utils";
+import DomiciliosAdicionalesField from "@/components/socio/DomiciliosAdicionalesField";
 import {
   crearSolicitud,
   prepararSubidaSolicitud,
@@ -84,6 +85,7 @@ export default function RegistroPage() {
     especialidades: [] as string[],
     direccion: "",
     localidadId: "",
+    domiciliosAdicionales: [] as { direccion: string; localidadId: string }[],
   });
 
   useEffect(() => {
@@ -193,6 +195,8 @@ export default function RegistroPage() {
 
       const res = await crearSolicitud({
         ...formData,
+        // filas totalmente vacías se descartan; las incompletas las rechaza el server
+        domiciliosAdicionales: formData.domiciliosAdicionales.filter((d) => d.direccion.trim() || d.localidadId),
         archivos: mapearPathsDesdeUploads(prep.uploads),
       });
 
@@ -358,6 +362,13 @@ export default function RegistroPage() {
                 <div className="col-span-full space-y-2">
                   <label className="text-xs font-bold text-slate-400 uppercase ml-1">Dirección de Consultorio <span className="text-red-500">*</span></label>
                   <input name="direccion" value={formData.direccion} onChange={handleChange} type="text" required className="w-full px-6 py-4 rounded-2xl bg-slate-50 border-transparent focus:bg-white focus:border-blue-600 focus:ring-4 focus:ring-blue-100 transition-all text-sm font-medium" placeholder="Ej: Av. Colón 123" />
+                </div>
+                <div className="col-span-full">
+                  <DomiciliosAdicionalesField
+                    localidades={localidades}
+                    defaultValue={formData.domiciliosAdicionales}
+                    onChange={(rows) => setFormData((f) => ({ ...f, domiciliosAdicionales: rows }))}
+                  />
                 </div>
               </div>
             </div>

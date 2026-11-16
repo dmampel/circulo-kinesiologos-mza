@@ -3,6 +3,7 @@
 import prisma from "@/lib/prisma";
 import { supabaseAdmin } from "@/lib/supabase/admin";
 import { revalidatePath } from "next/cache";
+import { parseDomiciliosAdicionales } from "@/lib/domicilios";
 import { ProfesionalRepository } from "@/lib/repositories/ProfesionalRepository";
 import { getResend, canSendEmails, FROM_EMAIL, INSTITUTIONAL_EMAIL } from "@/lib/resend";
 import { EMAIL_INSTITUCIONAL } from "@/lib/site";
@@ -13,7 +14,7 @@ import { firmarUrlsDocumentos, SIGNED_URL_TTL_EMAIL_SEGUNDOS } from "@/lib/stora
 import { DOCUMENTOS_SOLICITUD } from "@/lib/solicitudes/ficha";
 import { construirAvisoInstitucional } from "@/lib/emails/solicitud-institucional";
 import { WHATSAPP_ADMINISTRACION, construirLinkWhatsApp, mensajeNuevaSolicitud } from "@/lib/whatsapp";
-import { resolverNombresSolicitud } from "@/lib/solicitudes/nombres";
+import { resolverNombresSolicitud, resolverDomiciliosAdicionales } from "@/lib/solicitudes/nombres";
 
 /**
  * Traduce las especialidades declaradas en `Solicitud.datos` al payload de relación
@@ -139,6 +140,18 @@ export async function gestionarSolicitud(id: string, accion: "APROBAR" | "RECHAZ
         throw new Error("La solicitud para un nuevo profesional no contiene una Localidad seleccionada.");
       }
 
+      // Domicilios adicionales: se validan ANTES de crear la identidad en Auth.
+      let domicilios: { direccion: string; localidadId: string }[] | null = null;
+      if (datos.domiciliosAdicionales !== undefined) {
+        const localidades = await prisma.localidad.findMany({ select: { id: true } });
+        const parsedDom = parseDomiciliosAdicionales(
+          JSON.stringify(datos.domiciliosAdicionales),
+          new Set(localidades.map((l) => l.id))
+        );
+        if (!parsedDom.ok) return { success: false, error: parsedDom.error };
+        domicilios = parsedDom.items;
+      }
+
       // 4. Invitar al usuario a Supabase Auth
       const { data: authData, error: authError } = await supabaseAdmin.auth.admin.inviteUserByEmail(
         solicitud.email,
@@ -158,7 +171,9 @@ export async function gestionarSolicitud(id: string, accion: "APROBAR" | "RECHAZ
 
       // 5. Vincular profesional existente o crear uno nuevo
       try {
+        let profesionalId: string;
         if (existeMatricula) {
+          profesionalId = existeMatricula.id;
           await prisma.profesional.update({
             where: { id: existeMatricula.id },
             data: {
@@ -172,7 +187,7 @@ export async function gestionarSolicitud(id: string, accion: "APROBAR" | "RECHAZ
             },
           });
         } else {
-          await prisma.profesional.create({
+          const creado = await prisma.profesional.create({
             data: {
               nombre: solicitud.nombre,
               apellido: solicitud.apellido,
@@ -189,7 +204,9 @@ export async function gestionarSolicitud(id: string, accion: "APROBAR" | "RECHAZ
               especialidades: await resolverEspecialidades(datos)
             },
           });
+          profesionalId = creado.id;
         }
+        if (domicilios?.length) await ProfesionalRepository.setDomiciliosAdicionales(profesionalId, domicilios);
       } catch (dbError: unknown) {
         // La identidad en Supabase Auth ya se creó (paso 4): si no la revertimos acá,
         // queda huérfana y un reintento de "Aprobar" fallará en inviteUserByEmail.
@@ -299,6 +316,7 @@ export async function reenviarAvisoInstitucional(id: string): Promise<{ success:
 
     const datos = solicitud.datos;
     const { localidad, especialidades } = await resolverNombresSolicitud(datos);
+    const domiciliosAdicionales = await resolverDomiciliosAdicionales(datos);
 
     const archivos = archivosDe(datos);
     const paths = DOCUMENTOS_SOLICITUD.map((doc) => archivos[doc.id]).filter(
@@ -324,6 +342,7 @@ export async function reenviarAvisoInstitucional(id: string): Promise<{ success:
       telefono: texto((datos as { telefono?: unknown } | null)?.telefono),
       direccion: texto((datos as { direccion?: unknown } | null)?.direccion),
       localidad,
+      domiciliosAdicionales,
       especialidades,
       documentos,
       whatsappUrl,

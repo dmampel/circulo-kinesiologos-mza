@@ -32,6 +32,8 @@ export type DatosAvisoInstitucional = {
   direccion: string;
   /** Ya resuelta desde `localidadId`, o el marcador de "no disponible". */
   localidad: string;
+  /** Líneas "dirección — localidad" ya resueltas; opcional. */
+  domiciliosAdicionales?: string[];
   /** Ya resueltas desde los IDs de especialidad. */
   especialidades: string;
   documentos: Array<{ label: string; url?: string }>;
@@ -84,6 +86,7 @@ export function construirAvisoInstitucional(
         ${filaDato("Teléfono", datos.telefono)}
         ${filaDato("Dirección", datos.direccion)}
         ${filaDato("Localidad", datos.localidad)}
+        ${(datos.domiciliosAdicionales ?? []).map((d) => filaDato("Otros domicilios", d)).join("\n        ")}
         ${filaDato("Especialidad(es)", datos.especialidades)}
         <hr style="border: 0; border-top: 1px solid #eee; margin: 20px 0;" />
         ${bloqueDocumentos(datos.documentos)}

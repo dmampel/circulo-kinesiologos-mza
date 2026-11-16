@@ -72,3 +72,29 @@ export async function resolverNombresSolicitud(datos: unknown): Promise<NombresS
 
   return { localidad, especialidades };
 }
+
+/**
+ * Resuelve `datos.domiciliosAdicionales` a líneas "dirección — localidad" para
+ * mails y ficha. Nunca lanza ni devuelve IDs; sin el campo (solicitudes viejas)
+ * o ante un fallo de Prisma devuelve [].
+ */
+export async function resolverDomiciliosAdicionales(datos: unknown): Promise<string[]> {
+  const crudo = (datos as { domiciliosAdicionales?: unknown } | null)?.domiciliosAdicionales;
+  if (!Array.isArray(crudo) || crudo.length === 0) return [];
+
+  const filas = crudo.map((d) => ({
+    direccion: String(d?.direccion ?? "").trim(),
+    localidadId: String(d?.localidadId ?? ""),
+  }));
+
+  try {
+    const localidades = await prisma.localidad.findMany({
+      where: { id: { in: filas.map((f) => f.localidadId) } },
+      select: { id: true, nombre: true },
+    });
+    const nombres = new Map(localidades.map((l) => [l.id, l.nombre]));
+    return filas.map((f) => `${f.direccion} — ${nombres.get(f.localidadId) ?? SIN_LOCALIDAD}`);
+  } catch {
+    return [];
+  }
+}

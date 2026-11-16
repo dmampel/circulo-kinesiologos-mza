@@ -15,7 +15,7 @@ import { firmarUrlsDocumentos, SIGNED_URL_TTL_EMAIL_SEGUNDOS } from "@/lib/stora
 import { DOCUMENTOS_SOLICITUD } from "@/lib/solicitudes/ficha";
 import { construirAvisoInstitucional } from "@/lib/emails/solicitud-institucional";
 import { WHATSAPP_ADMINISTRACION, construirLinkWhatsApp, mensajeNuevaSolicitud } from "@/lib/whatsapp";
-import { resolverNombresSolicitud } from "@/lib/solicitudes/nombres";
+import { resolverNombresSolicitud, resolverDomiciliosAdicionales } from "@/lib/solicitudes/nombres";
 
 const BUCKET_SOLICITUDES = "solicitudes";
 
@@ -136,6 +136,7 @@ type CrearSolicitudInput = {
   telefono: string;
   direccion: string;
   localidadId: string;
+  domiciliosAdicionales?: { direccion: string; localidadId: string }[];
   especialidades: string[];
   archivos: Record<string, string>;
 };
@@ -152,7 +153,7 @@ export async function crearSolicitud(input: CrearSolicitudInput): Promise<{ succ
     return { success: false, error: parsed.error.issues[0]?.message ?? "Datos inválidos." };
   }
 
-  const { nombre, apellido, email, matricula, dni, telefono, direccion, localidadId, especialidades, archivos } =
+  const { nombre, apellido, email, matricula, dni, telefono, direccion, localidadId, domiciliosAdicionales, especialidades, archivos } =
     parsed.data;
 
   // Re-ejecutar verificación de duplicados: protección contra carrera entre
@@ -194,6 +195,8 @@ export async function crearSolicitud(input: CrearSolicitudInput): Promise<{ succ
     especialidades,
   });
 
+  const domiciliosAdicionalesNombres = await resolverDomiciliosAdicionales({ domiciliosAdicionales });
+
   try {
     await prisma.solicitud.create({
       data: {
@@ -207,6 +210,7 @@ export async function crearSolicitud(input: CrearSolicitudInput): Promise<{ succ
           telefono,
           direccion,
           localidadId,
+          domiciliosAdicionales,
           especialidades,
           archivos,
           fecha_solicitud: new Date().toISOString(),
@@ -243,6 +247,7 @@ export async function crearSolicitud(input: CrearSolicitudInput): Promise<{ succ
           telefono,
           direccion,
           localidad: localidadNombre,
+          domiciliosAdicionales: domiciliosAdicionalesNombres,
           especialidades: especialidadNombre,
           documentos,
           whatsappUrl,

@@ -70,6 +70,10 @@ export default async function PerfilPage() {
           horarios: profesional.horarios ?? null,
           foto_url: profesional.foto_url ?? null,
           localidadId: profesional.localidadId,
+          domiciliosAdicionales: profesional.domiciliosAdicionales.map((d) => ({
+            direccion: d.direccion,
+            localidadId: d.localidadId,
+          })),
         }}
         localidades={localidades.map((l) => ({ id: l.id, nombre: l.nombre }))}
         especialidades={especialidades.map((e) => ({ id: e.id, nombre: e.nombre }))}

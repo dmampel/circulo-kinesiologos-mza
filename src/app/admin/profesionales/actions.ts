@@ -4,6 +4,8 @@ import { Prisma, Status } from "@prisma/client";
 import prisma from "@/lib/prisma";
 import { revalidatePath } from "next/cache";
 import { requireAdmin } from "@/utils/supabase/require-admin";
+import { parseDomiciliosAdicionales } from "@/lib/domicilios";
+import { ProfesionalRepository } from "@/lib/repositories/ProfesionalRepository";
 import { supabaseAdmin } from "@/lib/supabase/admin";
 import { construirUrlAbsoluta } from "@/lib/site";
 import { getResend, canSendEmails, FROM_EMAIL } from "@/lib/resend";
@@ -22,6 +24,7 @@ type ProfesionalInput = {
   foto_url?: string;
   localidadId: string;
   status?: Status;
+  domiciliosAdicionales?: string; // JSON [{direccion, localidadId}]
 };
 
 export async function getProfesionales(search?: string, especialidadId?: string, localidadId?: string) {
@@ -160,10 +163,22 @@ export async function getLocalidadesYEspecialidades() {
 export async function saveProfesional(data: ProfesionalInput, especialidadIds: string[]) {
   await requireAdmin();
   try {
+    let domicilios: { direccion: string; localidadId: string }[] | null = null;
+    if (data.domiciliosAdicionales !== undefined) {
+      const localidades = await prisma.localidad.findMany({ select: { id: true } });
+      const parsed = parseDomiciliosAdicionales(
+        data.domiciliosAdicionales,
+        new Set(localidades.map((l) => l.id))
+      );
+      if (!parsed.ok) return { success: false, error: parsed.error };
+      domicilios = parsed.items;
+    }
+
     const baseSlug = `${data.nombre.toLowerCase().replace(/[^a-z0-9]+/g, '-')}-${data.apellido.toLowerCase().replace(/[^a-z0-9]+/g, '-')}`;
 
+    let profesionalId: string;
     if (data.id) {
-      await prisma.profesional.update({
+      const actualizado = await prisma.profesional.update({
         where: { id: data.id },
         data: {
           nombre: data.nombre,
@@ -183,8 +198,9 @@ export async function saveProfesional(data: ProfesionalInput, especialidadIds: s
           }
         },
       });
+      profesionalId = actualizado.id;
     } else {
-      await prisma.profesional.create({
+      const creado = await prisma.profesional.create({
         data: {
           nombre: data.nombre,
           apellido: data.apellido,
@@ -205,7 +221,9 @@ export async function saveProfesional(data: ProfesionalInput, especialidadIds: s
           }
         },
       });
+      profesionalId = creado.id;
     }
+    if (domicilios) await ProfesionalRepository.setDomiciliosAdicionales(profesionalId, domicilios);
     revalidatePath("/admin/profesionales");
     return { success: true };
   } catch {

@@ -49,6 +49,9 @@ model Profesional {
   localidadId String
   localidad   Localidad @relation(fields: [localidadId], references: [id])
 
+  // Domicilios extra además del principal (direccion + localidadId)
+  domiciliosAdicionales DomicilioAdicional[]
+
   especialidades            Especialidad[]
   inscripcionesCapacitacion InscripcionCapacitacion[]
   lecturasCirculares        LecturaCircular[]
@@ -56,7 +59,7 @@ model Profesional {
   pacientes                 Paciente[]
   turnos                    Turno[]
   inscripcionesSorteo       InscripcionSorteo[]
-  sorteoGanado              Sorteo?            @relation("SorteoGanador")
+  sorteoGanado              Sorteo?                   @relation("SorteoGanador")
 
   // Auth y Sistema
   userId String?  @unique // ID de Supabase Auth
@@ -68,13 +71,27 @@ model Profesional {
 }
 
 model Localidad {
-  id            String        @id @default(cuid())
-  nombre        String        @unique
-  profesionales Profesional[]
-  createdAt     DateTime      @default(now())
+  id                    String               @id @default(cuid())
+  nombre                String               @unique
+  profesionales         Profesional[]
+  domiciliosAdicionales DomicilioAdicional[]
+  createdAt             DateTime             @default(now())
 
   avisosBuscoTrabajo     AvisoBuscoTrabajo[]
   avisosBuscoKinesiologo AvisoBuscoKinesiologo[]
+}
+
+model DomicilioAdicional {
+  id            String      @id @default(cuid())
+  direccion     String
+  profesionalId String
+  profesional   Profesional @relation(fields: [profesionalId], references: [id], onDelete: Cascade)
+  localidadId   String
+  localidad     Localidad   @relation(fields: [localidadId], references: [id])
+  createdAt     DateTime    @default(now())
+
+  @@index([profesionalId])
+  @@index([localidadId])
 }
 
 model Especialidad {
@@ -83,19 +100,19 @@ model Especialidad {
   profesionales Profesional[]
   createdAt     DateTime      @default(now())
 
-  avisosBuscoTrabajo AvisoBuscoTrabajo[]
+  avisosBuscoTrabajo AvisoBuscoTrabajo[] @relation("AvisoBuscoTrabajoEspecialidades")
 }
 
 model Noticia {
-  id           String    @id @default(cuid())
-  slug         String    @unique
-  titulo       String
-  resumen      String?
-  contenido    String // Contenido en Markdown
-  imagen_url   String?   // cache derivado: imagenes[0].url (ver NoticiaImagen)
-  publicada    Boolean   @default(false)
-  publicada_en DateTime?
-  enlaceExterno String?  // link opcional a un recurso externo (ej. post de Instagram)
+  id            String    @id @default(cuid())
+  slug          String    @unique
+  titulo        String
+  resumen       String?
+  contenido     String // Contenido en Markdown
+  imagen_url    String? // cache derivado: imagenes[0].url (ver NoticiaImagen)
+  publicada     Boolean   @default(false)
+  publicada_en  DateTime?
+  enlaceExterno String? // link opcional a un recurso externo (ej. post de Instagram)
 
   // Relaciones
   categoriaId String?
@@ -119,12 +136,12 @@ model NoticiaImagen {
 }
 
 model Circular {
-  id           String    @id @default(cuid())
+  id           String            @id @default(cuid())
   titulo       String
-  contenido    String?   @db.Text
+  contenido    String?           @db.Text
   etiqueta     String
   archivo_url  String?
-  publicada    Boolean   @default(false)
+  publicada    Boolean           @default(false)
   publicada_en DateTime?
   lecturas     LecturaCircular[]
 
@@ -133,13 +150,13 @@ model Circular {
 }
 
 model LecturaCircular {
-  id             String      @id @default(cuid())
-  circularId     String
-  profesionalId  String
-  readAt         DateTime    @default(now())
+  id            String   @id @default(cuid())
+  circularId    String
+  profesionalId String
+  readAt        DateTime @default(now())
 
-  circular       Circular    @relation(fields: [circularId], references: [id], onDelete: Cascade)
-  profesional    Profesional @relation(fields: [profesionalId], references: [id], onDelete: Cascade)
+  circular    Circular    @relation(fields: [circularId], references: [id], onDelete: Cascade)
+  profesional Profesional @relation(fields: [profesionalId], references: [id], onDelete: Cascade)
 
   @@unique([circularId, profesionalId])
 }
@@ -221,35 +238,35 @@ enum EstadoInscripcion {
 }
 
 model Capacitacion {
-  id              String                @id @default(cuid())
-  tipo            TipoCapacitacion
-  titulo          String
-  descripcion     String                @db.Text
-  modalidad       ModalidadCapacitacion
-  fechaInicio     DateTime
-  fechaFin        DateTime?
-  ubicacion       String?
-  cupoMaximo      Int?
-  costo           Decimal?              @db.Decimal(10,2)
-  publicada       Boolean               @default(false)
-  
-  inscripciones   InscripcionCapacitacion[]
-  
-  createdAt       DateTime              @default(now())
-  updatedAt       DateTime              @updatedAt
+  id          String                @id @default(cuid())
+  tipo        TipoCapacitacion
+  titulo      String
+  descripcion String                @db.Text
+  modalidad   ModalidadCapacitacion
+  fechaInicio DateTime
+  fechaFin    DateTime?
+  ubicacion   String?
+  cupoMaximo  Int?
+  costo       Decimal?              @db.Decimal(10, 2)
+  publicada   Boolean               @default(false)
+
+  inscripciones InscripcionCapacitacion[]
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
 }
 
 model InscripcionCapacitacion {
-  id              String            @id @default(cuid())
-  capacitacionId  String
-  profesionalId   String
-  estado          EstadoInscripcion @default(PENDIENTE)
-  
-  capacitacion    Capacitacion      @relation(fields: [capacitacionId], references: [id])
-  profesional     Profesional       @relation(fields: [profesionalId], references: [id])
-  
-  createdAt       DateTime          @default(now())
-  updatedAt       DateTime          @updatedAt
+  id             String            @id @default(cuid())
+  capacitacionId String
+  profesionalId  String
+  estado         EstadoInscripcion @default(PENDIENTE)
+
+  capacitacion Capacitacion @relation(fields: [capacitacionId], references: [id])
+  profesional  Profesional  @relation(fields: [profesionalId], references: [id])
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
 
   @@unique([capacitacionId, profesionalId])
 }
@@ -278,15 +295,15 @@ model Paciente {
 }
 
 model EntradaHistoriaClinica {
-  id          String   @id @default(cuid())
-  fecha       DateTime @default(now())
-  motivo      String?
-  evolucion   String   @db.Text
-  pacienteId  String
-  paciente    Paciente @relation(fields: [pacienteId], references: [id], onDelete: Cascade)
+  id         String   @id @default(cuid())
+  fecha      DateTime @default(now())
+  motivo     String?
+  evolucion  String   @db.Text
+  pacienteId String
+  paciente   Paciente @relation(fields: [pacienteId], references: [id], onDelete: Cascade)
 
-  createdAt   DateTime @default(now())
-  updatedAt   DateTime @updatedAt
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
 }
 
 model Turno {
@@ -311,8 +328,8 @@ model Autoridad {
   profesionalId String
   profesional   Profesional @relation(fields: [profesionalId], references: [id], onDelete: Cascade)
 
-  createdAt     DateTime    @default(now())
-  updatedAt     DateTime    @updatedAt
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
 }
 
 enum EstadoSorteo {
@@ -322,22 +339,22 @@ enum EstadoSorteo {
 }
 
 model Sorteo {
-  id               String              @id @default(cuid())
+  id               String       @id @default(cuid())
   titulo           String
-  descripcion      String              @db.Text
+  descripcion      String       @db.Text
   imagen_url       String?
   instagramUrl     String?
   fechaInicio      DateTime
   fechaCierre      DateTime?
   maxParticipantes Int?
-  estado           EstadoSorteo        @default(BORRADOR)
+  estado           EstadoSorteo @default(BORRADOR)
 
-  inscripciones    InscripcionSorteo[]
-  ganadorId        String?             @unique
-  ganador          Profesional?        @relation("SorteoGanador", fields: [ganadorId], references: [id])
+  inscripciones InscripcionSorteo[]
+  ganadorId     String?             @unique
+  ganador       Profesional?        @relation("SorteoGanador", fields: [ganadorId], references: [id])
 
-  createdAt        DateTime            @default(now())
-  updatedAt        DateTime            @updatedAt
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
 }
 
 model InscripcionSorteo {
@@ -370,16 +387,17 @@ model AvisoBuscoTrabajo {
   cvPath   String? // path dentro del bucket privado `bolsa-trabajo-cv`
   // ----------------------------------------------------------------------------
 
-  especialidadId String
-  especialidad   Especialidad @relation(fields: [especialidadId], references: [id])
+  // Tabla `_AvisoBuscoTrabajoEspecialidades` (A = aviso, B = especialidad):
+  // nombre hardcodeado en el $queryRaw de AvisoRepository — no renombrar la relación.
+  especialidades Especialidad[] @relation("AvisoBuscoTrabajoEspecialidades")
   localidadId    String
-  localidad      Localidad    @relation(fields: [localidadId], references: [id])
+  localidad      Localidad      @relation(fields: [localidadId], references: [id])
   zona           String? // texto libre complementario ("zona oeste", "Gran Mendoza")
 
   disponibilidad String
   presentacion   String
 
-  aceptaDifusion Boolean  // siempre true: el form no envía sin tildarlo
+  aceptaDifusion Boolean // siempre true: el form no envía sin tildarlo
   aceptadoEn     DateTime // registro del consentimiento
 
   estado    EstadoAviso @default(PENDIENTE) // ver design.md — D6
@@ -410,7 +428,7 @@ model AvisoBuscoKinesiologo {
 
   fechaLimite DateTime? // fecha límite para postularse. Ver design.md — D7
 
-  aceptaDifusion Boolean  // consentimiento explícito, igual que en AvisoBuscoTrabajo (confirmado, por simetría)
+  aceptaDifusion Boolean // consentimiento explícito, igual que en AvisoBuscoTrabajo (confirmado, por simetría)
   aceptadoEn     DateTime
 
   estado    EstadoAviso @default(PENDIENTE)

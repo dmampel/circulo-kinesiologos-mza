@@ -12,7 +12,7 @@ export default async function EditarProfesionalPage({ params }: { params: Promis
   
   const profesional = await prisma.profesional.findUnique({
     where: { id },
-    include: { especialidades: true }
+    include: { especialidades: true, domiciliosAdicionales: true }
   });
 
   if (!profesional) {

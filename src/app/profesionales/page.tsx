@@ -210,7 +210,11 @@ export default async function ProfesionalesPage({ searchParams }: Props) {
                       {/* Localidad — always visible */}
                       <div className="flex items-center text-xs text-slate-500 font-medium md:text-sm">
                         <MapPin className="h-3 w-3 mr-1 text-slate-300 shrink-0 md:h-4 md:w-4 md:mr-2" />
-                        <span className="truncate">{p.localidad.nombre}</span>
+                        <span className="truncate">
+                          {[p.localidad.nombre, ...(p.domiciliosAdicionales ?? []).map((d: { localidad: { nombre: string } }) => d.localidad.nombre)]
+                            .filter((n, i, a) => a.indexOf(n) === i)
+                            .join(" · ")}
+                        </span>
                       </div>
 
                       {/* Especialidades — only on desktop */}

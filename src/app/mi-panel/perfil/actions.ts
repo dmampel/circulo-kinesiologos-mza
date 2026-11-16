@@ -6,6 +6,7 @@ import { redirect } from "next/navigation";
 import { ProfesionalRepository, type UpdateProfesionalData } from "@/lib/repositories/ProfesionalRepository";
 import { LocalidadRepository } from "@/lib/repositories/LocalidadRepository";
 import { EspecialidadRepository } from "@/lib/repositories/EspecialidadRepository";
+import { parseDomiciliosAdicionales } from "@/lib/domicilios";
 import { supabaseAdmin } from "@/lib/supabase/admin";
 
 type ActionResult = { success: true } | { success: false; error: string };
@@ -87,8 +88,21 @@ export async function updateDatosContacto(
     data.localidadId = localidadId;
   }
 
+  // Domicilios adicionales: sólo si el form los envía (el form de foto/otros no).
+  let domicilios: { direccion: string; localidadId: string }[] | null = null;
+  if (formData.has("domiciliosAdicionales")) {
+    const localidades = await LocalidadRepository.getAll();
+    const parsed = parseDomiciliosAdicionales(
+      formData.get("domiciliosAdicionales") as string,
+      new Set(localidades.map((l) => l.id))
+    );
+    if (!parsed.ok) return { success: false, error: parsed.error };
+    domicilios = parsed.items;
+  }
+
   try {
     const actualizado = await ProfesionalRepository.update(user.id, data);
+    if (domicilios) await ProfesionalRepository.setDomiciliosAdicionales(actualizado.id, domicilios);
     revalidatePath("/mi-panel");
     revalidatePath("/mi-panel/perfil");
     // El Padrón Público muestra estos datos y filtra por localidad. El perfil

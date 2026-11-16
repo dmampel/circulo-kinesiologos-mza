@@ -82,3 +82,19 @@ describe("construirAvisoInstitucional", () => {
     expect(html).toContain("&lt;b&gt;");
   });
 });
+
+describe("construirAvisoInstitucional — domicilios adicionales", () => {
+  it("lista cada domicilio adicional, escapado", () => {
+    const { html } = construirAvisoInstitucional(
+      datosBase({ domiciliosAdicionales: ["San Martín 45 — Godoy Cruz", "<b>X</b> 1 — Luján"] })
+    );
+    expect(html).toContain("San Martín 45 — Godoy Cruz");
+    expect(html).toContain("&lt;b&gt;X&lt;/b&gt; 1 — Luján");
+    expect(html).not.toContain("<b>X</b>");
+  });
+
+  it("no agrega la fila si no hay adicionales", () => {
+    expect(construirAvisoInstitucional(datosBase()).html).not.toContain("Otros domicilios");
+    expect(construirAvisoInstitucional(datosBase({ domiciliosAdicionales: [] })).html).not.toContain("Otros domicilios");
+  });
+});

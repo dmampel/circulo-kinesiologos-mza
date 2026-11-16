@@ -85,3 +85,18 @@ describe("construirFicha", () => {
     expect(ficha.documentacionCompleta).toBe(false);
   });
 });
+
+describe("construirFicha — domicilios adicionales", () => {
+  it("expone los domicilios adicionales ya resueltos", () => {
+    const ficha = construirFicha(base, {
+      localidad: "Godoy Cruz",
+      especialidades: [],
+      domiciliosAdicionales: ["Colón 1 — Luján"],
+    });
+    expect(ficha.domiciliosAdicionales).toEqual(["Colón 1 — Luján"]);
+  });
+
+  it("es lista vacía cuando no se informan", () => {
+    expect(construirFicha(base, { localidad: "X", especialidades: [] }).domiciliosAdicionales).toEqual([]);
+  });
+});

@@ -11,6 +11,7 @@ vi.mock('@/lib/repositories/ProfesionalRepository', () => ({
     update: vi.fn(),
     findByUserId: vi.fn(),
     findByMatricula: vi.fn(),
+    setDomiciliosAdicionales: vi.fn(),
   },
 }));
 
@@ -246,5 +247,42 @@ describe('updateDatosContacto — especialidades', () => {
       'auth-user-1',
       expect.not.objectContaining({ especialidadIds: expect.anything() })
     );
+  });
+});
+
+describe('updateDatosContacto — domicilios adicionales', () => {
+  beforeEach(() => {
+    vi.clearAllMocks();
+    mockGetUser.mockResolvedValue({ data: { user: { id: 'auth-user-1' } } });
+    mockGetAll.mockResolvedValue([
+      { id: 'loc-1', nombre: 'Mendoza', createdAt: new Date() },
+      { id: 'loc-2', nombre: 'Godoy Cruz', createdAt: new Date() },
+    ] as any);
+    mockUpdate.mockResolvedValue({ id: 'prof-1', slug: 'juan-perez' } as unknown as Profesional);
+  });
+
+  it('guarda los domicilios adicionales válidos', async () => {
+    const items = [{ direccion: 'Av. Colón 1', localidadId: 'loc-2' }];
+    const res = await updateDatosContacto(
+      null,
+      buildFormData({ domiciliosAdicionales: JSON.stringify(items) })
+    );
+    expect(res).toEqual({ success: true });
+    expect(ProfesionalRepository.setDomiciliosAdicionales).toHaveBeenCalledWith('prof-1', items);
+  });
+
+  it('rechaza una localidad inválida sin escribir nada', async () => {
+    const res = await updateDatosContacto(
+      null,
+      buildFormData({ domiciliosAdicionales: JSON.stringify([{ direccion: 'X', localidadId: 'nope' }]) })
+    );
+    expect(res.success).toBe(false);
+    expect(mockUpdate).not.toHaveBeenCalled();
+    expect(ProfesionalRepository.setDomiciliosAdicionales).not.toHaveBeenCalled();
+  });
+
+  it('no toca los adicionales si el campo no viene en el form', async () => {
+    await updateDatosContacto(null, buildFormData({ telefono: '123' }));
+    expect(ProfesionalRepository.setDomiciliosAdicionales).not.toHaveBeenCalled();
   });
 });

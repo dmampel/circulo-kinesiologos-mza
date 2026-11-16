@@ -5,7 +5,11 @@ vi.mock('@/lib/prisma', () => ({
   default: {
     profesional: {
       findUnique: vi.fn(),
+      findMany: vi.fn(),
+      count: vi.fn(),
     },
+    domicilioAdicional: { deleteMany: vi.fn(), createMany: vi.fn() },
+    $transaction: vi.fn(),
   },
 }));
 
@@ -60,5 +64,33 @@ describe('ProfesionalRepository.findByMatricula', () => {
     mockFindUnique.mockResolvedValue(profesionalMock as any);
     const result = await ProfesionalRepository.findByMatricula('12345');
     expect(result).toEqual(profesionalMock);
+  });
+});
+
+describe('ProfesionalRepository.findPaginated — domicilios adicionales', () => {
+  it('filtra por localidad en el domicilio principal O en los adicionales', async () => {
+    vi.mocked(prisma.profesional.count).mockResolvedValue(0);
+    vi.mocked(prisma.profesional.findMany).mockResolvedValue([]);
+
+    await ProfesionalRepository.findPaginated(1, 24, { localidadId: 'loc-2' });
+
+    const where = vi.mocked(prisma.profesional.findMany).mock.calls[0][0]!.where as any;
+    expect(where.AND).toContainEqual({
+      OR: [{ localidadId: 'loc-2' }, { domiciliosAdicionales: { some: { localidadId: 'loc-2' } } }],
+    });
+  });
+});
+
+describe('ProfesionalRepository.setDomiciliosAdicionales', () => {
+  it('reemplaza los domicilios en una transacción', async () => {
+    vi.mocked(prisma.$transaction).mockResolvedValue([] as any);
+    await ProfesionalRepository.setDomiciliosAdicionales('prof-1', [
+      { direccion: 'Av. Colón 1', localidadId: 'loc-2' },
+    ]);
+    expect(prisma.domicilioAdicional.deleteMany).toHaveBeenCalledWith({ where: { profesionalId: 'prof-1' } });
+    expect(prisma.domicilioAdicional.createMany).toHaveBeenCalledWith({
+      data: [{ profesionalId: 'prof-1', direccion: 'Av. Colón 1', localidadId: 'loc-2' }],
+    });
+    expect(prisma.$transaction).toHaveBeenCalled();
   });
 });

@@ -1,5 +1,6 @@
 "use client";
 
+import DomiciliosAdicionalesField, { type DomicilioRow } from "./DomiciliosAdicionalesField";
 import { useActionState, useRef, useState } from "react";
 import { updateDatosContacto, updateFotoPerfil } from "@/app/mi-panel/perfil/actions";
 import { Phone, MessageCircle, MapPin, Clock, Camera, CheckCircle, AlertCircle, User, CreditCard, Mail, Stethoscope, Building2 } from "lucide-react";
@@ -20,6 +21,7 @@ interface PerfilFormProps {
     horarios: string | null;
     foto_url: string | null;
     localidadId: string;
+    domiciliosAdicionales: DomicilioRow[];
   };
   localidades: { id: string; nombre: string }[];
   especialidades: { id: string; nombre: string }[];
@@ -289,6 +291,11 @@ export default function PerfilForm({ profesional, localidades, especialidades }:
                   Define en qué localidad aparecés en el Padrón Público.
                 </p>
               </div>
+
+              <DomiciliosAdicionalesField
+                localidades={localidades}
+                defaultValue={profesional.domiciliosAdicionales}
+              />
 
               <div className="space-y-1.5">
                 <label htmlFor="horarios" className="flex items-center gap-2 text-[10px] font-black text-slate-500 uppercase tracking-widest">

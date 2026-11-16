@@ -7,12 +7,13 @@ vi.mock("@/lib/prisma", () => ({
     },
     localidad: {
       findUnique: vi.fn(),
+      findMany: vi.fn(),
     },
   },
 }));
 
 import prisma from "@/lib/prisma";
-import { resolverNombresSolicitud, SIN_LOCALIDAD } from "./nombres";
+import { resolverNombresSolicitud, resolverDomiciliosAdicionales, SIN_LOCALIDAD } from "./nombres";
 
 const mockEspecialidadFindMany = vi.mocked(prisma.especialidad.findMany);
 const mockLocalidadFindUnique = vi.mocked(prisma.localidad.findUnique);
@@ -97,5 +98,32 @@ describe("resolverNombresSolicitud", () => {
 
     const resultadoVacio = await resolverNombresSolicitud({});
     expect(resultadoVacio).toEqual({ localidad: SIN_LOCALIDAD, especialidades: "" });
+  });
+});
+
+describe("resolverDomiciliosAdicionales", () => {
+  it("devuelve 'dirección — localidad' por cada domicilio, nunca IDs", async () => {
+    vi.mocked(prisma.localidad.findMany).mockResolvedValue([{ id: "loc-2", nombre: "Godoy Cruz" }] as any);
+    const r = await resolverDomiciliosAdicionales({
+      domiciliosAdicionales: [{ direccion: "San Martín 45", localidadId: "loc-2" }],
+    });
+    expect(r).toEqual(["San Martín 45 — Godoy Cruz"]);
+  });
+
+  it("usa el marcador si la localidad no se resuelve", async () => {
+    vi.mocked(prisma.localidad.findMany).mockResolvedValue([] as any);
+    const r = await resolverDomiciliosAdicionales({
+      domiciliosAdicionales: [{ direccion: "X 1", localidadId: "loc-9" }],
+    });
+    expect(r).toEqual([`X 1 — ${SIN_LOCALIDAD}`]);
+  });
+
+  it("devuelve [] sin el campo (solicitudes viejas) y si Prisma falla", async () => {
+    expect(await resolverDomiciliosAdicionales({})).toEqual([]);
+    expect(await resolverDomiciliosAdicionales(null)).toEqual([]);
+    vi.mocked(prisma.localidad.findMany).mockRejectedValue(new Error("db"));
+    expect(
+      await resolverDomiciliosAdicionales({ domiciliosAdicionales: [{ direccion: "X", localidadId: "l" }] })
+    ).toEqual([]);
   });
 });

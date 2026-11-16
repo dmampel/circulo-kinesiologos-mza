@@ -1,12 +1,16 @@
 "use client";
 
 import { useState } from "react";
+import DomiciliosAdicionalesField from "@/components/socio/DomiciliosAdicionalesField";
 import { saveProfesional } from "./actions";
 import { useRouter } from "next/navigation";
 import { Localidad, Especialidad, Profesional, Status } from "@prisma/client";
 
 interface FormProfesionalProps {
-  profesional?: Profesional & { especialidades?: Especialidad[] };
+  profesional?: Profesional & {
+    especialidades?: Especialidad[];
+    domiciliosAdicionales?: { direccion: string; localidadId: string }[];
+  };
   localidades: Localidad[];
   especialidades: Especialidad[];
 }
@@ -36,6 +40,7 @@ export default function FormProfesional({ profesional, localidades, especialidad
       horarios: formData.get("horarios") as string | undefined,
       foto_url: formData.get("foto_url") as string | undefined,
       localidadId: formData.get("localidadId") as string,
+      domiciliosAdicionales: formData.get("domiciliosAdicionales") as string,
       status: (formData.get("status") as Status) ?? Status.ACTIVO,
     };
 
@@ -132,6 +137,13 @@ export default function FormProfesional({ profesional, localidades, especialidad
           <div>
             <label className="block text-xs font-black text-slate-400 uppercase tracking-widest mb-2">Dirección de consultorio</label>
             <input type="text" name="direccion" defaultValue={profesional?.direccion || ""} className="w-full px-4 py-3 rounded-xl border border-slate-200 bg-slate-50 focus:bg-white focus:ring-2 focus:ring-blue-500 outline-none transition-all font-medium text-slate-900" />
+          </div>
+
+          <div className="md:col-span-2">
+            <DomiciliosAdicionalesField
+              localidades={localidades}
+              defaultValue={profesional?.domiciliosAdicionales?.map((d) => ({ direccion: d.direccion, localidadId: d.localidadId }))}
+            />
           </div>
 
           <div>

@@ -15,6 +15,7 @@ vi.mock('@/lib/prisma', () => ({
     },
     localidad: {
       findUnique: vi.fn(),
+      findMany: vi.fn(),
     },
   },
 }));
@@ -39,6 +40,7 @@ vi.mock('@/lib/repositories/ProfesionalRepository', () => ({
   ProfesionalRepository: {
     findByEmail: vi.fn(),
     findByMatricula: vi.fn(),
+    setDomiciliosAdicionales: vi.fn(),
   },
 }));
 
@@ -290,6 +292,47 @@ describe('gestionarSolicitud — especialidades', () => {
     const data = mockProfesionalUpdate.mock.calls[0]![0].data;
     expect(data.especialidades).toEqual({ connect: [{ id: 'esp-2' }] });
     expect(JSON.stringify(data.especialidades)).not.toContain('set');
+  });
+});
+
+describe('gestionarSolicitud — domicilios adicionales', () => {
+  const extra = [{ direccion: 'San Martín 45', localidadId: 'loc-2' }];
+
+  beforeEach(() => {
+    mockRequireAdmin.mockResolvedValue(undefined as any);
+    mockFindByEmail.mockResolvedValue(null);
+    mockFindByMatricula.mockResolvedValue(null);
+    mockEspecialidadFindMany.mockResolvedValue([{ id: 'esp-1', nombre: 'NEURO' }] as any);
+    vi.mocked(prisma.localidad.findMany).mockResolvedValue([{ id: 'loc-1' }, { id: 'loc-2' }] as any);
+    mockInvite.mockResolvedValue({ data: { user: { id: 'auth-uuid' } }, error: null } as any);
+    mockProfesionalCreate.mockResolvedValue({ id: 'prof-nuevo' } as any);
+    mockSolicitudUpdate.mockResolvedValue({ ...solicitudBase, status: 'APROBADA' } as any);
+  });
+
+  it('crea los domicilios adicionales del profesional nuevo', async () => {
+    mockSolicitudFindUnique.mockResolvedValue({
+      ...solicitudBase,
+      datos: { ...solicitudBase.datos, domiciliosAdicionales: extra },
+    } as any);
+    const r = await gestionarSolicitud('sol-1', 'APROBAR');
+    expect(r).toEqual({ success: true });
+    expect(ProfesionalRepository.setDomiciliosAdicionales).toHaveBeenCalledWith('prof-nuevo', extra);
+  });
+
+  it('no invita ni crea nada si un domicilio tiene localidad inválida', async () => {
+    mockSolicitudFindUnique.mockResolvedValue({
+      ...solicitudBase,
+      datos: { ...solicitudBase.datos, domiciliosAdicionales: [{ direccion: 'X', localidadId: 'nope' }] },
+    } as any);
+    const r = await gestionarSolicitud('sol-1', 'APROBAR');
+    expect(r.success).toBe(false);
+    expect(mockInvite).not.toHaveBeenCalled();
+  });
+
+  it('no toca adicionales en solicitudes viejas sin el campo', async () => {
+    mockSolicitudFindUnique.mockResolvedValue(solicitudBase as any);
+    await gestionarSolicitud('sol-1', 'APROBAR');
+    expect(ProfesionalRepository.setDomiciliosAdicionales).not.toHaveBeenCalled();
   });
 });
 

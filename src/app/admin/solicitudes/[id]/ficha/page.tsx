@@ -1,3 +1,4 @@
+import { resolverDomiciliosAdicionales } from "@/lib/solicitudes/nombres";
 import prisma from "@/lib/prisma";
 import Link from "next/link";
 import Image from "next/image";
@@ -100,6 +101,7 @@ export default async function FichaSolicitudPage({ params }: Props) {
   const ficha = construirFicha(solicitud, {
     localidad: localidad?.nombre ?? "",
     especialidades: especialidades.map((e) => e.nombre),
+    domiciliosAdicionales: await resolverDomiciliosAdicionales(datos),
   });
 
   const obligatorios = ficha.documentos.filter((doc) => doc.obligatorio);
@@ -164,6 +166,9 @@ export default async function FichaSolicitudPage({ params }: Props) {
             <Campo label="Email" valor={ficha.email} />
             <Campo label="Localidad" valor={ficha.localidad} />
             <Campo label="Dirección de Consultorio" valor={ficha.direccion} className="md:col-span-2" />
+            {ficha.domiciliosAdicionales.map((d, i) => (
+              <Campo key={i} label="Otro Domicilio" valor={d} className="md:col-span-2" />
+            ))}
             <Campo label="Especialidades" valor={ficha.especialidades} className="md:col-span-2" />
           </div>
         </section>
