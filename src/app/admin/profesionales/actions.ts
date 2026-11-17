@@ -5,6 +5,7 @@ import prisma from "@/lib/prisma";
 import { revalidatePath } from "next/cache";
 import { requireAdmin } from "@/utils/supabase/require-admin";
 import { parseDomiciliosAdicionales } from "@/lib/domicilios";
+import { limpiarTelefonos } from "@/lib/telefonos";
 import { ProfesionalRepository } from "@/lib/repositories/ProfesionalRepository";
 import { supabaseAdmin } from "@/lib/supabase/admin";
 import { construirUrlAbsoluta } from "@/lib/site";
@@ -18,6 +19,7 @@ type ProfesionalInput = {
   matricula: string;
   dni?: string;
   telefono?: string;
+  telefonosAdicionales?: string[];
   whatsapp?: string;
   direccion?: string;
   horarios?: string;
@@ -187,6 +189,7 @@ export async function saveProfesional(data: ProfesionalInput, especialidadIds: s
           matricula: data.matricula,
           dni: data.dni || null,
           telefono: data.telefono || null,
+          telefonosAdicionales: limpiarTelefonos(data.telefonosAdicionales),
           whatsapp: data.whatsapp || null,
           direccion: data.direccion || null,
           horarios: data.horarios || null,
@@ -210,6 +213,7 @@ export async function saveProfesional(data: ProfesionalInput, especialidadIds: s
           matricula: data.matricula,
           dni: data.dni || null,
           telefono: data.telefono || null,
+          telefonosAdicionales: limpiarTelefonos(data.telefonosAdicionales),
           whatsapp: data.whatsapp || null,
           direccion: data.direccion || null,
           horarios: data.horarios || null,

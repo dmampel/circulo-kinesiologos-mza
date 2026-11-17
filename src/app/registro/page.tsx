@@ -15,6 +15,7 @@ import {
   AlertCircle
 } from "lucide-react";
 import { cn } from "@/lib/utils";
+import TelefonosAdicionalesField from "@/components/socio/TelefonosAdicionalesField";
 import DomiciliosAdicionalesField from "@/components/socio/DomiciliosAdicionalesField";
 import {
   crearSolicitud,
@@ -81,6 +82,7 @@ export default function RegistroPage() {
     dni: "",
     email: "",
     telefono: "",
+    telefonosAdicionales: [] as string[],
     matricula: "",
     especialidades: [] as string[],
     direccion: "",
@@ -310,6 +312,10 @@ export default function RegistroPage() {
                 <div className="space-y-2">
                   <label className="text-xs font-bold text-slate-400 uppercase ml-1">Teléfono / Celular</label>
                   <input name="telefono" value={formData.telefono} onChange={handleChange} type="tel" className="w-full px-6 py-4 rounded-2xl bg-slate-50 border-transparent focus:bg-white focus:border-blue-600 focus:ring-4 focus:ring-blue-100 transition-all text-sm font-medium" placeholder="+54 261 ..." />
+                  <TelefonosAdicionalesField
+                    defaultValue={formData.telefonosAdicionales}
+                    onChange={(rows) => setFormData((f) => ({ ...f, telefonosAdicionales: rows }))}
+                  />
                 </div>
               </div>
             </div>

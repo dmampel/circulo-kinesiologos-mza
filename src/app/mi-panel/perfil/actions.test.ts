@@ -100,6 +100,36 @@ describe('updateDatosContacto — localidad', () => {
     expect(mockUpdate).not.toHaveBeenCalled();
   });
 
+  it('guarda los teléfonos adicionales limpios cuando el form los envía', async () => {
+    const result = await updateDatosContacto(
+      null,
+      buildFormData({
+        telefonosAdicionalesEnviados: '1',
+        telefonosAdicionales: [' 261 1111111 ', '', '261 1111111', '261 2222222'],
+      })
+    );
+
+    expect(result).toEqual({ success: true });
+    expect(mockUpdate).toHaveBeenCalledWith(
+      'auth-user-1',
+      expect.objectContaining({ telefonosAdicionales: ['261 1111111', '261 2222222'] })
+    );
+  });
+
+  it('vaciar la lista borra los teléfonos adicionales; si no se envía, no los toca', async () => {
+    await updateDatosContacto(null, buildFormData({ telefonosAdicionalesEnviados: '1' }));
+    expect(mockUpdate).toHaveBeenLastCalledWith(
+      'auth-user-1',
+      expect.objectContaining({ telefonosAdicionales: [] })
+    );
+
+    await updateDatosContacto(null, buildFormData({ telefono: '261 4000000' }));
+    expect(mockUpdate).toHaveBeenLastCalledWith(
+      'auth-user-1',
+      expect.not.objectContaining({ telefonosAdicionales: expect.anything() })
+    );
+  });
+
   it('no toca la localidad si el formulario no la envía', async () => {
     const result = await updateDatosContacto(
       null,

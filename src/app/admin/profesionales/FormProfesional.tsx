@@ -1,6 +1,7 @@
 "use client";
 
 import { useState } from "react";
+import TelefonosAdicionalesField from "@/components/socio/TelefonosAdicionalesField";
 import DomiciliosAdicionalesField from "@/components/socio/DomiciliosAdicionalesField";
 import { saveProfesional } from "./actions";
 import { useRouter } from "next/navigation";
@@ -35,6 +36,7 @@ export default function FormProfesional({ profesional, localidades, especialidad
       dni: formData.get("dni") as string | undefined,
       email: formData.get("email") as string | undefined,
       telefono: formData.get("telefono") as string | undefined,
+      telefonosAdicionales: formData.getAll("telefonosAdicionales").map(String),
       whatsapp: formData.get("whatsapp") as string | undefined,
       direccion: formData.get("direccion") as string | undefined,
       horarios: formData.get("horarios") as string | undefined,
@@ -123,6 +125,8 @@ export default function FormProfesional({ profesional, localidades, especialidad
               <input type="text" name="whatsapp" defaultValue={profesional?.whatsapp || ""} className="w-full px-4 py-3 rounded-xl border border-slate-200 bg-slate-50 focus:bg-white focus:ring-2 focus:ring-blue-500 outline-none transition-all font-medium text-slate-900" />
             </div>
           </div>
+
+          <TelefonosAdicionalesField defaultValue={profesional?.telefonosAdicionales} />
 
           <div>
             <label className="block text-xs font-black text-slate-400 uppercase tracking-widest mb-2">Localidad *</label>

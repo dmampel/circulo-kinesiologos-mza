@@ -7,6 +7,7 @@ import { ProfesionalRepository, type UpdateProfesionalData } from "@/lib/reposit
 import { LocalidadRepository } from "@/lib/repositories/LocalidadRepository";
 import { EspecialidadRepository } from "@/lib/repositories/EspecialidadRepository";
 import { parseDomiciliosAdicionales } from "@/lib/domicilios";
+import { limpiarTelefonos } from "@/lib/telefonos";
 import { supabaseAdmin } from "@/lib/supabase/admin";
 
 type ActionResult = { success: true } | { success: false; error: string };
@@ -33,6 +34,11 @@ export async function updateDatosContacto(
     direccion: (formData.get("direccion") as string) || undefined,
     horarios: (formData.get("horarios") as string) || undefined,
   };
+
+  // Teléfonos adicionales: sólo si el form los envía (el form de foto/otros no).
+  if (formData.has("telefonosAdicionalesEnviados")) {
+    data.telefonosAdicionales = limpiarTelefonos(formData.getAll("telefonosAdicionales"));
+  }
 
   if (formData.has("nombre")) {
     const nombre = ((formData.get("nombre") as string) || "").trim();

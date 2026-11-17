@@ -20,6 +20,7 @@ export interface UpdateProfesionalData {
   apellido?: string;
   matricula?: string;
   telefono?: string;
+  telefonosAdicionales?: string[];
   whatsapp?: string;
   direccion?: string;
   horarios?: string;

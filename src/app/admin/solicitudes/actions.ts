@@ -4,6 +4,7 @@ import prisma from "@/lib/prisma";
 import { supabaseAdmin } from "@/lib/supabase/admin";
 import { revalidatePath } from "next/cache";
 import { parseDomiciliosAdicionales } from "@/lib/domicilios";
+import { limpiarTelefonos } from "@/lib/telefonos";
 import { ProfesionalRepository } from "@/lib/repositories/ProfesionalRepository";
 import { getResend, canSendEmails, FROM_EMAIL, INSTITUTIONAL_EMAIL } from "@/lib/resend";
 import { EMAIL_INSTITUCIONAL } from "@/lib/site";
@@ -152,6 +153,8 @@ export async function gestionarSolicitud(id: string, accion: "APROBAR" | "RECHAZ
         domicilios = parsedDom.items;
       }
 
+      const telefonosAdicionales = limpiarTelefonos(datos.telefonosAdicionales);
+
       // 4. Invitar al usuario a Supabase Auth
       const { data: authData, error: authError } = await supabaseAdmin.auth.admin.inviteUserByEmail(
         solicitud.email,
@@ -180,6 +183,7 @@ export async function gestionarSolicitud(id: string, accion: "APROBAR" | "RECHAZ
               userId: authUserId,
               email: emailNormalizado,
               telefono: datos.telefono || existeMatricula.telefono,
+              ...(telefonosAdicionales.length ? { telefonosAdicionales } : {}),
               direccion: datos.direccion || existeMatricula.direccion,
               dni: datos.dni || existeMatricula.dni,
               localidadId: datos.localidadId || existeMatricula.localidadId,
@@ -196,6 +200,7 @@ export async function gestionarSolicitud(id: string, accion: "APROBAR" | "RECHAZ
               matricula: solicitud.matricula,
               dni: datos.dni,
               telefono: datos.telefono,
+              telefonosAdicionales,
               direccion: datos.direccion,
               slug: `${solicitud.apellido}-${solicitud.nombre}-${solicitud.matricula}`.toLowerCase().replace(/ /g, "-"),
               localidadId: datos.localidadId,

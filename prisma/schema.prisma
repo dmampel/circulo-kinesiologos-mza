@@ -39,6 +39,8 @@ model Profesional {
   matricula String  @unique
   dni       String?
   telefono  String?
+  // Teléfonos extra además del principal (`telefono`)
+  telefonosAdicionales String[] @default([])
   whatsapp  String?
   direccion String?
   horarios  String?

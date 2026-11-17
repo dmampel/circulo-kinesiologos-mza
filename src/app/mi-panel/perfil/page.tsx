@@ -65,6 +65,7 @@ export default async function PerfilPage() {
           email: profesional.email ?? "",
           especialidadIds: profesional.especialidades.map((e) => e.id),
           telefono: profesional.telefono ?? null,
+          telefonosAdicionales: profesional.telefonosAdicionales,
           whatsapp: profesional.whatsapp ?? null,
           direccion: profesional.direccion ?? null,
           horarios: profesional.horarios ?? null,

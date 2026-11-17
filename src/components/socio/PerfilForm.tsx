@@ -1,5 +1,6 @@
 "use client";
 
+import TelefonosAdicionalesField from "./TelefonosAdicionalesField";
 import DomiciliosAdicionalesField, { type DomicilioRow } from "./DomiciliosAdicionalesField";
 import { useActionState, useRef, useState } from "react";
 import { updateDatosContacto, updateFotoPerfil } from "@/app/mi-panel/perfil/actions";
@@ -16,6 +17,7 @@ interface PerfilFormProps {
     email: string;
     especialidadIds: string[];
     telefono: string | null;
+    telefonosAdicionales: string[];
     whatsapp: string | null;
     direccion: string | null;
     horarios: string | null;
@@ -254,6 +256,11 @@ export default function PerfilForm({ profesional, localidades, especialidades }:
                   </div>
                 ))}
               </div>
+
+              <TelefonosAdicionalesField
+                key={JSON.stringify(profesional.telefonosAdicionales)}
+                defaultValue={profesional.telefonosAdicionales}
+              />
 
               <div className="space-y-1.5">
                 <label htmlFor="direccion" className="flex items-center gap-2 text-[10px] font-black text-slate-500 uppercase tracking-widest">

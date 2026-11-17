@@ -1,3 +1,4 @@
+import { limpiarTelefonos } from "@/lib/telefonos";
 import { z } from "zod";
 
 /** Límite de tamaño por archivo individual (10 MB). */
@@ -87,6 +88,10 @@ export const crearSolicitudSchema = z.object({
   ...camposTextoSchema,
   direccion: z.string().min(1, "La dirección es obligatoria."),
   localidadId: z.string().min(1, "La localidad es obligatoria."),
+  telefonosAdicionales: z
+    .array(z.string())
+    .default([])
+    .transform(limpiarTelefonos),
   domiciliosAdicionales: z
     .array(
       z.object({

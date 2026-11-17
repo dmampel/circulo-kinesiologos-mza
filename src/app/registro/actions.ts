@@ -134,6 +134,7 @@ type CrearSolicitudInput = {
   matricula: string;
   dni: string;
   telefono: string;
+  telefonosAdicionales?: string[];
   direccion: string;
   localidadId: string;
   domiciliosAdicionales?: { direccion: string; localidadId: string }[];
@@ -153,7 +154,7 @@ export async function crearSolicitud(input: CrearSolicitudInput): Promise<{ succ
     return { success: false, error: parsed.error.issues[0]?.message ?? "Datos inválidos." };
   }
 
-  const { nombre, apellido, email, matricula, dni, telefono, direccion, localidadId, domiciliosAdicionales, especialidades, archivos } =
+  const { nombre, apellido, email, matricula, dni, telefono, telefonosAdicionales, direccion, localidadId, domiciliosAdicionales, especialidades, archivos } =
     parsed.data;
 
   // Re-ejecutar verificación de duplicados: protección contra carrera entre
@@ -208,6 +209,7 @@ export async function crearSolicitud(input: CrearSolicitudInput): Promise<{ succ
         datos: {
           dni,
           telefono,
+          telefonosAdicionales,
           direccion,
           localidadId,
           domiciliosAdicionales,
